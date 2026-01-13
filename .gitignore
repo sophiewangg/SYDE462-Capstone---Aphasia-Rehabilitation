@@ -1,0 +1,47 @@
+# --- Secrets and Credentials ---
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# --- Python Backend (aphasia_rehab_be) ---
+venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.python-version
+# Ignore large ML model files if they are over 100MB
+*.joblib
+*.pkl
+*.xgb
+
+# --- Flutter Frontend (aphasia_rehab_fe) ---
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+# iOS/macOS specific
+ios/Pods/
+ios/.symlinks/
+macos/Pods/
+macos/.symlinks/
+*.lock
+
+# --- Editors and IDEs ---
+.vscode/
+.idea/
+*.swp
+*.iml
+*.iws
+
+# --- System Files ---
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
