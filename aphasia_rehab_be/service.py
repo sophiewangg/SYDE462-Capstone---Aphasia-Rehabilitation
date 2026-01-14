@@ -13,16 +13,16 @@ def create_user_record(db: Session, full_name: str, email: str):
     
     return new_user
 
-def save_session(db: Session, user_id: uuid.UUID, analysis_results: dict):
+def save_session(db: Session, user_id: uuid.UUID, session_stats: dict):
     #TODO: implementation
+    session_id = uuid.uuid4()
 
     new_attempt = models.ModuleAttempt(
+        id = session_id,
         user_id=user_id,
-        module_name="Word Finding - Level 1",
-        stutter_count=analysis_results['disfluency_total'],
-        filler_words=analysis_results['filler_counts'],
-        cues_used=analysis_results['cues_triggered'],
-        duration_seconds=analysis_results['audio_length']
+        module_name=session_stats['module_name'],
+        cues_used=session_stats['cues_used'],
+        duration_seconds=session_stats['audio_length']
     )
     
     db.add(new_attempt)
