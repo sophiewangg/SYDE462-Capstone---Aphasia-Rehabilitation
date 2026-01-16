@@ -28,7 +28,7 @@ class ModuleAttempt(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
-    module_id = Column(String(100), ForeignKey("modules.id"), nullable=False)
+    module_id = Column(UUID(as_uuid=True), ForeignKey("modules.id"), nullable=False)
     
     stutter_count = Column(Integer, default=0)
     filler_words = Column(Integer, default=0)
