@@ -30,6 +30,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  # deps for audio
+  record: ^6.1.1 # To stream raw PCM audio from mic
+  permission_handler: ^11.3.0 # To manage mic permissions
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

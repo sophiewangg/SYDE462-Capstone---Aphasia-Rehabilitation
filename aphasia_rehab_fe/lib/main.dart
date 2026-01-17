@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'services/transcription_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,14 +57,22 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final TranscriptionService _service = TranscriptionService();
+  bool _isRecording = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestMicPermission();
+  }
+
+  Future<void> _requestMicPermission() async {
+    final status = await Permission.microphone.request();
+    print(status); // granted / denied / permanentlyDenied
+  }
 
   void _incrementCounter() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
       _counter++;
     });
   }
@@ -108,6 +118,34 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            Expanded(
+              child: StreamBuilder<String>(
+                stream: _service.transcriptionStream,
+                builder: (context, snapshot) {
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      snapshot.data ?? "Press start to transcribe...",
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 50),
+              child: FloatingActionButton(
+                onPressed: () {
+                  if (_isRecording) {
+                    _service.stopStreaming();
+                  } else {
+                    _service.startStreaming();
+                  }
+                  setState(() => _isRecording = !_isRecording);
+                },
+                child: Icon(_isRecording ? Icons.stop : Icons.mic),
+              ),
             ),
           ],
         ),
