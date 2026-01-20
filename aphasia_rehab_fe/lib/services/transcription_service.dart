@@ -10,7 +10,7 @@ class TranscriptionService {
   final _textController = StreamController<String>.broadcast();
   Stream<String> get transcriptionStream => _textController.stream;
 
-final String backendUrl = "ws://localhost:8000/ws/transcribe";
+  final String backendUrl = "ws://localhost:8000/ws/transcribe";
 
   Future<void> startStreaming() async {
     try {
