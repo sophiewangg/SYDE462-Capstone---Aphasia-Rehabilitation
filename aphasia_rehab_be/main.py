@@ -1,12 +1,12 @@
 import uuid
-from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect, Body
 from sqlalchemy.orm import Session
 import database
 import models
-import service
 import asyncio
 import os
 from dotenv import load_dotenv
+from services import TranscriptionService, CueService, create_user_record, save_session
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +19,8 @@ models.Base.metadata.create_all(bind=database.engine)
 app = FastAPI()
 
 # Initialize the service with API key
-transcription_service = service.TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_KEY"))
+transcription_service = TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_KEY"))
+cue_service = CueService(api_key=os.getenv("GPT_API_KEY"))
 
 # root endpoint (can use as health check)
 @app.get("/")
@@ -29,17 +30,14 @@ def root():
 # when request hits API, FastAPI opens a temporary session with the DB, performs the action and closes the session
 @app.post("/users/")
 def create_user(full_name: str, email: str, db: Session = Depends(database.get_db)):
-    return service.create_user_record(db, full_name=full_name, email=email)
+    return create_user_record(db, full_name=full_name, email=email)
 
 @app.post("/module_attempts/")
 # TODO: implement
 
 def save_session(user_id: uuid.UUID, db: Session = Depends(database.get_db)):
     session_stats = dict()
-    return service.save_session(db, user_id = user_id, session_stats = session_stats)
-
-def create_user(email: str, db: Session = Depends(database.get_db)):
-    return service.create_user_record(db, email=email)
+    return save_session(db, user_id = user_id, session_stats = session_stats)
 
 @app.websocket("/ws/transcribe")
 async def websocket_endpoint(websocket: WebSocket):
@@ -69,3 +67,7 @@ async def websocket_endpoint(websocket: WebSocket):
         logger.info(f"🚨 Unexpected error in loop: {e}")
     finally:
         transcription_service.close()
+
+@app.post("/generate_cues/")
+async def generate_cues(transcription: str = Body(..., embed=True), goal: str = Body(..., embed=True)):
+    return cue_service.generate_cues(transcription, goal)
