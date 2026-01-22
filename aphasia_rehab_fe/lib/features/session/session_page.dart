@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../models/cue_model.dart'; // Updated path (go up two levels)
+import '../../models/cue_model.dart';
 import '../../services/transcription_service.dart';
 import '../../services/cue_service.dart';
 import 'widgets/microphone_button.dart';
