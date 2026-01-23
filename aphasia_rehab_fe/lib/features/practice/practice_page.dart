@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aphasia_rehab_fe/colors.dart';
 
 class PracticePage extends StatefulWidget {
   const PracticePage({super.key});
@@ -10,6 +11,6 @@ class PracticePage extends StatefulWidget {
 class _PracticePageState extends State<PracticePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(backgroundColor: Colors.background);
+    return Scaffold(backgroundColor: AppColors.background);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:aphasia_rehab_fe/common/start_button.dart';
 import 'package:flutter/material.dart';
+import 'package:aphasia_rehab_fe/colors.dart';
 
 class ContinueSession extends StatefulWidget {
   const ContinueSession({super.key});
@@ -25,7 +26,7 @@ class _ContinueSessionState extends State<ContinueSession> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.boxBorder),
+              border: Border.all(color: AppColors.boxBorder),
             ),
             child: Row(
               children: [
@@ -43,7 +44,7 @@ class _ContinueSessionState extends State<ContinueSession> {
                   flex: 65, // 65% of the space
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border(left: BorderSide(color: Colors.boxBorder)),
+                      border: Border(left: BorderSide(color: AppColors.boxBorder)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
