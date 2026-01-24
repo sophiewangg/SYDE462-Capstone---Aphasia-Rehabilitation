@@ -63,11 +63,11 @@ class _CueModalState extends State<CueModal> {
 
         final fetchedCue = cueSnapshot.data!;
 
-        return StreamBuilder<String>(
+        return StreamBuilder<TranscriptionResult>(
           stream: widget.transcriptionService.transcriptionStream,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              _latestSpeech = snapshot.data!;
+              _latestSpeech = snapshot.data!.text;
             }
 
             return Container(

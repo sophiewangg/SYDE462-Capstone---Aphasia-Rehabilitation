@@ -62,19 +62,36 @@ class _SessionPageState extends State<SessionPage> {
           mainAxisAlignment: .center,
           children: [
             Expanded(
-              child: StreamBuilder<String>(
+              child: StreamBuilder<TranscriptionResult>(
                 stream: _transcriptionService.transcriptionStream,
                 builder: (context, snapshot) {
+                  double? confidence;
                   if (snapshot.hasData) {
-                    _transcription = snapshot.data!;
+                    _transcription = snapshot.data!.text;
+                    confidence = snapshot.data!.confidence;
                   }
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      _transcription.isNotEmpty
-                          ? _transcription
-                          : "Press start to transcribe...",
-                      style: TextStyle(fontSize: 18),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (confidence != null)
+                          Text(
+                            "Confidence: ${(confidence * 100).toStringAsFixed(1)}%",
+                            style: TextStyle(
+                              color: confidence > 0.8 ? Colors.green : Colors.orange,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _transcription.isNotEmpty
+                              ? _transcription
+                              : "Press start to transcribe...",
+                          style: TextStyle(fontSize: 18),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
                     ),
                   );
                 },
