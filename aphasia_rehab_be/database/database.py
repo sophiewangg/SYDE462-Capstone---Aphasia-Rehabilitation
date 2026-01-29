@@ -17,7 +17,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # FastAPI dependency that ensures every request to an API (that needs the DB), a connection is opened and subsequently closed
-# use by adding `db: Session = Depends(database.get_db))` in function arguments
 def get_db():
     db = SessionLocal()
     try:

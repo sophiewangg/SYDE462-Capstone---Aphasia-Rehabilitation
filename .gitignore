@@ -7,6 +7,8 @@
 
 # --- Python Backend (aphasia_rehab_be) ---
 venv/
+.venv/
+pyvenv.cfg
 env/
 ENV/
 __pycache__/
@@ -14,6 +16,8 @@ __pycache__/
 *$py.class
 .pytest_cache/
 .python-version
+chroma_db/
+*.sqlite3ß
 # Ignore large ML model files if they are over 100MB
 *.joblib
 *.pkl

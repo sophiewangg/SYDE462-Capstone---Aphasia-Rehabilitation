@@ -1,28 +1,36 @@
+from __future__ import annotations
 from sqlalchemy.orm import Session
-import models
+from database import models
 import uuid
 
-def create_user_record(db: Session, full_name: str, email: str):
-    user_id = uuid.uuid4()
-    new_user = models.User(user_id=user_id, full_name=full_name, email=email)
-    
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    
-    return new_user
+class UserService:
+    def __init__(self, db: Session):
+        self.db = db
 
-def save_session(db: Session, user_id: uuid.UUID, session_stats: dict):
-    #TODO: implementation
-    session_id = uuid.uuid4()
+    def create_user_record(self, full_name: str, email: str):
+        user_id = uuid.uuid4()
+        new_user = models.User(
+            user_id=user_id, 
+            full_name=full_name, 
+            email=email
+        )
+        
+        self.db.add(new_user)
+        self.db.commit()
+        self.db.refresh(new_user)
+        return new_user
 
-    new_attempt = models.ModuleAttempt(
-        id = session_id,
-        user_id=user_id,
-        module_name=session_stats['module_name'],
-        cues_used=session_stats['cues_used'],
-        duration_seconds=session_stats['audio_length']
-    )
-    
-    db.add(new_attempt)
-    db.commit()
+    def save_session(self, module_id: uuid.UUID, user_id: uuid.UUID, session_stats: dict):
+        session_id = uuid.uuid4()
+
+        new_attempt = models.ModuleAttempt(
+            id=session_id,
+            user_id=user_id,
+            module_id=module_id,
+            cues_used=session_stats.get('cues_used', 0),
+            duration_seconds=session_stats.get('audio_length', 0)
+        )
+        
+        self.db.add(new_attempt)
+        self.db.commit()
+        return new_attempt
