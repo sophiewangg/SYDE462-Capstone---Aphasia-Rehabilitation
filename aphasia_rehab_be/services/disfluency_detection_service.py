@@ -55,28 +55,24 @@ class DisfluencyDetectionService:
     def _load_assets(self):
         """Loads model, scaler, and encoder if they aren't already in memory."""
         if self.model_sound_rep is None:
-            # Load XGBoost
+            # Load Sound Rep model, scaler, label encoder
             self.model_sound_rep = xgb.XGBClassifier()
             self.model_sound_rep.load_model(os.path.join(self.model_dir, "sound_rep_xgb_model.json"))
 
-            # Load Scaler
             with open(os.path.join(self.model_dir, "scaler_sound_rep.pkl"), "rb") as f:
                 self.scaler_sound_rep = pickle.load(f)
 
-            # Load Label Encoder
             with open(os.path.join(self.model_dir, "label_encoder_sound_rep.pkl"), "rb") as f:
                 self.le_sound_rep = pickle.load(f)
 
         if self.model_interjection is None:
-            # Load XGBoost
+            # Load Interjection model scaler, label encode
             self.model_interjection = xgb.XGBClassifier()
             self.model_interjection.load_model(os.path.join(self.model_dir, "interjection_xgb_model.json"))
 
-            # Load Scaler
             with open(os.path.join(self.model_dir, "scaler_interjection.pkl"), "rb") as f:
                 self.scaler_interjection = pickle.load(f)
 
-            # Load Label Encoder
             with open(os.path.join(self.model_dir, "label_encoder_interjection.pkl"), "rb") as f:
                 self.le_interjection = pickle.load(f)
 
@@ -89,58 +85,63 @@ class DisfluencyDetectionService:
         sos = butter(order, [low, high], btype='band', output='sos')
         return sosfilt(sos, y)
     
+    def preprocess_audio(self, audio_bytes, sr, duration, pretreatment):
+        # 1. Convert bytes to a file-like object
+        # If you're already passing a BytesIO object, this ensures we're at the start
+        if isinstance(audio_bytes, bytes):
+            buffer = io.BytesIO(audio_bytes)
+        else:
+            buffer = audio_bytes
+            buffer.seek(0)
+
+        # 2. Load the audio data using soundfile
+        # This bypasses the librosa "stat" error for in-memory objects
+        y, native_sr = sf.read(buffer)
+
+        # 3. Standardize format: soundfile is (samples, channels), librosa expects (channels, samples)
+        if len(y.shape) > 1:
+            y = np.mean(y, axis=1) # Convert to mono if needed
+
+        # 4. Resample if the source doesn't match your target 16kHz
+        if native_sr != sr:
+            y = librosa.resample(y, orig_sr=native_sr, target_sr=sr)
+
+        if len(y) == 0:
+            return None
+        # 2. OPTIMIZATION: Trim Silence FIRST to reduce data size
+        # We normalize slightly before trim to ensure thresholding works consistently
+        y = y / (np.max(np.abs(y)) + 1e-9)
+        y, _ = librosa.effects.trim(y, top_db=25)
+
+        # 3. OPTIMIZATION: Crop to duration FIRST
+        # If the file is 10 minutes long, we only care about the first 3 seconds anyway.
+        # Don't waste RAM processing the rest.
+        target_len = int(sr * duration)
+        if len(y) > target_len:
+            y = y[:target_len] # Crop immediately
+
+        # 4. NOW Apply Filters (On the much smaller array)
+        y = self.butterfly_bandpass(y, sr=sr)
+
+        # 5. NOW Apply Noise Reduce (On the small array)
+        # This is now safe because 'y' is guaranteed to be small (max 3 seconds)
+        if pretreatment in ['noisereduce', 'pcen_and_noisereduce']:
+            # We use a stationary noise reduction since the clip is short
+            try:
+                y = nr.reduce_noise(y=y, sr=sr, stationary=True)
+            except:
+                pass # If clip is too short for NR, skip it
+
+        # 6. Pad if necessary (if it was shorter than target_len)
+        if len(y) < target_len:
+            y = np.pad(y, (0, target_len - len(y)))
+
+        return y
+    
     def extract_features_sound_rep(self, audio_bytes, sr=16000, duration=3.0, pretreatment='noisereduce'):
         warnings.filterwarnings("ignore")
         try:
-            # 1. Convert bytes to a file-like object
-            # If you're already passing a BytesIO object, this ensures we're at the start
-            if isinstance(audio_bytes, bytes):
-                buffer = io.BytesIO(audio_bytes)
-            else:
-                buffer = audio_bytes
-                buffer.seek(0)
-
-            # 2. Load the audio data using soundfile
-            # This bypasses the librosa "stat" error for in-memory objects
-            y, native_sr = sf.read(buffer)
-
-            # 3. Standardize format: soundfile is (samples, channels), librosa expects (channels, samples)
-            if len(y.shape) > 1:
-                y = np.mean(y, axis=1) # Convert to mono if needed
-
-            # 4. Resample if the source doesn't match your target 16kHz
-            if native_sr != sr:
-                y = librosa.resample(y, orig_sr=native_sr, target_sr=sr)
-
-            if len(y) == 0:
-                return None
-            # 2. OPTIMIZATION: Trim Silence FIRST to reduce data size
-            # We normalize slightly before trim to ensure thresholding works consistently
-            y = y / (np.max(np.abs(y)) + 1e-9)
-            y, _ = librosa.effects.trim(y, top_db=25)
-
-            # 3. OPTIMIZATION: Crop to duration FIRST
-            # If the file is 10 minutes long, we only care about the first 3 seconds anyway.
-            # Don't waste RAM processing the rest.
-            target_len = int(sr * duration)
-            if len(y) > target_len:
-                y = y[:target_len] # Crop immediately
-
-            # 4. NOW Apply Filters (On the much smaller array)
-            y = self.butterfly_bandpass(y, sr=sr)
-
-            # 5. NOW Apply Noise Reduce (On the small array)
-            # This is now safe because 'y' is guaranteed to be small (max 3 seconds)
-            if pretreatment in ['noisereduce', 'pcen_and_noisereduce']:
-                # We use a stationary noise reduction since the clip is short
-                try:
-                    y = nr.reduce_noise(y=y, sr=sr, stationary=True)
-                except:
-                    pass # If clip is too short for NR, skip it
-
-            # 6. Pad if necessary (if it was shorter than target_len)
-            if len(y) < target_len:
-                y = np.pad(y, (0, target_len - len(y)))
+            y = self.preprocess_audio(audio_bytes, sr, duration, pretreatment)
 
             # --- Feature Extraction (Same as before) ---
             mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
@@ -253,55 +254,7 @@ class DisfluencyDetectionService:
     def extract_features_interjection(self, audio_bytes, sr=16000, duration=3.0, pretreatment='noisereduce'):
         warnings.filterwarnings("ignore")
         try:
-            # 1. Convert bytes to a file-like object
-            # If you're already passing a BytesIO object, this ensures we're at the start
-            if isinstance(audio_bytes, bytes):
-                buffer = io.BytesIO(audio_bytes)
-            else:
-                buffer = audio_bytes
-                buffer.seek(0)
-
-            # 2. Load the audio data using soundfile
-            # This bypasses the librosa "stat" error for in-memory objects
-            y, native_sr = sf.read(buffer)
-
-            # 3. Standardize format: soundfile is (samples, channels), librosa expects (channels, samples)
-            if len(y.shape) > 1:
-                y = np.mean(y, axis=1) # Convert to mono if needed
-
-            # 4. Resample if the source doesn't match your target 16kHz
-            if native_sr != sr:
-                y = librosa.resample(y, orig_sr=native_sr, target_sr=sr)
-
-            if len(y) == 0:
-                return None
-            # 2. OPTIMIZATION: Trim Silence FIRST to reduce data size
-            # We normalize slightly before trim to ensure thresholding works consistently
-            y = y / (np.max(np.abs(y)) + 1e-9)
-            y, _ = librosa.effects.trim(y, top_db=25)
-
-            # 3. OPTIMIZATION: Crop to duration FIRST
-            # If the file is 10 minutes long, we only care about the first 3 seconds anyway.
-            # Don't waste RAM processing the rest.
-            target_len = int(sr * duration)
-            if len(y) > target_len:
-                y = y[:target_len] # Crop immediately
-
-            # 4. NOW Apply Filters (On the much smaller array)
-            y = self.butterfly_bandpass(y, sr=sr)
-
-            # 5. NOW Apply Noise Reduce (On the small array)
-            # This is now safe because 'y' is guaranteed to be small (max 3 seconds)
-            if pretreatment in ['noisereduce', 'pcen_and_noisereduce']:
-                # We use a stationary noise reduction since the clip is short
-                try:
-                    y = nr.reduce_noise(y=y, sr=sr, stationary=True)
-                except:
-                    pass # If clip is too short for NR, skip it
-
-            # 6. Pad if necessary (if it was shorter than target_len)
-            if len(y) < target_len:
-                y = np.pad(y, (0, target_len - len(y)))
+            y = self.preprocess_audio(audio_bytes, sr, duration, pretreatment)
 
             mid = len(y) // 2
             y1 = y[:mid]
