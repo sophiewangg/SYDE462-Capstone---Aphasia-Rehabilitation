@@ -4,7 +4,6 @@ from pydub import AudioSegment
 import wave
 import os
 from services import DisfluencyDetectionService
-import xgboost
 
 # Configure Celery to use Redis as the broker and backend
 celery_app = Celery(
@@ -22,7 +21,7 @@ def process_recording_pipeline(raw_filepath: str):
     with open(raw_filepath, "rb") as f:
         raw_data = f.read()
     
-    # 2. Convert to WAV in memory (using the fix from before)
+    # 2. Convert to WAV in memory
     buffer = io.BytesIO()
     with wave.open(buffer, "wb") as wav_f:
         wav_f.setnchannels(1)
