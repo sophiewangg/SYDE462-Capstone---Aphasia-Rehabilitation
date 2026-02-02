@@ -72,7 +72,7 @@ def chunk_audio(wav_bytes: bytes):
         chunk = audio[i:i + chunk_length_ms]
         
         # Skip 'silence' or tiny fragments at the very end (e.g., < 500ms)
-        if len(chunk) < 500:
+        if len(chunk) < 3000:
             continue
             
         buffer = io.BytesIO()
