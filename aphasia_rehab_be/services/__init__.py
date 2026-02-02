@@ -1,11 +1,12 @@
-from .user_service import create_user_record, save_session
+from .user_service import UserService
 from .transcription_service import TranscriptionService
 from .cue_service import CueService
+from .vector_service import VectorService
 
 # This defines what is exported when someone types "from services import *"
 __all__ = [
-    "create_user_record",
-    "save_session",
+    "UserService",
     "TranscriptionService",
-    "CueService"
+    "CueService",
+    "VectorService",
 ]
