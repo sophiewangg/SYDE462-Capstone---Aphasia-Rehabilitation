@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../models/cue_model.dart';
@@ -5,6 +6,7 @@ import '../../services/transcription_service.dart';
 import '../../services/cue_service.dart';
 import 'widgets/microphone_button.dart';
 import 'widgets/cue_modal.dart';
+import 'widgets/transcription_display.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key, required this.title});
@@ -17,6 +19,8 @@ class SessionPage extends StatefulWidget {
 class _SessionPageState extends State<SessionPage> {
   final TranscriptionService _transcriptionService = TranscriptionService();
   final CueService _cueService = CueService();
+  
+  late StreamSubscription<TranscriptionResult> _subscription;
   String _transcription = "";
   String _goal = "Ask for a utensil.";
 
@@ -24,6 +28,17 @@ class _SessionPageState extends State<SessionPage> {
   void initState() {
     super.initState();
     _requestMicPermission();
+    
+    // Listen to the stream for logic purposes (updating _transcription for the Hint button)
+    _subscription = _transcriptionService.transcriptionStream.listen((result) {
+      _transcription = result.text;
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   Future<void> _requestMicPermission() async {
@@ -62,44 +77,20 @@ class _SessionPageState extends State<SessionPage> {
           mainAxisAlignment: .center,
           children: [
             Expanded(
-              child: StreamBuilder<TranscriptionResult>(
+              child: TranscriptionDisplay(
                 stream: _transcriptionService.transcriptionStream,
-                builder: (context, snapshot) {
-                  double? confidence;
-                  if (snapshot.hasData) {
-                    _transcription = snapshot.data!.text;
-                    confidence = snapshot.data!.confidence;
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (confidence != null)
-                          Text(
-                            "Confidence: ${(confidence * 100).toStringAsFixed(1)}%",
-                            style: TextStyle(
-                              color: confidence > 0.8 ? Colors.green : Colors.orange,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        const SizedBox(height: 10),
-                        Text(
-                          _transcription.isNotEmpty
-                              ? _transcription
-                              : "Press start to transcribe...",
-                          style: TextStyle(fontSize: 18),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                },
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
-              child: MicrophoneButton(service: _transcriptionService),
+              child: MicrophoneButton(
+                service: _transcriptionService,
+                onToggle: (isRecording) {
+                  if (!isRecording) {
+                    print("End of turn. Triggering next dialogue event.");
+                  }
+                },
+              ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
