@@ -19,7 +19,7 @@ class SessionPage extends StatefulWidget {
 class _SessionPageState extends State<SessionPage> {
   final TranscriptionService _transcriptionService = TranscriptionService();
   final CueService _cueService = CueService();
-  
+
   late StreamSubscription<TranscriptionResult> _subscription;
   String _transcription = "";
   String _goal = "Ask for a utensil.";
@@ -28,7 +28,7 @@ class _SessionPageState extends State<SessionPage> {
   void initState() {
     super.initState();
     _requestMicPermission();
-    
+
     // Listen to the stream for logic purposes (updating _transcription for the Hint button)
     _subscription = _transcriptionService.transcriptionStream.listen((result) {
       _transcription = result.text;
@@ -38,12 +38,28 @@ class _SessionPageState extends State<SessionPage> {
   @override
   void dispose() {
     _subscription.cancel();
+    _transcriptionService.dispose();
     super.dispose();
   }
 
   Future<void> _requestMicPermission() async {
     final status = await Permission.microphone.request();
     print(status); // granted / denied / permanentlyDenied
+  }
+
+  void _nextDialogueEvent(bool isRecording) {
+    if (!isRecording) {
+      print("End of turn. Triggering next dialogue event.");
+      // TODO: Add dialogue event logic here
+    }
+  }
+
+  void _handleHintPressed() {
+    // 1. Kick off the request (don't 'await' it here)
+    final cueFuture = _cueService.getCues(_transcription, _goal);
+
+    // 2. Open the modal immediately
+    _showModal(cueFuture);
   }
 
   void _showModal(Future<Cue?> fetchedCue) {
@@ -85,23 +101,13 @@ class _SessionPageState extends State<SessionPage> {
               padding: const EdgeInsets.only(bottom: 50),
               child: MicrophoneButton(
                 service: _transcriptionService,
-                onToggle: (isRecording) {
-                  if (!isRecording) {
-                    print("End of turn. Triggering next dialogue event.");
-                  }
-                },
+                onToggle: _nextDialogueEvent,
               ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
               child: ElevatedButton(
-                onPressed: () {
-                  // 1. Kick off the request (don't 'await' it here)
-                  final cueFuture = _cueService.getCues(_transcription, _goal);
-
-                  // 2. Open the modal immediately
-                  _showModal(cueFuture);
-                },
+                onPressed: _handleHintPressed,
                 child: const Text('I need a hint!'),
               ),
             ),
