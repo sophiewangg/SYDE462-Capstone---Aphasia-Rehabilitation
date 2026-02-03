@@ -1,14 +1,22 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:record/record.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+class TranscriptionResult {
+  final String text;
+  final double confidence;
+
+  TranscriptionResult({required this.text, required this.confidence});
+}
 
 class TranscriptionService {
   final _audioRecorder = AudioRecorder();
   WebSocketChannel? _channel;
 
   // StreamController to pipe transcripts to your UI
-  final _textController = StreamController<String>.broadcast();
-  Stream<String> get transcriptionStream => _textController.stream;
+  final _textController = StreamController<TranscriptionResult>.broadcast();
+  Stream<TranscriptionResult> get transcriptionStream => _textController.stream;
 
   final String backendUrl = "ws://localhost:8000/ws/transcribe";
 
@@ -27,9 +35,23 @@ class TranscriptionService {
       // 3. Listen for text coming BACK from the server
       _channel!.stream.listen(
         (message) {
-          // The backend sends us the transcript as a simple string
-          print("🎯 Transcript received: $message");
-          _textController.add(message);
+          // Parse JSON from backend
+          try {
+            final data = jsonDecode(message);
+            final text = data['text'];
+            final confidence = data['confidence'];
+
+            print("🎯 Transcript: $text (Confidence: $confidence)");
+
+            // Push structured result to the UI
+            _textController.add(TranscriptionResult(
+              text: text, 
+              // Safety check: ensure it's a double
+              confidence: (confidence is num) ? confidence.toDouble() : 0.0,
+            ));
+          } catch (e) {
+            print("Error parsing transcript: $e");
+          }
         },
         onDone: () => print("🔌 Connection to backend closed"),
         onError: (err) => print("🚨 WebSocket Error: $err"),

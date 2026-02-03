@@ -5,11 +5,7 @@ class MicrophoneButton extends StatefulWidget {
   final TranscriptionService service;
   final Function(bool isRecording)? onToggle;
 
-  const MicrophoneButton({
-    super.key,
-    required this.service,
-    this.onToggle,
-  });
+  const MicrophoneButton({super.key, required this.service, this.onToggle});
 
   @override
   State<MicrophoneButton> createState() => _MicrophoneButtonState();
