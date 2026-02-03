@@ -1,6 +1,7 @@
-from datetime import datetime
 import uuid
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, JSON, Numeric
+from datetime import datetime
+
+from sqlalchemy import (JSON, Column, DateTime, ForeignKey, Integer, Numeric, String, Text)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -38,3 +39,11 @@ class ModuleAttempt(Base):
     completed_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     user = relationship("User", back_populates="attempts")
+
+class TherapyExercise(Base):
+    __tablename__ = "therapy_exercises"
+
+    id = Column(Integer, primary_key=True)
+    target_word = Column(String, nullable=False)
+    phonemic_cue = Column(String)
+    semantic_cue = Column(Text)
