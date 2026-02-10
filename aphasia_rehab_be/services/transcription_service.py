@@ -3,9 +3,9 @@ import logging
 import assemblyai as aai
 # Note the specific V3 imports
 from assemblyai.streaming.v3 import (
-    StreamingClient, 
+    StreamingClient,
     StreamingClientOptions,
-    StreamingEvents, 
+    StreamingEvents,
     StreamingParameters,
     TurnEvent,
     StreamingError,
@@ -13,6 +13,7 @@ from assemblyai.streaming.v3 import (
 )
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn")
+
 
 class TranscriptionService:
     def __init__(self, api_key: str):
@@ -24,7 +25,7 @@ class TranscriptionService:
         options = StreamingClientOptions(
             api_key=self.api_key
         )
-        
+
         self.client = StreamingClient(options=options)
 
         # 2. Define Event Handlers (same as before)
@@ -35,8 +36,14 @@ class TranscriptionService:
             if not event.transcript:
                 return
             logger.info(f"🎤 Text: {event.transcript}")
+
+            data = {
+                "text": event.transcript,
+                "confidence": event.end_of_turn_confidence,
+            }
+
             asyncio.run_coroutine_threadsafe(
-                websocket.send_text(event.transcript), 
+                websocket.send_json(data),
                 loop
             )
 
@@ -56,6 +63,7 @@ class TranscriptionService:
                 encoding='pcm_s16le'
             )
         )
+
     def feed_audio(self, data: bytes):
         if self.client:
             self.client.stream(data)
