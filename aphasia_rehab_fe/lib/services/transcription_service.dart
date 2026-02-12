@@ -5,9 +5,14 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class TranscriptionResult {
   final String text;
-  final double confidence;
+  final double endOfTurnConfidence;
+  final bool isEndOfTurn;
 
-  TranscriptionResult({required this.text, required this.confidence});
+  TranscriptionResult({
+    required this.text,
+    required this.endOfTurnConfidence,
+    required this.isEndOfTurn,
+  });
 }
 
 class TranscriptionService {
@@ -39,16 +44,22 @@ class TranscriptionService {
           try {
             final data = jsonDecode(message);
             final text = data['text'];
-            final confidence = data['confidence'];
+            final endOfTurnConfidence = data['end_of_turn_confidence'];
+            final isEndOfTurn = data['end_of_turn'];
 
-            print("🎯 Transcript: $text (Confidence: $confidence)");
+            // print("🎯 Transcript: $text (Confidence: $confidence)");
 
             // Push structured result to the UI
-            _textController.add(TranscriptionResult(
-              text: text, 
-              // Safety check: ensure it's a double
-              confidence: (confidence is num) ? confidence.toDouble() : 0.0,
-            ));
+            _textController.add(
+              TranscriptionResult(
+                text: text,
+                // Safety check: ensure it's a double
+                endOfTurnConfidence: (endOfTurnConfidence is num)
+                    ? endOfTurnConfidence.toDouble()
+                    : 0.0,
+                isEndOfTurn: isEndOfTurn,
+              ),
+            );
           } catch (e) {
             print("Error parsing transcript: $e");
           }

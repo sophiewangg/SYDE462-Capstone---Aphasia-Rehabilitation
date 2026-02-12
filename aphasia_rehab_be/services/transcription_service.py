@@ -39,7 +39,8 @@ class TranscriptionService:
 
             data = {
                 "text": event.transcript,
-                "confidence": event.end_of_turn_confidence,
+                "end_of_turn_confidence": event.end_of_turn_confidence,
+                "end_of_turn": event.end_of_turn,
             }
 
             asyncio.run_coroutine_threadsafe(
@@ -58,9 +59,16 @@ class TranscriptionService:
         # 4. Connect
         logger.info("📡 Connecting to AssemblyAI V3...")
         self.client.connect(
-            StreamingParameters(
+            StreamingParameters(  # These params need to be conservative to give users time to respond
                 sample_rate=16000,
-                encoding='pcm_s16le'
+                encoding='pcm_s16le',
+                # Threshold for model confidence turn has ended
+                end_of_turn_confidence_threshold=0.7,
+                # How long to wait for silence if confidence is above threshold
+                min_end_of_turn_silence_when_confident=800,
+                max_turn_silence=3600,  # Max silence allowed before forcing end of turn
+                # disable turn formatting as this adds latency and is unessesary for LLM interpretation
+                format_turns=False
             )
         )
 

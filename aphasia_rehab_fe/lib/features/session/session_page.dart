@@ -23,6 +23,7 @@ class _SessionPageState extends State<SessionPage> {
   late StreamSubscription<TranscriptionResult> _subscription;
   String _transcription = "";
   String _goal = "Ask for a utensil.";
+  bool _isRecording = false;
 
   @override
   void initState() {
@@ -31,7 +32,13 @@ class _SessionPageState extends State<SessionPage> {
 
     // Listen to the stream for logic purposes (updating _transcription for the Hint button)
     _subscription = _transcriptionService.transcriptionStream.listen((result) {
-      _transcription = result.text;
+      setState(() {
+        _transcription = result.text;
+      });
+
+      if (result.isEndOfTurn && _isRecording) {
+        _handleMicToggle(); // Auto-stop recording
+      }
     });
   }
 
@@ -47,8 +54,19 @@ class _SessionPageState extends State<SessionPage> {
     print(status); // granted / denied / permanentlyDenied
   }
 
-  void _nextDialogueEvent(bool isRecording) {
-    if (!isRecording) {
+  void _handleMicToggle() {
+    if (_isRecording) {
+      _transcriptionService.stopStreaming();
+    } else {
+      _transcriptionService.startStreaming();
+    }
+
+    setState(() {
+      _isRecording = !_isRecording;
+    });
+
+    if (!_isRecording) {
+      // Stopped manually or automatically
       print("End of turn. Triggering next dialogue event.");
       // TODO: Add dialogue event logic here
     }
@@ -100,8 +118,8 @@ class _SessionPageState extends State<SessionPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
               child: MicrophoneButton(
-                service: _transcriptionService,
-                onToggle: _nextDialogueEvent,
+                isRecording: _isRecording,
+                onPressed: _handleMicToggle,
               ),
             ),
             Padding(
