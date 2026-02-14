@@ -5,6 +5,7 @@ import '../../services/transcription_service.dart';
 import '../../services/cue_service.dart';
 import 'widgets/microphone_button.dart';
 import 'widgets/cue_modal.dart';
+import 'scenario_sim.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key, required this.title});
@@ -79,6 +80,15 @@ class _SessionPageState extends State<SessionPage> {
                   );
                 },
               ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ScenarioSim()),
+                );
+              },
+              child: const Text('Go to scenario'),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
