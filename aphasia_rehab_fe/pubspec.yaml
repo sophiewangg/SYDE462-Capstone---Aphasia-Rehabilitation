@@ -35,6 +35,7 @@ dependencies:
   permission_handler: ^11.3.0 # To manage mic permissions
   flutter_svg: ^2.0.10+1
   google_fonts: ^6.1.0
+  audioplayers: ^5.2.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -64,6 +65,17 @@ flutter:
     - assets/icons/profile_icon.svg
     - assets/icons/start_icon.svg
     - assets/images/restaurant_image.png
+    - assets/backgrounds/restaurant_background.png
+    - assets/icons/hint_icon.svg
+    - assets/icons/settings_icon.svg
+    - assets/icons/audio_icon.svg
+    - assets/icons/mic_button.svg
+    - assets/images/help_finding_word_image.png
+    - assets/images/i_dont_understand_image.png
+    - assets/characters/server_1.png
+    - assets/icons/processing_icon.svg
+    - assets/audio_clips/server_speech_1.mp3
+
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
