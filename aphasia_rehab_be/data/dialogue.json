@@ -1,0 +1,51 @@
+{
+  "start_node": "waiter_greeting",
+  "nodes": {
+    "waiter_greeting": {
+      "npc_text": "hi, do you have a reservation?",
+      "options": [
+        {
+          "intent": "yes",
+          "user_phrases": ["yes", "i do", "yeah, under smith"],
+          "target": "ask_party_size"
+        },
+        {
+          "intent": "no",
+          "user_phrases": ["no", "i don't", "no reservation"],
+          "target": "ask_party_size"
+        }
+      ]
+    },
+    "ask_party_size": {
+      "npc_text": "for how many people?",
+      "options": [
+        {
+          "intent": "any_number_people",
+          "user_phrases": [
+            "for two",
+            "two people",
+            "three people",
+            "three people",
+            "just me",
+            "a table for four"
+          ],
+          "target": "follow_me"
+        }
+      ]
+    },
+    "follow_me": {
+      "npc_text": "ok great, you can follow me to your table.",
+      "options": [
+        {
+          "intent": "acknowledge",
+          "user_phrases": ["okay", "thanks", "lead the way"],
+          "target": "waiter_exit"
+        }
+      ]
+    },
+    "waiter_exit": {
+      "npc_text": "i'll be back with you shortly.",
+      "options": []
+    }
+  }
+}

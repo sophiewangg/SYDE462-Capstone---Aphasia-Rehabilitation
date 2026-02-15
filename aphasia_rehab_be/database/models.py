@@ -14,6 +14,7 @@ class User(Base):
     full_name = Column(String(255), nullable=False)
     email = Column(String(225), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+    current_node_id = Column(String(100), nullable=True)  # dialogue game state TODO: probably want to store this on a per-module basis
 
     attempts = relationship("ModuleAttempt", back_populates="user")
 

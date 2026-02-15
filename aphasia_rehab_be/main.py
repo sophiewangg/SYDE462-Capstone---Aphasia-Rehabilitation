@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 import uuid
@@ -6,8 +7,7 @@ import uuid
 from database import database, models
 from dotenv import load_dotenv
 from fastapi import Body, Depends, FastAPI, WebSocket, WebSocketDisconnect
-from services import (CueService, TranscriptionService, UserService, VectorService)
-from services.vector_service import VectorService
+from services import CueService, GameEngine, TranscriptionService, UserService, VectorService
 from sqlalchemy.orm import Session
 
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +21,7 @@ app = FastAPI()
 
 transcription_service = TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_KEY")) # type: ignore
 cue_service = CueService(api_key=os.getenv("GPT_API_KEY")) # type: ignore
-vector_service = VectorService()
+vector_service = VectorService(api_key=os.getenv("GPT_API_KEY"))
 
 def get_user_service(db: Session = Depends(database.get_db)):
     return UserService(db)
@@ -98,3 +98,25 @@ async def find_exercise(transcription: str = Body(..., embed=True)):
         "metadata": results["metadatas"],
         "distances": results["distances"]
     }
+
+# Load dialogue data once at startup (path relative to this file)
+_dialogue_path = os.path.join(os.path.dirname(__file__), "data", "dialogue.json")
+try:
+    with open(_dialogue_path, "r") as f:
+        dialogue_data = json.load(f)
+except FileNotFoundError:
+    dialogue_data = {}
+
+@app.post("/game/speak")
+def handle_user_speech(
+    user_id: str,
+    transcript_data: dict,
+    db: Session = Depends(database.get_db),
+):
+    if not dialogue_data:
+        return {"status": "error", "message": "dialogue.json not loaded (missing data/dialogue.json)"}
+    engine = GameEngine(vector_service, cue_service, db, dialogue_data)
+    result = engine.process_turn(user_id, transcript_data["text"])
+    return result
+
+

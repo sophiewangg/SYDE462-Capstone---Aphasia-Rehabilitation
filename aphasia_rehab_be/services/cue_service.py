@@ -36,3 +36,36 @@ class CueService:
         # convert string → dict
         parsed = json.loads(clean)
         return parsed
+    
+    def evaluate_intent(self, transcript, expected_options):
+            """
+            Acts as a 'Judge' when Vector DB is unsure. 
+            Determines if the transcript matches any of the expected intents contextually.
+            """
+            prompt = (
+                f"Context: A user with aphasia is playing a dialogue game.\n"
+                f"User said: \"{transcript}\"\n"
+                f"The valid options for this moment are: {expected_options}\n\n"
+                f"Task: Does the user's speech roughly align with any of the valid options? "
+                f"Ignore stuttering or filler words.\n"
+                f"Return a JSON object with: {{ 'is_match': boolean, 'matched_intent_index': int (or null) }}"
+            )
+            
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json"
+            }
+            data = {
+                "model": self.MODEL, 
+                "input": prompt,
+                "response_format": { "type": "json_object" }
+            }
+
+            try:
+                response = requests.post(self.URL, headers=headers, json=data)
+                result = response.json()
+                text = result["output"][0]["content"][0]["text"]
+                return json.loads(text)
+            except Exception as e:
+                print(f"LLM Judge Error: {e}")
+                return {"is_match": False}
