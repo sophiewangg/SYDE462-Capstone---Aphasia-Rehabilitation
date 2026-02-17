@@ -12,7 +12,7 @@ class TranscriptionDisplay extends StatelessWidget {
       stream: stream,
       builder: (context, snapshot) {
         String displayText = "Press start to transcribe...";
-        double? confidence;
+        double? endOfTurnConfidence;
 
         if (snapshot.hasData) {
           final data = snapshot.data!;
@@ -20,7 +20,7 @@ class TranscriptionDisplay extends StatelessWidget {
           if (data.text.isNotEmpty) {
             displayText = data.text;
           }
-          confidence = data.confidence;
+          endOfTurnConfidence = data.endOfTurnConfidence;
         }
 
         return Padding(
@@ -28,9 +28,9 @@ class TranscriptionDisplay extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (confidence != null)
+              if (endOfTurnConfidence != null)
                 Text(
-                  "Confidence: ${(confidence * 100).toStringAsFixed(1)}%",
+                  "endOfTurnConfidence: ${(endOfTurnConfidence * 100).toStringAsFixed(1)}%",
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               const SizedBox(height: 10),

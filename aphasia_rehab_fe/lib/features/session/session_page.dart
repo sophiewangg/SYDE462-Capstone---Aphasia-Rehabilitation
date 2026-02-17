@@ -23,6 +23,7 @@ class _SessionPageState extends State<SessionPage> {
   late StreamSubscription<TranscriptionResult> _subscription;
   String _transcription = "";
   String _goal = "Ask for a utensil.";
+  bool _isRecording = false;
 
   @override
   void initState() {
@@ -31,7 +32,13 @@ class _SessionPageState extends State<SessionPage> {
 
     // Listen to the stream for logic purposes (updating _transcription for the Hint button)
     _subscription = _transcriptionService.transcriptionStream.listen((result) {
-      _transcription = result.text;
+      setState(() {
+        _transcription = result.text;
+      });
+
+      if (result.isEndOfTurn && _isRecording) {
+        _stopRecording(); // Explicitly stop instead of toggling
+      }
     });
   }
 
@@ -47,10 +54,29 @@ class _SessionPageState extends State<SessionPage> {
     print(status); // granted / denied / permanentlyDenied
   }
 
-  void _nextDialogueEvent(bool isRecording) {
-    if (!isRecording) {
-      print("End of turn. Triggering next dialogue event.");
-      // TODO: Add dialogue event logic here
+  void _startRecording() {
+    _transcriptionService.startStreaming();
+    setState(() {
+      _isRecording = true;
+    });
+  }
+
+  void _stopRecording() {
+    _transcriptionService.stopStreaming();
+    setState(() {
+      _isRecording = false;
+    });
+
+    print("End of turn. Triggering next dialogue event.");
+    // This can only get worked on when we actually have the structure of the dialogue events in the scenarios
+    // When the dialogue event ends, this would trigger the mic to automatically turn on and listent for the user's response
+  }
+
+  void _handleMicToggle() {
+    if (_isRecording) {
+      _stopRecording();
+    } else {
+      _startRecording();
     }
   }
 
@@ -73,10 +99,7 @@ class _SessionPageState extends State<SessionPage> {
       ),
       builder: (BuildContext context) {
         // Pass the service and the current transcription string
-        return CueModal(
-          cueFuture: fetchedCue,
-          transcriptionService: _transcriptionService,
-        );
+        return CueModal(cueFuture: fetchedCue);
       },
     );
   }
@@ -100,8 +123,8 @@ class _SessionPageState extends State<SessionPage> {
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
               child: MicrophoneButton(
-                service: _transcriptionService,
-                onToggle: _nextDialogueEvent,
+                isRecording: _isRecording,
+                onPressed: _handleMicToggle,
               ),
             ),
             Padding(
