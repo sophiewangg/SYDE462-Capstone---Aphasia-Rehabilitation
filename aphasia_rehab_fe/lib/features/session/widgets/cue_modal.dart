@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../models/cue_model.dart';
-import '../../../services/transcription_service.dart';
-import 'microphone_button.dart';
+// Removed transcription_service import
+// Removed microphone_button import
 
 class CueModal extends StatefulWidget {
   final Future<Cue?> cueFuture;
-  final TranscriptionService transcriptionService;
+  // Removed transcriptionService
 
   const CueModal({
     super.key,
     required this.cueFuture,
-    required this.transcriptionService,
+    // Removed transcriptionService
   });
 
   @override
@@ -20,7 +20,6 @@ class CueModal extends StatefulWidget {
 class _CueModalState extends State<CueModal> {
   int _cuesUsed = 0;
   bool _cueComplete = false;
-  String _latestSpeech = ""; // Local variable to track what was said
 
   String _getHintText(int stage, Cue fetchedCue) {
     switch (stage) {
@@ -43,14 +42,14 @@ class _CueModalState extends State<CueModal> {
         if (cueSnapshot.connectionState == ConnectionState.waiting) {
           return Container(
             width: double.infinity,
-            height: 400,
+            height: 300, // Reduced height since mic is gone
             padding: const EdgeInsets.all(20),
             child: const Center(
               child: SizedBox(
-                width: 40, // Fixed width
-                height: 40, // Fixed height
+                width: 40,
+                height: 40,
                 child: CircularProgressIndicator(
-                  strokeWidth: 3, // Makes the line a bit thinner/cleaner
+                  strokeWidth: 3,
                 ),
               ),
             ),
@@ -63,60 +62,45 @@ class _CueModalState extends State<CueModal> {
 
         final fetchedCue = cueSnapshot.data!;
 
-        return StreamBuilder<TranscriptionResult>(
-          stream: widget.transcriptionService.transcriptionStream,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              _latestSpeech = snapshot.data!.text;
-            }
+        // Removed StreamBuilder since we don't need real-time transcription here anymore
 
-            return Container(
-              width: double.infinity,
-              height: 400,
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text(
-                    'Need a Hint?',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    _getHintText(_cuesUsed, fetchedCue),
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  const Spacer(),
+        return Container(
+          width: double.infinity,
+          height: 300, // Reduced height
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Use min size for a "popup/notification" feel
+            children: [
+              const Text(
+                'Need a Hint?',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                _getHintText(_cuesUsed, fetchedCue),
+                style: const TextStyle(fontSize: 18),
+                textAlign: TextAlign.center,
+              ),
+              const Spacer(),
 
-                  MicrophoneButton(
-                    service: widget.transcriptionService,
-                    onToggle: (isNowRecording) {
-                      if (!isNowRecording) {
-                        // Compare against the LIVE speech captured during this modal session
-                        if (_latestSpeech.toLowerCase().contains(
-                          fetchedCue.likelyWord.toLowerCase(),
-                        )) {
-                          setState(() {
-                            _cueComplete = true;
-                          });
-                        }
-                      }
-                    },
-                  ),
+              // Removed MicrophoneButton
 
-                  const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-                  _cueComplete
-                      ? ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text(
-                            'Return to exercise',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        )
-                      : ElevatedButton(
+              _cueComplete
+                  ? ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Return to exercise',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        ElevatedButton(
                           onPressed: () {
                             setState(() {
                               _cuesUsed++;
@@ -125,10 +109,15 @@ class _CueModalState extends State<CueModal> {
                           },
                           child: const Text('Another hint please!'),
                         ),
-                ],
-              ),
-            );
-          },
+                        const SizedBox(height: 10),
+                        TextButton(
+                           onPressed: () => Navigator.pop(context),
+                           child: const Text("Cancel"),
+                        )
+                      ],
+                    ),
+            ],
+          ),
         );
       },
     );

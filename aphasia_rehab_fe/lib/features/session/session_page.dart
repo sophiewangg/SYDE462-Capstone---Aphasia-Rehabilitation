@@ -93,7 +93,6 @@ class _SessionPageState extends State<SessionPage> {
         // Pass the service and the current transcription string
         return CueModal(
           cueFuture: fetchedCue,
-          transcriptionService: _transcriptionService,
         );
       },
     );
