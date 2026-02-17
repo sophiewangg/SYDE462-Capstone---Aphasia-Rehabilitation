@@ -37,7 +37,7 @@ class _SessionPageState extends State<SessionPage> {
       });
 
       if (result.isEndOfTurn && _isRecording) {
-        _handleMicToggle(); // Auto-stop recording
+        _stopRecording(); // Explicitly stop instead of toggling
       }
     });
   }
@@ -54,21 +54,28 @@ class _SessionPageState extends State<SessionPage> {
     print(status); // granted / denied / permanentlyDenied
   }
 
-  void _handleMicToggle() {
-    if (_isRecording) {
-      _transcriptionService.stopStreaming();
-    } else {
-      _transcriptionService.startStreaming();
-    }
-
+  void _startRecording() {
+    _transcriptionService.startStreaming();
     setState(() {
-      _isRecording = !_isRecording;
+      _isRecording = true;
+    });
+  }
+
+  void _stopRecording() {
+    _transcriptionService.stopStreaming();
+    setState(() {
+      _isRecording = false;
     });
 
-    if (!_isRecording) {
-      // Stopped manually or automatically
-      print("End of turn. Triggering next dialogue event.");
-      // TODO: Add dialogue event logic here
+    print("End of turn. Triggering next dialogue event.");
+    // TODO: Add dialogue event logic here
+  }
+
+  void _handleMicToggle() {
+    if (_isRecording) {
+      _stopRecording();
+    } else {
+      _startRecording();
     }
   }
 
