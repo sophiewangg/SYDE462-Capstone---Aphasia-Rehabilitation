@@ -68,7 +68,8 @@ class _SessionPageState extends State<SessionPage> {
     });
 
     print("End of turn. Triggering next dialogue event.");
-    // TODO: Add dialogue event logic here
+    // This can only get worked on when we actually have the structure of the dialogue events in the scenarios
+    // When the dialogue event ends, this would trigger the mic to automatically turn on and listent for the user's response
   }
 
   void _handleMicToggle() {
@@ -98,9 +99,7 @@ class _SessionPageState extends State<SessionPage> {
       ),
       builder: (BuildContext context) {
         // Pass the service and the current transcription string
-        return CueModal(
-          cueFuture: fetchedCue,
-        );
+        return CueModal(cueFuture: fetchedCue);
       },
     );
   }
