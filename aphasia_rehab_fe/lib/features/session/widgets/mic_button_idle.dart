@@ -17,28 +17,28 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
         // TODO: Implement audio play logic
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.audioButton,
+        backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
-        shape: const CircleBorder(), // Makes it a circle
+        // 1. Change to StadiumBorder for the pill shape
+        shape: const StadiumBorder(),
 
-        // ADD THIS LINE:
-        side: const BorderSide(
-          color: AppColors.buttonBorder, // Or any color from your AppColors
-          width: 2.0,                 // Thickness of the border
-        ),
+        side: const BorderSide(color: Colors.black, width: 1.0),
 
-        padding: const EdgeInsets.all(18), // Adjust padding to change circle size
-        elevation: 2, // Optional: gives it a slight shadow
-        fixedSize: const Size(74, 74), // Sets both width and height to 74px
+        // 2. Adjust fixedSize: Width should be greater than Height
+        // For a pill, try a 2:1 or 1.5:1 ratio
+        fixedSize: const Size(240, 75),
+
+        padding: EdgeInsets.zero, // Center the icon perfectly
+        elevation: 2,
       ),
-      // Use a Column or just the SVG if you want it centered
+      // No text here, just the SVG
       child: SvgPicture.asset(
-        'assets/icons/mic_button.svg', // Update with your actual icon
+        'assets/icons/mic_button.svg',
         colorFilter: const ColorFilter.mode(
-          AppColors.yellowSecondary,
+          Colors.black,
           BlendMode.srcIn,
         ),
-        width: 38, // Slightly larger for a circular button
+        width: 30, // Adjust icon size to fit the pill height
       ),
     );
   }

@@ -115,43 +115,52 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
 
-          Positioned(bottom: 300, right: 20, child: Character()),
+          Positioned(bottom: 250, right: 40, child: Character()),
+          Positioned(
+            bottom: 0,
+            child: Image.asset(
+              'assets/images/table_image.png',
+              height: 250, // Set a specific height
+              fit: BoxFit
+                  .contain, // Ensures the whole image fits without cropping
+            ),
+          ),
+
+          Positioned(top: 75, right: 20, child: SettingsButton()),
 
           Positioned(
-            top: 75,
+            bottom: 50,
             right: 20,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                const SizedBox(height: 20),
+                _hintButtonPressed ? SelectHint() : const SizedBox.shrink(),
                 Row(
                   mainAxisSize: MainAxisSize.min,
-                  spacing: 10.0,
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start, // Aligns children to the top
+                  spacing: 20.0,
                   children: [
                     HintButton(
                       toggleHintButton: toggleHintButton,
                       hintButtonPressed: _hintButtonPressed,
                     ),
-                    SettingsButton(),
+                    _buildMicButton(),
                   ],
                 ),
-                const SizedBox(height: 10),
-                _hintButtonPressed ? SelectHint() : const SizedBox.shrink(),
               ],
             ),
           ),
 
           Positioned(
-            bottom: 75,
+            bottom: 275,
             right: 20,
             child: Column(
               // Use Column for multiple items
               mainAxisSize: MainAxisSize.min,
-              children: [
-                SpeechBubble(prompt: prompts[_currentPromptIndex]),
-                const SizedBox(height: 40),
-                _buildMicButton(),
-              ],
+              children: [SpeechBubble(prompt: prompts[_currentPromptIndex])],
             ),
           ),
         ],

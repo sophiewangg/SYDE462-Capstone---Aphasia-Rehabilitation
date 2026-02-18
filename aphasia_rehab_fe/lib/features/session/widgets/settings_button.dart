@@ -19,12 +19,14 @@ class _SettingsButtonState extends State<SettingsButton> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
-        // Using minimumSize and padding ensures the button stays square or properly sized
-        minimumSize: Size.zero, 
+        fixedSize: const Size(64, 64),
+        // tapTargetSize ensures the hit area is comfortable
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: const EdgeInsets.all(12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        // This is the key change for a circle
+        shape: const CircleBorder(),
+        // Optional: Add a subtle border if it needs to match your speech bubble
+        side: const BorderSide(color: AppColors.boxBorder, width: 1),
       ),
       child: SvgPicture.asset(
         'assets/icons/settings_icon.svg',
@@ -32,7 +34,7 @@ class _SettingsButtonState extends State<SettingsButton> {
           AppColors.textPrimary,
           BlendMode.srcIn,
         ),
-        width: 20,
+        width: 24, // Increased slightly for better visual balance in a circle
       ),
     );
   }

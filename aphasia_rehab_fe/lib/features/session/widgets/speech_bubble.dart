@@ -15,31 +15,53 @@ class SpeechBubble extends StatefulWidget {
 class _SpeechBubbleState extends State<SpeechBubble> {
   @override
   Widget build(BuildContext context) {
-    // Wrapping in Align allows the Container to respect its 400 width
     return Align(
-      alignment: Alignment.center, // or topCenter, centerRight, etc.
-      child: Container(
+      alignment: Alignment.center,
+      child: SizedBox(
         width: 350,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: AppColors.boxBorder, width: 1),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing:
-                12.0, // This adds 12 pixels of space between the button and the text
-            children: [
-              PlayAudioButton(),
-              Text(
-                widget.prompt,
-                style: Theme.of(context).textTheme.bodyLarge,
+        child: Stack(
+          clipBehavior: Clip.none, // Required to let the tip sit on the border
+          children: [
+            // 1. The main Speech Bubble
+            Container(
+              // The margin creates space ABOVE the bubble for the tip to exist
+              margin: const EdgeInsets.only(top: 20),
+              width: 350,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
               ),
-            ],
-          ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 12.0,
+                ),
+                child: Row(
+                  spacing: 12.0,
+                  children: [
+                    PlayAudioButton(),
+                    Expanded(
+                      child: Text(
+                        widget.prompt,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // 2. The Tip (Positioned on the top border)
+            Positioned(
+              top:
+                  -80, // Adjust this (e.g., 2 or 4) to make it "sink" into the border
+              left: 30, // Your requested position
+              child: Image.asset(
+                'assets/images/speech_bubble_tip_image.png',
+                width: 150,
+              ),
+            ),
+          ],
         ),
       ),
     );

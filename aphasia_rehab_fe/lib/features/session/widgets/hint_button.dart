@@ -7,7 +7,7 @@ class HintButton extends StatefulWidget {
   final Function() toggleHintButton;
 
   const HintButton({
-    super.key, 
+    super.key,
     required this.hintButtonPressed,
     required this.toggleHintButton,
   });
@@ -19,31 +19,36 @@ class HintButton extends StatefulWidget {
 class _HintButtonState extends State<HintButton> {
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      onPressed: () {
-        widget.toggleHintButton();
-      },
-      icon: SvgPicture.asset(
-        'assets/icons/hint_icon.svg',
-        colorFilter: const ColorFilter.mode(
-          AppColors.textPrimary,
-          BlendMode.srcIn,
+    return Column(
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            widget.toggleHintButton();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: AppColors.textPrimary,
+            fixedSize: const Size(72, 72),
+            // tapTargetSize ensures the hit area is comfortable
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            padding: const EdgeInsets.all(12),
+            // This is the key change for a circle
+            shape: const CircleBorder(),
+            // Optional: Add a subtle border if it needs to match your speech bubble
+            side: const BorderSide(color: AppColors.boxBorder, width: 1),
+          ),
+          child: SvgPicture.asset(
+            'assets/icons/hint_icon.svg',
+            colorFilter: const ColorFilter.mode(
+              AppColors.textPrimary,
+              BlendMode.srcIn,
+            ),
+            width:
+                24, // Increased slightly for better visual balance in a circle
+          ),
         ),
-        width: 20,
-      ),
-      label: Text('Hint', style: Theme.of(context).textTheme.titleMedium),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
-        
-        minimumSize: Size.zero, 
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+        Text("Hint", style: TextStyle(color: Colors.white)),
+      ],
     );
   }
 }

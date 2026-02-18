@@ -16,42 +16,28 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // TODO: Implement processing logic
         widget.updateCurrentPromptState();
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.audioButton,
+        backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
-        // ADD THIS LINE:
-        side: const BorderSide(
-          color: AppColors.buttonBorder, // Or any color from your AppColors
-          width: 2.0, // Thickness of the border
-        ),
+        // 1. Change to StadiumBorder for the pill shape
+        shape: const StadiumBorder(),
 
-        padding: const EdgeInsets.all(
-          18,
-        ), // Adjust padding to change circle size
-        elevation: 2, // Optional: gives it a slight shadow
-        fixedSize: const Size.fromHeight(74),
+        side: const BorderSide(color: Colors.black, width: 1.0),
+
+        // 2. Adjust fixedSize: Width should be greater than Height
+        // For a pill, try a 2:1 or 1.5:1 ratio
+        fixedSize: const Size(240, 75),
+
+        padding: EdgeInsets.zero, // Center the icon perfectly
+        elevation: 2,
       ),
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/mic_button.svg', // Update with your actual icon
-            colorFilter: const ColorFilter.mode(
-              AppColors.yellowSecondary,
-              BlendMode.srcIn,
-            ),
-            width: 38, // Slightly larger for a circular button
-          ),
-          const SizedBox(width: 10),
-          Text(
-            "Speak now",
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge?.copyWith(color: AppColors.yellowSecondary),
-          ),
-        ],
+      // No text here, just the SVG
+      child: SvgPicture.asset(
+        'assets/icons/pause_icon.svg',
+        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+        width: 30, // Adjust icon size to fit the pill height
       ),
     );
   }

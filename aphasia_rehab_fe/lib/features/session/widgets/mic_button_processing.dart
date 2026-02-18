@@ -17,31 +17,25 @@ class _MicButtonProcessingState extends State<MicButtonProcessing> {
         // TODO: Implement audio play logic
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.audioButton,
+        backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
-        // ADD THIS LINE:
-        side: const BorderSide(
-          color: AppColors.buttonBorder, // Or any color from your AppColors
-          width: 2.0, // Thickness of the border
-        ),
+        // 1. Change to StadiumBorder for the pill shape
+        shape: const StadiumBorder(),
 
-        padding: const EdgeInsets.all(
-          18,
-        ), // Adjust padding to change circle size
-        elevation: 2, // Optional: gives it a slight shadow
-        fixedSize: const Size.fromHeight(74),
+        side: const BorderSide(color: Colors.black, width: 1.0),
+
+        // 2. Adjust fixedSize: Width should be greater than Height
+        // For a pill, try a 2:1 or 1.5:1 ratio
+        fixedSize: const Size(240, 75),
+
+        padding: EdgeInsets.zero, // Center the icon perfectly
+        elevation: 2,
       ),
-      child: Row(
-        children: [
-          SvgPicture.asset(
-            'assets/icons/processing_icon.svg', // Update with your actual icon
-            colorFilter: const ColorFilter.mode(
-              AppColors.yellowSecondary,
-              BlendMode.srcIn,
-            ),
-            width: 38, // Slightly larger for a circular button
-          ),
-        ],
+      // No text here, just the SVG
+      child: SvgPicture.asset(
+        'assets/icons/processing_icon.svg',
+        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+        width: 30, // Adjust icon size to fit the pill height
       ),
     );
   }
