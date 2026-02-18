@@ -4,10 +4,11 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../models/cue_model.dart';
 import '../../services/transcription_service.dart';
 import '../../services/cue_service.dart';
-import 'widgets/microphone_button.dart';
 import 'widgets/cue_modal.dart';
 import 'widgets/transcription_display.dart';
+import 'widgets/mic_and_hint_button.dart';
 import 'scenario_sim.dart';
+import 'package:aphasia_rehab_fe/models/prompt_state.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key, required this.title});
@@ -25,6 +26,42 @@ class _SessionPageState extends State<SessionPage> {
   String _transcription = "";
   String _goal = "Ask for a utensil.";
   bool _isRecording = false;
+  bool _hintButtonPressed = false;
+
+  List<String> prompts = [
+    "Hello! How are you doing?",
+    "Would you like something to drink?",
+    "What would you like to order?",
+    "Here is your food. Enjoy your meal!",
+    "Can I get you anything else?",
+    "Thank you! Have a great day!",
+  ];
+  int _currentPromptIndex = 0;
+  final ValueNotifier<PromptState> _currentPromptState = ValueNotifier(
+    PromptState.idle,
+  );
+
+  void toggleHintButton() {
+    setState(() {
+      _hintButtonPressed = !_hintButtonPressed;
+    });
+  }
+
+  void updateCurrentPromptState() {
+    if (_currentPromptState.value == PromptState.userSpeaking) {
+      _currentPromptState.value = PromptState.processing;
+
+      Timer(const Duration(seconds: 2), () {
+        if (mounted) {
+          _currentPromptIndex = (_currentPromptIndex + 1) % prompts.length;
+          _currentPromptState.value =
+              PromptState.idle; // This will now auto-update the modal!
+        }
+      });
+    } else if (_currentPromptState.value == PromptState.idle) {
+      _currentPromptState.value = PromptState.userSpeaking;
+    }
+  }
 
   @override
   void initState() {
@@ -36,9 +73,9 @@ class _SessionPageState extends State<SessionPage> {
       setState(() {
         _transcription = result.text;
       });
-
       if (result.isEndOfTurn && _isRecording) {
         _stopRecording(); // Explicitly stop instead of toggling
+        updateCurrentPromptState(); // Update the prompt state when the turn ends
       }
     });
   }
@@ -84,7 +121,11 @@ class _SessionPageState extends State<SessionPage> {
   void _handleHintPressed() {
     // 1. Kick off the request (don't 'await' it here)
     final cueFuture = _cueService.getCues(_transcription, _goal);
-
+    toggleHintButton();
+    setState(() {
+      _currentPromptState.value = PromptState.idle;
+    });
+    _stopRecording();
     // 2. Open the modal immediately
     _showModal(cueFuture);
   }
@@ -94,13 +135,21 @@ class _SessionPageState extends State<SessionPage> {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
       builder: (BuildContext context) {
-        // Pass the service and the current transcription string
-        return CueModal(cueFuture: fetchedCue);
+        return ValueListenableBuilder<PromptState>(
+          valueListenable: _currentPromptState, // Listen to the "radio station"
+          builder: (context, state, child) {
+            return CueModal(
+              cueFuture: fetchedCue,
+              startRecording: _startRecording,
+              updateCurrentPromptState: updateCurrentPromptState,
+              currentPromptState:
+                  state, // Uses the fresh state from the listener
+            );
+          },
+        );
       },
     );
   }
@@ -132,16 +181,21 @@ class _SessionPageState extends State<SessionPage> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),
-              child: MicrophoneButton(
-                isRecording: _isRecording,
-                onPressed: _handleMicToggle,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 50),
-              child: ElevatedButton(
-                onPressed: _handleHintPressed,
-                child: const Text('I need a hint!'),
+              child: ValueListenableBuilder<PromptState>(
+                valueListenable: _currentPromptState,
+                builder: (context, state, child) {
+                  // 'state' here is the current value of _currentPromptState
+                  return MicAndHintButton(
+                    currentPrompt: "",
+                    hintButtonPressed: _hintButtonPressed,
+                    currentPromptState:
+                        state, // Use the 'state' from the builder
+                    updateCurrentPromptState: updateCurrentPromptState,
+                    toggleHintButton: toggleHintButton,
+                    onPressedMic: _handleMicToggle,
+                    handleHintPressed: _handleHintPressed,
+                  );
+                },
               ),
             ),
           ],

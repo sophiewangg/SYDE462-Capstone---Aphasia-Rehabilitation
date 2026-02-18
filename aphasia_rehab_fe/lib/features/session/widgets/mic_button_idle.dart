@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MicButtonIdle extends StatefulWidget {
-  const MicButtonIdle({super.key});
+  final Function() updateCurrentPromptState;
+  final Function() onPressedMic;
+
+  const MicButtonIdle({super.key, required this.updateCurrentPromptState, required this.onPressedMic});
 
   @override
   State<MicButtonIdle> createState() => _MicButtonIdleState();
@@ -14,7 +17,8 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // TODO: Implement audio play logic
+        widget.updateCurrentPromptState();
+        widget.onPressedMic();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
@@ -27,10 +31,7 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
       ),
       child: SvgPicture.asset(
         'assets/icons/mic_button.svg',
-        colorFilter: const ColorFilter.mode(
-          Colors.black,
-          BlendMode.srcIn,
-        ),
+        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
         width: 30,
       ),
     );

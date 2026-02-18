@@ -20,6 +20,7 @@ class _HintButtonState extends State<HintButton> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      spacing: 5.0,
       children: [
         ElevatedButton(
           onPressed: () {

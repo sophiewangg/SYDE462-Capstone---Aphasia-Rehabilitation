@@ -1,14 +1,13 @@
+import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/select_hint.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'widgets/hint_button.dart';
 import 'widgets/settings_button.dart';
-import 'widgets/speech_bubble.dart';
-import 'widgets/mic_button_idle.dart';
-import 'widgets/select_hint.dart';
 import 'widgets/character.dart';
-import 'widgets/mic_button_speaking.dart';
-import 'widgets/mic_button_processing.dart';
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:aphasia_rehab_fe/models/prompt_state.dart';
 
 class ScenarioSim extends StatefulWidget {
   const ScenarioSim({super.key});
@@ -16,8 +15,6 @@ class ScenarioSim extends StatefulWidget {
   @override
   State<ScenarioSim> createState() => _ScenarioSimState();
 }
-
-enum PromptState { userSpeaking, characterSpeaking, processing }
 
 class _ScenarioSimState extends State<ScenarioSim> {
   final _player = AudioPlayer();
@@ -31,7 +28,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
     "Thank you! Have a great day!",
   ];
   int _currentPromptIndex = 0;
-  PromptState _currentPromptState = PromptState.characterSpeaking;
+  PromptState _currentPromptState = PromptState.idle;
 
   void toggleHintButton() {
     setState(() {
@@ -51,12 +48,12 @@ class _ScenarioSimState extends State<ScenarioSim> {
           setState(() {
             _currentPromptIndex =
                 (_currentPromptIndex + 1) % prompts.length; // Loop prompts
-            _currentPromptState = PromptState.characterSpeaking;
+            _currentPromptState = PromptState.idle;
           });
           startPromptTimer();
         }
       });
-    } else if (_currentPromptState == PromptState.characterSpeaking) {
+    } else if (_currentPromptState == PromptState.idle) {
       setState(() {
         _currentPromptState = PromptState.userSpeaking;
       });
@@ -81,21 +78,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
   void initState() {
     super.initState();
     startPromptTimer();
-  }
-
-  Widget _buildMicButton() {
-    switch (_currentPromptState) {
-      case PromptState.characterSpeaking:
-        return MicButtonIdle();
-      case PromptState.userSpeaking:
-        return MicButtonSpeaking(
-          updateCurrentPromptState: updateCurrentPromptState,
-        );
-      case PromptState.processing:
-        return MicButtonProcessing();
-      default:
-        return MicButtonIdle();
-    }
   }
 
   Widget build(BuildContext context) {
@@ -137,25 +119,14 @@ class _ScenarioSimState extends State<ScenarioSim> {
               children: [
                 SpeechBubble(prompt: prompts[_currentPromptIndex]),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 150,
-                  child: _hintButtonPressed
-                      ? SelectHint()
-                      : const SizedBox.shrink(),
-                ),
 
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 20.0,
-                  children: [
-                    HintButton(
-                      toggleHintButton: toggleHintButton,
-                      hintButtonPressed: _hintButtonPressed,
-                    ),
-                    _buildMicButton(),
-                  ],
-                ),
+                // MicAndHintButton(
+                //   currentPrompt: prompts[_currentPromptIndex],
+                //   hintButtonPressed: _hintButtonPressed,
+                //   currentPromptState: _currentPromptState,
+                //   updateCurrentPromptState: updateCurrentPromptState,
+                //   toggleHintButton: toggleHintButton,
+                // ),
               ],
             ),
           ),
