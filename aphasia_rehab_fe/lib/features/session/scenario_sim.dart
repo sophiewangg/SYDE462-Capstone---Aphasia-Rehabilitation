@@ -76,7 +76,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
     }
   }
 
-  // 1. Trigger it when the screen first loads
+  // Trigger it when the screen first loads
   @override
   void initState() {
     super.initState();
@@ -120,27 +120,34 @@ class _ScenarioSimState extends State<ScenarioSim> {
             bottom: 0,
             child: Image.asset(
               'assets/images/table_image.png',
-              height: 250, // Set a specific height
-              fit: BoxFit
-                  .contain, // Ensures the whole image fits without cropping
+              height: 250,
+              fit: BoxFit.contain,
             ),
           ),
 
           Positioned(top: 75, right: 20, child: SettingsButton()),
 
           Positioned(
-            bottom: 50,
+            bottom: 30,
             right: 20,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10.0,
               children: [
-                const SizedBox(height: 20),
-                _hintButtonPressed ? SelectHint() : const SizedBox.shrink(),
+                SpeechBubble(prompt: prompts[_currentPromptIndex]),
+
+                SizedBox(
+                  height:
+                      150,
+                  child: _hintButtonPressed
+                      ? SelectHint()
+                      : const SizedBox.shrink(),
+                ),
+
                 Row(
                   mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start, // Aligns children to the top
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   spacing: 20.0,
                   children: [
                     HintButton(
@@ -151,16 +158,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
                   ],
                 ),
               ],
-            ),
-          ),
-
-          Positioned(
-            bottom: 275,
-            right: 20,
-            child: Column(
-              // Use Column for multiple items
-              mainAxisSize: MainAxisSize.min,
-              children: [SpeechBubble(prompt: prompts[_currentPromptIndex])],
             ),
           ),
         ],

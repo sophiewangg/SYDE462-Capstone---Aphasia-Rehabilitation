@@ -1,8 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'play_audio_button.dart';
-
 class SelectHint extends StatefulWidget {
   const SelectHint({super.key});
 
@@ -13,7 +10,7 @@ class SelectHint extends StatefulWidget {
 class _SelectHintState extends State<SelectHint> {
   @override
   Widget build(BuildContext context) {
-    const double borderRadius = 8.0; // Define once for consistency
+    const double borderRadius = 8.0;
 
     return Container(
         width: 300,
@@ -49,7 +46,6 @@ class _SelectHintState extends State<SelectHint> {
                 flex: 35,
                 child: InkWell(
                   onTap: () => print("I don't understand tapped"),
-                  // And wrap the second image here
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(borderRadius),

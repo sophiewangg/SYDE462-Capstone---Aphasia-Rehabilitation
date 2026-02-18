@@ -54,8 +54,8 @@ class _SpeechBubbleState extends State<SpeechBubble> {
             // 2. The Tip (Positioned on the top border)
             Positioned(
               top:
-                  -80, // Adjust this (e.g., 2 or 4) to make it "sink" into the border
-              left: 30, // Your requested position
+                  -80, // Adjust this to move speech bubble tip higher
+              left: 30,
               child: Image.asset(
                 'assets/images/speech_bubble_tip_image.png',
                 width: 150,

@@ -15,7 +15,7 @@ class _PlayAudioButtonState extends State<PlayAudioButton> {
 
   @override
   void dispose() {
-    _player.dispose(); // Always clean up your players!
+    _player.dispose(); // Always clean up your players
     super.dispose();
   }
 
@@ -31,22 +31,21 @@ class _PlayAudioButtonState extends State<PlayAudioButton> {
         _playSound();
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.audioButton,
+        backgroundColor: AppColors.grey100,
         foregroundColor: AppColors.textPrimary,
-        shape: const CircleBorder(), // Makes it a circle
+        shape: const CircleBorder(),
         padding: const EdgeInsets.all(
           10,
-        ), // Adjust padding to change circle size
-        elevation: 2, // Optional: gives it a slight shadow
+        ),
+        elevation: 2,
       ),
-      // Use a Column or just the SVG if you want it centered
       child: SvgPicture.asset(
-        'assets/icons/audio_icon.svg', // Update with your actual icon
+        'assets/icons/audio_icon.svg',
         colorFilter: const ColorFilter.mode(
           AppColors.textPrimary,
           BlendMode.srcIn,
         ),
-        width: 20, // Slightly larger for a circular button
+        width: 20,
       ),
     );
   }

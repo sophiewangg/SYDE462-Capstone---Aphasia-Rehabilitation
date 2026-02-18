@@ -26,15 +26,14 @@ class _HintButtonState extends State<HintButton> {
             widget.toggleHintButton();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
+            backgroundColor: widget.hintButtonPressed
+                ? AppColors.grey100
+                : Colors.white,
             foregroundColor: AppColors.textPrimary,
             fixedSize: const Size(72, 72),
-            // tapTargetSize ensures the hit area is comfortable
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             padding: const EdgeInsets.all(12),
-            // This is the key change for a circle
             shape: const CircleBorder(),
-            // Optional: Add a subtle border if it needs to match your speech bubble
             side: const BorderSide(color: AppColors.boxBorder, width: 1),
           ),
           child: SvgPicture.asset(
@@ -43,8 +42,7 @@ class _HintButtonState extends State<HintButton> {
               AppColors.textPrimary,
               BlendMode.srcIn,
             ),
-            width:
-                24, // Increased slightly for better visual balance in a circle
+            width: 24,
           ),
         ),
         Text("Hint", style: TextStyle(color: Colors.white)),

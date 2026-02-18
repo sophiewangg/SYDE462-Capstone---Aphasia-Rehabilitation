@@ -20,12 +20,9 @@ class _SettingsButtonState extends State<SettingsButton> {
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         fixedSize: const Size(64, 64),
-        // tapTargetSize ensures the hit area is comfortable
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         padding: const EdgeInsets.all(12),
-        // This is the key change for a circle
         shape: const CircleBorder(),
-        // Optional: Add a subtle border if it needs to match your speech bubble
         side: const BorderSide(color: AppColors.boxBorder, width: 1),
       ),
       child: SvgPicture.asset(
@@ -34,7 +31,7 @@ class _SettingsButtonState extends State<SettingsButton> {
           AppColors.textPrimary,
           BlendMode.srcIn,
         ),
-        width: 24, // Increased slightly for better visual balance in a circle
+        width: 24,
       ),
     );
   }

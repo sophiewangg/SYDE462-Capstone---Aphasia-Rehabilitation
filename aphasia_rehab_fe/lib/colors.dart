@@ -20,7 +20,7 @@ class AppColors {
   static const Color boxBorder = Color(0xFFD7D7D7);
 
   /// Audio button color
-  static const Color audioButton = Color(0xFFDDE0E7);
+  static const Color grey100 = Color(0xFFDDE0E7);
 
   /// Button border color
   static const Color buttonBorder = Color(0xFFFBD78D);
