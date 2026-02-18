@@ -115,7 +115,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
 
-          Positioned(bottom: 250, right: 40, child: Character()),
+          Positioned(bottom: 30, right: 0, child: Character()),
           Positioned(
             bottom: 0,
             child: Image.asset(
@@ -136,10 +136,9 @@ class _ScenarioSimState extends State<ScenarioSim> {
               spacing: 10.0,
               children: [
                 SpeechBubble(prompt: prompts[_currentPromptIndex]),
-
+                const SizedBox(height: 20),
                 SizedBox(
-                  height:
-                      150,
+                  height: 150,
                   child: _hintButtonPressed
                       ? SelectHint()
                       : const SizedBox.shrink(),
