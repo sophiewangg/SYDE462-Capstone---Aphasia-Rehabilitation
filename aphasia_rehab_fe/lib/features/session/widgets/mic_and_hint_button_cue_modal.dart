@@ -11,6 +11,7 @@ class MicAndHintButtonCueModal extends StatefulWidget {
   final PromptState currentPromptState;
   final Function() startRecording;
   final Function() updateCurrentPromptState;
+  final Function() updateCueNumber;
 
   const MicAndHintButtonCueModal({
     super.key,
@@ -22,6 +23,7 @@ class MicAndHintButtonCueModal extends StatefulWidget {
     // required this.toggleHintButton,
     // required this.onPressedMic,
     // required this.handleHintPressed,
+    required this.updateCueNumber,
   });
 
   @override
@@ -62,7 +64,7 @@ class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
-          children: [HintButtonCueModal(), _buildMicButton()],
+          children: [HintButtonCueModal(updateCueNumber: widget.updateCueNumber), _buildMicButton()],
         ),
       ],
     );

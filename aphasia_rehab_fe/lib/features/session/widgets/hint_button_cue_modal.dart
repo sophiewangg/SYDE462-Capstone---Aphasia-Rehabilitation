@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HintButtonCueModal extends StatefulWidget {
-  const HintButtonCueModal({super.key});
+  final Function() updateCueNumber;
+  const HintButtonCueModal({super.key, required this.updateCueNumber});
 
   @override
   State<HintButtonCueModal> createState() => _HintButtonCueModalState();
@@ -21,7 +22,7 @@ class _HintButtonCueModalState extends State<HintButtonCueModal> {
           children: [
             // Main Button
             ElevatedButton(
-              onPressed: () {},
+              onPressed: widget.updateCueNumber,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 fixedSize: const Size(72, 72),

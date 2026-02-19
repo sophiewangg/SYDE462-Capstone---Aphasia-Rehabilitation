@@ -6,7 +6,11 @@ class MicButtonIdle extends StatefulWidget {
   final Function() updateCurrentPromptState;
   final Function() onPressedMic;
 
-  const MicButtonIdle({super.key, required this.updateCurrentPromptState, required this.onPressedMic});
+  const MicButtonIdle({
+    super.key,
+    required this.updateCurrentPromptState,
+    required this.onPressedMic,
+  });
 
   @override
   State<MicButtonIdle> createState() => _MicButtonIdleState();

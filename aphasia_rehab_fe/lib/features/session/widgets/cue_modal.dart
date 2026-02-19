@@ -3,14 +3,18 @@ import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button_cu
 import 'package:aphasia_rehab_fe/models/prompt_state.dart';
 import 'package:flutter/material.dart';
 import '../../../models/cue_model.dart';
-// Removed transcription_service import
-// Removed microphone_button import
 
 class CueModal extends StatefulWidget {
   final Future<Cue?> cueFuture;
   final Function() startRecording;
   final Function() updateCurrentPromptState;
   final PromptState currentPromptState;
+  final bool cueComplete;
+  final String? cueResultString;
+  final int cueNumber;
+  final Function({bool reset}) updateCueNumber;
+  final Function() resetCueComplete;
+  final Function() resetCueResultString;
 
   const CueModal({
     super.key,
@@ -18,6 +22,12 @@ class CueModal extends StatefulWidget {
     required this.startRecording,
     required this.updateCurrentPromptState,
     required this.currentPromptState,
+    required this.cueComplete,
+    this.cueResultString,
+    required this.cueNumber,
+    required this.updateCueNumber,
+    required this.resetCueComplete,
+    required this.resetCueResultString,
   });
 
   @override
@@ -25,8 +35,6 @@ class CueModal extends StatefulWidget {
 }
 
 class _CueModalState extends State<CueModal> {
-  int _cuesUsed = 0;
-  bool _cueComplete = false;
   final ValueNotifier<PromptState> _currentPromptState = ValueNotifier(
     PromptState.idle,
   );
@@ -40,7 +48,7 @@ class _CueModalState extends State<CueModal> {
       case 2:
         return "Starts with: ${fetchedCue.firstSound.toUpperCase()}";
       default:
-        return "Try the word: ${fetchedCue.likelyWord}";
+        return "Try the word: ${fetchedCue.likelyWord.toUpperCase()}";
     }
   }
 
@@ -68,9 +76,7 @@ class _CueModalState extends State<CueModal> {
             height: 300, // Reduced height since mic is gone
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: _cueComplete
-                  ? AppColors.cueModalComplete
-                  : AppColors.cueModalInProgress,
+              color: AppColors.cueModalInProgress,
               borderRadius: BorderRadius.circular(32.0),
             ),
             child: const Center(
@@ -91,10 +97,12 @@ class _CueModalState extends State<CueModal> {
 
         return Container(
           width: double.infinity,
-          height: 325, // Reduced height
+          height: 350, // Reduced height
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: AppColors.cueModalInProgress,
+            color: widget.cueComplete
+                ? AppColors.cueModalComplete
+                : AppColors.cueModalInProgress,
             borderRadius: BorderRadius.circular(32.0),
           ),
           child: Column(
@@ -105,8 +113,12 @@ class _CueModalState extends State<CueModal> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton.icon(
-                  onPressed: () {
+                  onPressed: () async {
                     Navigator.pop(context);
+                    await Future.delayed(const Duration(milliseconds: 300));
+                    widget.updateCueNumber(reset: true);
+                    widget.resetCueComplete();
+                    widget.resetCueResultString();
                   },
                   icon: const Icon(Icons.close),
                   label: const Text('Cancel'),
@@ -117,6 +129,33 @@ class _CueModalState extends State<CueModal> {
                 ),
               ),
               const SizedBox(height: 10),
+              widget.cueResultString != null
+                  ? SizedBox(
+                      child: Container(
+                        width: 375,
+                        padding: const EdgeInsets.all(
+                          8.0,
+                        ), // Adds space inside the box
+                        decoration: BoxDecoration(
+                          color: AppColors
+                              .hintBackground, // The hint background color
+                          borderRadius: BorderRadius.circular(
+                            8.0,
+                          ), // Optional: rounds the corners
+                        ),
+                        child: Text(
+                          widget.cueResultString!,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          ), // Ensure text is visible on white
+                          textAlign: TextAlign.start,
+                        ),
+                      ),
+                    )
+                  : SizedBox(height: 25),
+              const SizedBox(height: 10),
+
               Container(
                 width: 350,
                 padding: const EdgeInsets.all(8.0), // Adds space inside the box
@@ -127,7 +166,7 @@ class _CueModalState extends State<CueModal> {
                   ), // Optional: rounds the corners
                 ),
                 child: Text(
-                  _getHintText(_cuesUsed, fetchedCue),
+                  _getHintText(widget.cueNumber, fetchedCue),
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -143,33 +182,8 @@ class _CueModalState extends State<CueModal> {
                 startRecording: widget.startRecording,
                 updateCurrentPromptState: widget.updateCurrentPromptState,
                 currentPromptState: widget.currentPromptState,
+                updateCueNumber: widget.updateCueNumber,
               ),
-
-              // _cueComplete
-              //     ? ElevatedButton(
-              //         style: ElevatedButton.styleFrom(
-              //           backgroundColor: Colors.green,
-              //         ),
-              //         onPressed: () => Navigator.pop(context),
-              //         child: const Text(
-              //           'Return to exercise',
-              //           style: TextStyle(color: Colors.white),
-              //         ),
-              //       )
-              //     : Column(
-              //         children: [
-              //           ElevatedButton(
-              //             onPressed: () {
-              //               setState(() {
-              //                 _cuesUsed++;
-              //                 if (_cuesUsed >= 3) _cueComplete = true;
-              //               });
-              //             },
-              //             child: const Text('Another hint please!'),
-              //           ),
-              //           const SizedBox(height: 10),
-              //         ],
-              //       ),
             ],
           ),
         );

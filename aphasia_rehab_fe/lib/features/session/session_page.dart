@@ -27,7 +27,7 @@ class _SessionPageState extends State<SessionPage> {
   String _goal = "Ask for a utensil.";
   bool _isRecording = false;
   bool _hintButtonPressed = false;
-
+  String? _likelyWord;
   List<String> prompts = [
     "Hello! How are you doing?",
     "Would you like something to drink?",
@@ -40,6 +40,32 @@ class _SessionPageState extends State<SessionPage> {
   final ValueNotifier<PromptState> _currentPromptState = ValueNotifier(
     PromptState.idle,
   );
+
+  final ValueNotifier<PromptState> _currentPromptStateModal = ValueNotifier(
+    PromptState.idle,
+  );
+
+  final ValueNotifier<bool> _cueCompleteNotifier = ValueNotifier(false);
+
+  final ValueNotifier<String?> _cueResultStringNotifier = ValueNotifier(null);
+
+  final ValueNotifier<int> _cueNumberNotifier = ValueNotifier(0);
+
+  void updateCueNumber({bool reset = false}) {
+    if (reset) {
+      _cueNumberNotifier.value = 0;
+    } else {
+      _cueNumberNotifier.value = _cueNumberNotifier.value + 1;
+    }
+  }
+
+  void resetCueComplete() {
+    _cueCompleteNotifier.value = false;
+  }
+
+  void resetCueResultString() {
+    _cueResultStringNotifier.value = null;
+  }
 
   void toggleHintButton() {
     setState(() {
@@ -63,6 +89,43 @@ class _SessionPageState extends State<SessionPage> {
     }
   }
 
+  void updateCurrentPromptStateModal() {
+    if (_currentPromptStateModal.value == PromptState.userSpeaking) {
+      _currentPromptStateModal.value = PromptState.processing;
+      processSpeechFromCue(_likelyWord ?? "");
+      // processSpeechFromCue();
+    } else if (_currentPromptStateModal.value == PromptState.idle) {
+      _currentPromptStateModal.value = PromptState.userSpeaking;
+    }
+  }
+
+  // Update the function to accept the target word
+  void processSpeechFromCue(String targetWord) async {
+    print("Processing speech. Latest transcript: $_transcription");
+
+    // Clean up the strings for a fair comparison
+    String cleanTranscript = _transcription.toLowerCase().trim();
+    String cleanTarget = targetWord.toLowerCase().trim();
+
+    if (cleanTranscript.contains(cleanTarget)) {
+      print("Success! Word detected.");
+      // Just update the value. The ValueListenableBuilder in the modal hears this!
+      _cueCompleteNotifier.value = true;
+      _currentPromptStateModal.value = PromptState.idle;
+      _cueResultStringNotifier.value =
+          "Correct! The word is ${targetWord.toUpperCase()}";
+
+      // TODO: If you want the modal to show a 'Success' checkmark,
+      // you should use another ValueNotifier<bool> for _cueComplete.
+    } else {
+      print("Word not matched yet.");
+      // Revert to idle so they can try again
+      _cueResultStringNotifier.value = "Not quite. Here's another hint:";
+      updateCueNumber();
+      _currentPromptStateModal.value = PromptState.idle;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +138,10 @@ class _SessionPageState extends State<SessionPage> {
       });
       if (result.isEndOfTurn && _isRecording) {
         _stopRecording(); // Explicitly stop instead of toggling
-        updateCurrentPromptState(); // Update the prompt state when the turn ends
+        bool isModalOpen = ModalRoute.of(context)?.isCurrent == false;
+        isModalOpen
+            ? updateCurrentPromptStateModal()
+            : updateCurrentPromptState(); // Update the prompt state when the turn ends
       }
     });
   }
@@ -118,7 +184,7 @@ class _SessionPageState extends State<SessionPage> {
     }
   }
 
-  void _handleHintPressed() {
+  void _handleHintPressed() async {
     // 1. Kick off the request (don't 'await' it here)
     final cueFuture = _cueService.getCues(_transcription, _goal);
     toggleHintButton();
@@ -127,10 +193,23 @@ class _SessionPageState extends State<SessionPage> {
     });
     _stopRecording();
     // 2. Open the modal immediately
+
     _showModal(cueFuture);
+
+    // Separately, wait for the future to finish to save the word locally
+    final fetchedCue = await cueFuture;
+
+    if (fetchedCue != null) {
+      setState(() {
+        _likelyWord = fetchedCue.likelyWord;
+      });
+    }
   }
 
   void _showModal(Future<Cue?> fetchedCue) {
+    _cueCompleteNotifier.value = false;
+    _currentPromptStateModal.value = PromptState.idle;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -138,15 +217,26 @@ class _SessionPageState extends State<SessionPage> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       builder: (BuildContext context) {
-        return ValueListenableBuilder<PromptState>(
-          valueListenable: _currentPromptState, // Listen to the "radio station"
-          builder: (context, state, child) {
+        // AnimatedBuilder is the correct widget for Listenable.merge
+        return AnimatedBuilder(
+          animation: Listenable.merge([
+            _currentPromptStateModal,
+            _cueCompleteNotifier,
+            _cueResultStringNotifier,
+            _cueNumberNotifier,
+          ]),
+          builder: (context, _) {
             return CueModal(
               cueFuture: fetchedCue,
               startRecording: _startRecording,
-              updateCurrentPromptState: updateCurrentPromptState,
-              currentPromptState:
-                  state, // Uses the fresh state from the listener
+              updateCurrentPromptState: updateCurrentPromptStateModal,
+              currentPromptState: _currentPromptStateModal.value,
+              cueComplete: _cueCompleteNotifier.value,
+              cueResultString: _cueResultStringNotifier.value,
+              cueNumber: _cueNumberNotifier.value,
+              updateCueNumber: updateCueNumber,
+              resetCueComplete: resetCueComplete,
+              resetCueResultString: resetCueResultString,
             );
           },
         );

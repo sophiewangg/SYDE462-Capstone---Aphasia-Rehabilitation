@@ -31,6 +31,6 @@ class AppColors {
   /// Cue modal in progress background
   static const Color cueModalInProgress = Color.fromARGB(255, 239, 199, 135);
 
-  static const Color cueModalComplete = Color.fromARGB(212, 100, 240, 121);
+  static const Color cueModalComplete = Color.fromARGB(210, 166, 227, 142);
 
 }
