@@ -1,9 +1,19 @@
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'common/bottom_nav_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ScenarioSimManager()),
+        // Other managers...
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

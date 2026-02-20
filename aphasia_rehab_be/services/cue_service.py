@@ -9,11 +9,15 @@ class CueService:
         self.api_key = api_key
 
     def build_prompt(self, goal, transcription):
-        return f"You are talking to someone with aphasia who has the following goal: {goal}.\n" \
+        return f"You are talking to someone with aphasia who has been given the following prompt: {goal}.\n" \
             f"This is what they have just said: {transcription}.\n" \
             f"Provide the following cues: semantic, a word that rhymes, the first sound (>1 letters)" \
             f"Return a JSON object with the fields: 'likely_word', 'semantic', 'rhyming', 'first_sound'"
-        
+    
+    def build_simplify_prompt(self, prompt):
+        return f"A user with aphasia was given the following prompt: {prompt}. THey said they don't understand. Simplify the prompt. Return only the simplified prompt." \
+            f"Return a JSON object with only the field: 'simplified_prompt'"
+    
     def generate_cues(self, transcription, goal):
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -23,6 +27,29 @@ class CueService:
         data = {
             "model": self.MODEL,  # use GPT-4o mini
             "input": self.build_prompt(goal, transcription)
+        }
+
+        response = requests.post(self.URL, headers=headers, json=data)
+        result = response.json()
+
+        text = result["output"][0]["content"][0]["text"]
+
+        # remove markdown code fences
+        clean = text.replace("```json", "").replace("```", "").strip()
+
+        # convert string → dict
+        parsed = json.loads(clean)
+        return parsed
+    
+    def simplify_prompt(self, prompt):
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+
+        data = {
+            "model": self.MODEL,  # use GPT-4o mini
+            "input": self.build_simplify_prompt(prompt)
         }
 
         response = requests.post(self.URL, headers=headers, json=data)

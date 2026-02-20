@@ -24,4 +24,13 @@ class AppColors {
 
   /// Button border color
   static const Color buttonBorder = Color(0xFFFBD78D);
+
+  /// Hint background
+  static const Color hintBackground = Color.fromARGB(161, 255, 255, 255);
+
+  /// Cue modal in progress background
+  static const Color cueModalInProgress = Color.fromARGB(255, 239, 199, 135);
+
+  static const Color cueModalComplete = Color.fromARGB(210, 166, 227, 142);
+
 }

@@ -1,12 +1,10 @@
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
 import 'package:flutter/material.dart';
-import 'widgets/hint_button.dart';
+import 'package:provider/provider.dart';
 import 'widgets/settings_button.dart';
-import 'widgets/speech_bubble.dart';
-import 'widgets/mic_button_idle.dart';
-import 'widgets/select_hint.dart';
 import 'widgets/character.dart';
-import 'widgets/mic_button_speaking.dart';
-import 'widgets/mic_button_processing.dart';
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -17,87 +15,21 @@ class ScenarioSim extends StatefulWidget {
   State<ScenarioSim> createState() => _ScenarioSimState();
 }
 
-enum PromptState { userSpeaking, characterSpeaking, processing }
-
 class _ScenarioSimState extends State<ScenarioSim> {
-  final _player = AudioPlayer();
-  bool _hintButtonPressed = false;
-  List<String> prompts = [
-    "Hello! How are you doing?",
-    "Would you like something to drink?",
-    "What would you like to order?",
-    "Here is your food. Enjoy your meal!",
-    "Can I get you anything else?",
-    "Thank you! Have a great day!",
-  ];
-  int _currentPromptIndex = 0;
-  PromptState _currentPromptState = PromptState.characterSpeaking;
-
-  void toggleHintButton() {
-    setState(() {
-      _hintButtonPressed = !_hintButtonPressed;
-    });
-  }
-
-  void updateCurrentPromptState() {
-    if (_currentPromptState == PromptState.userSpeaking) {
-      setState(() {
-        _currentPromptState = PromptState.processing;
-      });
-
-      // Simulate processing delay
-      Timer(const Duration(seconds: 2), () {
-        if (mounted) {
-          setState(() {
-            _currentPromptIndex =
-                (_currentPromptIndex + 1) % prompts.length; // Loop prompts
-            _currentPromptState = PromptState.characterSpeaking;
-          });
-          startPromptTimer();
-        }
-      });
-    } else if (_currentPromptState == PromptState.characterSpeaking) {
-      setState(() {
-        _currentPromptState = PromptState.userSpeaking;
-      });
-    }
-  }
-
-  void startPromptTimer() async {
-    await _player.play(AssetSource('audio_clips/server_speech_1.mp3'));
-
-    // .first ensures we don't keep listening after it finishes
-    await _player.onPlayerComplete.first;
-
-    if (mounted) {
-      setState(() {
-        _currentPromptState = PromptState.userSpeaking;
-      });
-    }
-  }
-
-  // Trigger it when the screen first loads
   @override
   void initState() {
     super.initState();
-    startPromptTimer();
+
+    // Use context.read here because we only want to trigger the action once,
+    // not "watch" for updates during the init phase.
+    Future.microtask(() {
+      if (mounted) {
+        context.read<ScenarioSimManager>().requestMicPermission();
+      }
+    });
   }
 
-  Widget _buildMicButton() {
-    switch (_currentPromptState) {
-      case PromptState.characterSpeaking:
-        return MicButtonIdle();
-      case PromptState.userSpeaking:
-        return MicButtonSpeaking(
-          updateCurrentPromptState: updateCurrentPromptState,
-        );
-      case PromptState.processing:
-        return MicButtonProcessing();
-      default:
-        return MicButtonIdle();
-    }
-  }
-
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -124,6 +56,26 @@ class _ScenarioSimState extends State<ScenarioSim> {
               fit: BoxFit.contain,
             ),
           ),
+          Positioned(
+            top: 75,
+            left: 20,
+            child: Container(
+              width: 64, // Total width of the circle
+              height: 64, // Total height of the circle
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero, // Centers the icon perfectly
+                iconSize: 32, // Size of the actual arrow icon
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          ),
 
           Positioned(top: 75, right: 20, child: SettingsButton()),
 
@@ -135,27 +87,9 @@ class _ScenarioSimState extends State<ScenarioSim> {
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: 10.0,
               children: [
-                SpeechBubble(prompt: prompts[_currentPromptIndex]),
+                SpeechBubble(),
                 const SizedBox(height: 20),
-                SizedBox(
-                  height: 150,
-                  child: _hintButtonPressed
-                      ? SelectHint()
-                      : const SizedBox.shrink(),
-                ),
-
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 20.0,
-                  children: [
-                    HintButton(
-                      toggleHintButton: toggleHintButton,
-                      hintButtonPressed: _hintButtonPressed,
-                    ),
-                    _buildMicButton(),
-                  ],
-                ),
+                MicAndHintButton(),
               ],
             ),
           ),

@@ -1,12 +1,10 @@
-import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 import 'play_audio_button.dart';
 
 class SpeechBubble extends StatefulWidget {
-  final String prompt;
-
-  const SpeechBubble({super.key, required this.prompt});
+  const SpeechBubble({super.key});
 
   @override
   State<SpeechBubble> createState() => _SpeechBubbleState();
@@ -15,6 +13,8 @@ class SpeechBubble extends StatefulWidget {
 class _SpeechBubbleState extends State<SpeechBubble> {
   @override
   Widget build(BuildContext context) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return Align(
       alignment: Alignment.center,
       child: SizedBox(
@@ -39,10 +39,10 @@ class _SpeechBubbleState extends State<SpeechBubble> {
                 child: Row(
                   spacing: 12.0,
                   children: [
-                    PlayAudioButton(),
+                    SizedBox(width: 40, height: 40, child: PlayAudioButton()),
                     Expanded(
                       child: Text(
-                        widget.prompt,
+                        scenarioSimManager.currentPrompt,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
@@ -53,8 +53,7 @@ class _SpeechBubbleState extends State<SpeechBubble> {
 
             // 2. The Tip (Positioned on the top border)
             Positioned(
-              top:
-                  -80, // Adjust this to move speech bubble tip higher
+              top: -80, // Adjust this to move speech bubble tip higher
               left: 30,
               child: Image.asset(
                 'assets/images/speech_bubble_tip_image.png',
