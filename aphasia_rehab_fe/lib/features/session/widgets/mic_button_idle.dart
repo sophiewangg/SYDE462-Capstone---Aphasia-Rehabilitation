@@ -1,16 +1,11 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class MicButtonIdle extends StatefulWidget {
-  final Function() updateCurrentPromptState;
-  final Function() onPressedMic;
-
-  const MicButtonIdle({
-    super.key,
-    required this.updateCurrentPromptState,
-    required this.onPressedMic,
-  });
+  const MicButtonIdle({super.key});
 
   @override
   State<MicButtonIdle> createState() => _MicButtonIdleState();
@@ -19,10 +14,11 @@ class MicButtonIdle extends StatefulWidget {
 class _MicButtonIdleState extends State<MicButtonIdle> {
   @override
   Widget build(BuildContext context) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return ElevatedButton(
       onPressed: () {
-        widget.updateCurrentPromptState();
-        widget.onPressedMic();
+        scenarioSimManager.handleMicToggle();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,

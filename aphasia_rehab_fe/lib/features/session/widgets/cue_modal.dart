@@ -1,45 +1,26 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button_cue_modal.dart';
-import 'package:aphasia_rehab_fe/models/prompt_state.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../models/cue_model.dart';
 
 class CueModal extends StatefulWidget {
   final Future<Cue?> cueFuture;
-  final Function() startRecording;
-  final Function() updateCurrentPromptState;
-  final PromptState currentPromptState;
-  final bool cueComplete;
-  final String? cueResultString;
-  final int cueNumber;
-  final Function({bool reset}) updateCueNumber;
-  final Function() resetCueComplete;
-  final Function() resetCueResultString;
 
-  const CueModal({
-    super.key,
-    required this.cueFuture,
-    required this.startRecording,
-    required this.updateCurrentPromptState,
-    required this.currentPromptState,
-    required this.cueComplete,
-    this.cueResultString,
-    required this.cueNumber,
-    required this.updateCueNumber,
-    required this.resetCueComplete,
-    required this.resetCueResultString,
-  });
+  const CueModal({super.key, required this.cueFuture});
 
   @override
   State<CueModal> createState() => _CueModalState();
 }
 
 class _CueModalState extends State<CueModal> {
-  final ValueNotifier<PromptState> _currentPromptState = ValueNotifier(
-    PromptState.idle,
-  );
+  String _getHintText(int stage, Cue? fetchedCue) {
+    // If we have no cue data (the "else" case from your handlePressed)
+    if (fetchedCue == null) {
+      return "Try saying \"I didn't understand that\"";
+    }
 
-  String _getHintText(int stage, Cue fetchedCue) {
     switch (stage) {
       case 0:
         return "Meaning: ${fetchedCue.semantic}";
@@ -52,142 +33,129 @@ class _CueModalState extends State<CueModal> {
     }
   }
 
-  void updateCurrentPromptState() {
-    if (_currentPromptState.value == PromptState.userSpeaking) {
-      _currentPromptState.value = PromptState.processing;
-      processSpeechResult();
-    } else if (_currentPromptState.value == PromptState.idle) {
-      _currentPromptState.value = PromptState.userSpeaking;
-    }
-  }
-
-  void processSpeechResult() async {
-    print("Processing speech result");
-  }
-
   @override
   Widget build(BuildContext context) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return FutureBuilder<Cue?>(
       future: widget.cueFuture,
       builder: (context, cueSnapshot) {
+        // 1. Loading State
         if (cueSnapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            width: double.infinity,
-            height: 300, // Reduced height since mic is gone
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.cueModalInProgress,
-              borderRadius: BorderRadius.circular(32.0),
-            ),
+          return _buildBaseContainer(
+            scenarioSimManager: scenarioSimManager,
             child: const Center(
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: CircularProgressIndicator(strokeWidth: 3),
-              ),
+              child: CircularProgressIndicator(strokeWidth: 3),
             ),
           );
         }
 
-        if (cueSnapshot.hasError || !cueSnapshot.hasData) {
-          return const Center(child: Text("Error loading hints."));
+        // 2. Error State (Actual network/parsing failure)
+        if (cueSnapshot.hasError) {
+          return _buildBaseContainer(
+            scenarioSimManager: scenarioSimManager,
+            child: const Center(child: Text("Error loading hints.")),
+          );
         }
 
-        final fetchedCue = cueSnapshot.data!;
+        // 3. Success State (Note: data can be null here if we passed Future.value(null))
+        final fetchedCue = cueSnapshot.data;
 
-        return Container(
-          width: double.infinity,
-          height: 350, // Reduced height
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: widget.cueComplete
-                ? AppColors.cueModalComplete
-                : AppColors.cueModalInProgress,
-            borderRadius: BorderRadius.circular(32.0),
-          ),
+        return _buildBaseContainer(
+          scenarioSimManager: scenarioSimManager,
           child: Column(
-            mainAxisSize: MainAxisSize
-                .min, // Use min size for a "popup/notification" feel
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton.icon(
-                  onPressed: () async {
-                    Navigator.pop(context);
-                    await Future.delayed(const Duration(milliseconds: 300));
-                    widget.updateCueNumber(reset: true);
-                    widget.resetCueComplete();
-                    widget.resetCueResultString();
-                  },
-                  icon: const Icon(Icons.close),
-                  label: const Text('Cancel'),
-                  style: TextButton.styleFrom(
-                    side: BorderSide.none,
-                    foregroundColor: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              widget.cueResultString != null
-                  ? SizedBox(
-                      child: Container(
-                        width: 375,
-                        padding: const EdgeInsets.all(
-                          8.0,
-                        ), // Adds space inside the box
-                        decoration: BoxDecoration(
-                          color: AppColors
-                              .hintBackground, // The hint background color
-                          borderRadius: BorderRadius.circular(
-                            8.0,
-                          ), // Optional: rounds the corners
-                        ),
-                        child: Text(
-                          widget.cueResultString!,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                          ), // Ensure text is visible on white
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                    )
-                  : SizedBox(height: 25),
+              _buildCloseButton(context, scenarioSimManager),
               const SizedBox(height: 10),
 
-              Container(
-                width: 350,
-                padding: const EdgeInsets.all(8.0), // Adds space inside the box
-                decoration: BoxDecoration(
-                  color: AppColors.hintBackground, // The hint background color
-                  borderRadius: BorderRadius.circular(
-                    8.0,
-                  ), // Optional: rounds the corners
-                ),
-                child: Text(
-                  _getHintText(widget.cueNumber, fetchedCue),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
-                  ), // Ensure text is visible on white
-                  textAlign: TextAlign.start,
+              // Result String (The "Correct!" message)
+              if (scenarioSimManager.cueResultStringNotifier.value != null)
+                _buildMessageBox(
+                  scenarioSimManager.cueResultStringNotifier.value!,
+                )
+              else
+                const SizedBox(height: 25),
+
+              const SizedBox(height: 10),
+
+              // The Hint Text (Now handles null fetchedCue inside the helper)
+              _buildMessageBox(
+                _getHintText(
+                  scenarioSimManager.cueNumberNotifier.value,
+                  fetchedCue,
                 ),
               ),
 
-              // Removed MicrophoneButton
               const SizedBox(height: 40),
 
-              MicAndHintButtonCueModal(
-                startRecording: widget.startRecording,
-                updateCurrentPromptState: widget.updateCurrentPromptState,
-                currentPromptState: widget.currentPromptState,
-                updateCueNumber: widget.updateCueNumber,
-              ),
+              MicAndHintButtonCueModal(),
             ],
           ),
         );
       },
+    );
+  }
+
+  // --- Helper Builders to keep the code clean ---
+
+  Widget _buildBaseContainer({
+    required Widget child,
+    required ScenarioSimManager scenarioSimManager,
+  }) {
+    return Container(
+      width: double.infinity,
+      height: 350,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: scenarioSimManager.cueCompleteNotifier.value
+            ? AppColors.cueModalComplete
+            : AppColors.cueModalInProgress,
+        borderRadius: BorderRadius.circular(32.0),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildMessageBox(String text) {
+    return Container(
+      width: 375,
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: AppColors.hintBackground,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 18, color: Colors.black),
+        textAlign: TextAlign.start,
+      ),
+    );
+  }
+
+  Widget _buildCloseButton(
+    BuildContext context,
+    ScenarioSimManager scenarioSimManager,
+  ) {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: TextButton.icon(
+        onPressed: () async {
+          Navigator.pop(context);
+          await Future.delayed(const Duration(milliseconds: 300));
+          scenarioSimManager.updateCueNumber(reset: true);
+          scenarioSimManager.resetCueComplete();
+          scenarioSimManager.resetCueResultString();
+          scenarioSimManager.setIsModalOpen(false);
+        },
+        icon: const Icon(Icons.close),
+        label: const Text('Cancel'),
+        style: TextButton.styleFrom(
+          side: BorderSide.none,
+          foregroundColor: AppColors.textPrimary,
+        ),
+      ),
     );
   }
 }

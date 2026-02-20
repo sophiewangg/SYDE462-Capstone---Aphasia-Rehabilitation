@@ -1,10 +1,10 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SelectHint extends StatefulWidget {
-  final Function() handleHintPressed;
-
-  const SelectHint({super.key, required this.handleHintPressed});
+  const SelectHint({super.key});
 
   @override
   State<SelectHint> createState() => _SelectHintState();
@@ -13,6 +13,8 @@ class SelectHint extends StatefulWidget {
 class _SelectHintState extends State<SelectHint> {
   @override
   Widget build(BuildContext context) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     const double borderRadius = 8.0;
 
     return Container(
@@ -30,8 +32,10 @@ class _SelectHintState extends State<SelectHint> {
             Expanded(
               flex: 35,
               child: InkWell(
-                onTap: () =>
-                    widget.handleHintPressed(), // Call the provided callback
+                onTap: () => scenarioSimManager.handleHintPressed(
+                  isWordFinding: true,
+                  context: context,
+                ), // Call the provided callback
                 // Wrap the image here
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
@@ -49,7 +53,10 @@ class _SelectHintState extends State<SelectHint> {
             Expanded(
               flex: 35,
               child: InkWell(
-                onTap: () => print("I don't understand tapped"),
+                onTap: () => scenarioSimManager.handleHintPressed(
+                  isWordFinding: false,
+                  context: context,
+                ), // Call the provided callback
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(borderRadius),

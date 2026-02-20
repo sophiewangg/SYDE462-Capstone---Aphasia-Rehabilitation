@@ -1,59 +1,40 @@
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/hint_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_button_idle.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_button_processing.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_button_speaking.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/select_hint.dart';
 import 'package:flutter/material.dart';
-import 'package:aphasia_rehab_fe/models/prompt_state.dart';
+import 'package:aphasia_rehab_fe/models/microphone_state.dart';
+import 'package:provider/provider.dart';
 
 class MicAndHintButton extends StatefulWidget {
-  final String currentPrompt;
-  final bool hintButtonPressed;
-  final PromptState currentPromptState;
-  final Function() updateCurrentPromptState;
-  final Function() toggleHintButton;
-  final Function() onPressedMic;
-  final Function() handleHintPressed;
-
-  const MicAndHintButton({
-    super.key,
-    required this.currentPrompt,
-    required this.hintButtonPressed,
-    required this.currentPromptState,
-    required this.updateCurrentPromptState,
-    required this.toggleHintButton,
-    required this.onPressedMic,
-    required this.handleHintPressed,
-  });
+  const MicAndHintButton({super.key});
 
   @override
   State<MicAndHintButton> createState() => _MicAndHintButtonState();
 }
 
 class _MicAndHintButtonState extends State<MicAndHintButton> {
-  Widget _buildMicButton() {
-    switch (widget.currentPromptState) {
-      case PromptState.idle:
-        return MicButtonIdle(
-          updateCurrentPromptState: widget.updateCurrentPromptState,
-          onPressedMic: widget.onPressedMic,
-        );
-      case PromptState.userSpeaking:
-        return MicButtonSpeaking(
-          updateCurrentPromptState: widget.updateCurrentPromptState,
-        );
-      case PromptState.processing:
+  Widget _buildMicButton(ScenarioSimManager manager) {
+    // Access the state directly from the manager we pass in
+    switch (manager.currentMicrophoneState) {
+      case MicrophoneState.idle:
+        return MicButtonIdle();
+      case MicrophoneState.userSpeaking:
+        return MicButtonSpeaking();
+      case MicrophoneState.processing:
         return MicButtonProcessing();
       default:
-        return MicButtonIdle(
-          updateCurrentPromptState: widget.updateCurrentPromptState,
-          onPressedMic: widget.onPressedMic,
-        );
+        return MicButtonIdle();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final transcriptionManager = context.watch<ScenarioSimManager>();
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,21 +42,15 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
       children: [
         SizedBox(
           height: 150,
-          child: widget.hintButtonPressed
-              ? SelectHint(handleHintPressed: widget.handleHintPressed)
+          child: scenarioSimManager.hintButtonPressed
+              ? SelectHint()
               : const SizedBox.shrink(),
         ),
         Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
-          children: [
-            HintButton(
-              toggleHintButton: widget.toggleHintButton,
-              hintButtonPressed: widget.hintButtonPressed,
-            ),
-            _buildMicButton(),
-          ],
+          children: [HintButton(), _buildMicButton(transcriptionManager)],
         ),
       ],
     );

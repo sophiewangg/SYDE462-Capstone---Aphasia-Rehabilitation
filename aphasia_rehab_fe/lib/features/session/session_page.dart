@@ -6,9 +6,8 @@ import '../../services/transcription_service.dart';
 import '../../services/cue_service.dart';
 import 'widgets/cue_modal.dart';
 import 'widgets/transcription_display.dart';
-import 'widgets/mic_and_hint_button.dart';
 import 'scenario_sim.dart';
-import 'package:aphasia_rehab_fe/models/prompt_state.dart';
+import 'package:aphasia_rehab_fe/models/microphone_state.dart';
 
 class SessionPage extends StatefulWidget {
   const SessionPage({super.key, required this.title});
@@ -37,19 +36,20 @@ class _SessionPageState extends State<SessionPage> {
     "Thank you! Have a great day!",
   ];
   int _currentPromptIndex = 0;
-  final ValueNotifier<PromptState> _currentPromptState = ValueNotifier(
-    PromptState.idle,
+  final ValueNotifier<MicrophoneState> _currentMicrophoneState = ValueNotifier(
+    MicrophoneState.idle,
   );
 
-  final ValueNotifier<PromptState> _currentPromptStateModal = ValueNotifier(
-    PromptState.idle,
-  );
+  final ValueNotifier<MicrophoneState> _currentMicrophoneStateModal =
+      ValueNotifier(MicrophoneState.idle);
 
   final ValueNotifier<bool> _cueCompleteNotifier = ValueNotifier(false);
 
   final ValueNotifier<String?> _cueResultStringNotifier = ValueNotifier(null);
 
   final ValueNotifier<int> _cueNumberNotifier = ValueNotifier(0);
+
+  bool _modalIsWordFinding = true;
 
   void updateCueNumber({bool reset = false}) {
     if (reset) {
@@ -73,57 +73,61 @@ class _SessionPageState extends State<SessionPage> {
     });
   }
 
-  void updateCurrentPromptState() {
-    if (_currentPromptState.value == PromptState.userSpeaking) {
-      _currentPromptState.value = PromptState.processing;
+  void updateCurrentMicrophoneState() {
+    if (_currentMicrophoneState.value == MicrophoneState.userSpeaking) {
+      _currentMicrophoneState.value = MicrophoneState.processing;
 
       Timer(const Duration(seconds: 2), () {
         if (mounted) {
           _currentPromptIndex = (_currentPromptIndex + 1) % prompts.length;
-          _currentPromptState.value =
-              PromptState.idle; // This will now auto-update the modal!
+          _currentMicrophoneState.value =
+              MicrophoneState.idle; // This will now auto-update the modal!
         }
       });
-    } else if (_currentPromptState.value == PromptState.idle) {
-      _currentPromptState.value = PromptState.userSpeaking;
+    } else if (_currentMicrophoneState.value == MicrophoneState.idle) {
+      _currentMicrophoneState.value = MicrophoneState.userSpeaking;
     }
   }
 
-  void updateCurrentPromptStateModal() {
-    if (_currentPromptStateModal.value == PromptState.userSpeaking) {
-      _currentPromptStateModal.value = PromptState.processing;
-      processSpeechFromCue(_likelyWord ?? "");
-      // processSpeechFromCue();
-    } else if (_currentPromptStateModal.value == PromptState.idle) {
-      _currentPromptStateModal.value = PromptState.userSpeaking;
+  void updateCurrentMicrophoneStateModal() {
+    if (_currentMicrophoneStateModal.value == MicrophoneState.userSpeaking) {
+      _currentMicrophoneStateModal.value = MicrophoneState.processing;
+      if (_modalIsWordFinding) {
+        processSpeechWordFinding(_likelyWord ?? "");
+      } else {
+        processSpeechUnderstanding();
+      }
+    } else if (_currentMicrophoneStateModal.value == MicrophoneState.idle) {
+      _currentMicrophoneStateModal.value = MicrophoneState.userSpeaking;
     }
   }
 
-  // Update the function to accept the target word
-  void processSpeechFromCue(String targetWord) async {
+  void processSpeechWordFinding(String targetWord) async {
     print("Processing speech. Latest transcript: $_transcription");
 
-    // Clean up the strings for a fair comparison
     String cleanTranscript = _transcription.toLowerCase().trim();
     String cleanTarget = targetWord.toLowerCase().trim();
 
     if (cleanTranscript.contains(cleanTarget)) {
       print("Success! Word detected.");
-      // Just update the value. The ValueListenableBuilder in the modal hears this!
       _cueCompleteNotifier.value = true;
-      _currentPromptStateModal.value = PromptState.idle;
+      _currentMicrophoneStateModal.value = MicrophoneState.idle;
       _cueResultStringNotifier.value =
           "Correct! The word is ${targetWord.toUpperCase()}";
-
-      // TODO: If you want the modal to show a 'Success' checkmark,
-      // you should use another ValueNotifier<bool> for _cueComplete.
     } else {
       print("Word not matched yet.");
       // Revert to idle so they can try again
       _cueResultStringNotifier.value = "Not quite. Here's another hint:";
       updateCueNumber();
-      _currentPromptStateModal.value = PromptState.idle;
+      _currentMicrophoneStateModal.value = MicrophoneState.idle;
     }
+  }
+
+  void processSpeechUnderstanding() {
+    print("Sucess! User indicated they didn't understand.");
+    _cueCompleteNotifier.value = true;
+    _currentMicrophoneStateModal.value = MicrophoneState.idle;
+    _cueResultStringNotifier.value = "Return to exercise.";
   }
 
   @override
@@ -140,8 +144,8 @@ class _SessionPageState extends State<SessionPage> {
         _stopRecording(); // Explicitly stop instead of toggling
         bool isModalOpen = ModalRoute.of(context)?.isCurrent == false;
         isModalOpen
-            ? updateCurrentPromptStateModal()
-            : updateCurrentPromptState(); // Update the prompt state when the turn ends
+            ? updateCurrentMicrophoneStateModal()
+            : updateCurrentMicrophoneState(); // Update the prompt state when the turn ends
       }
     });
   }
@@ -184,31 +188,44 @@ class _SessionPageState extends State<SessionPage> {
     }
   }
 
-  void _handleHintPressed() async {
-    // 1. Kick off the request (don't 'await' it here)
-    final cueFuture = _cueService.getCues(_transcription, _goal);
-    toggleHintButton();
+  void _handleHintPressed(bool isWordFinding) async {
     setState(() {
-      _currentPromptState.value = PromptState.idle;
+      _modalIsWordFinding = isWordFinding;
+      _hintButtonPressed = false;
     });
-    _stopRecording();
-    // 2. Open the modal immediately
 
-    _showModal(cueFuture);
-
-    // Separately, wait for the future to finish to save the word locally
-    final fetchedCue = await cueFuture;
-
-    if (fetchedCue != null) {
+    if (isWordFinding) {
+      // 1. Kick off the request (don't 'await' it here)
+      final cueFuture = _cueService.getCues(_transcription, _goal);
+      toggleHintButton();
       setState(() {
-        _likelyWord = fetchedCue.likelyWord;
+        _currentMicrophoneState.value = MicrophoneState.idle;
       });
+      _stopRecording();
+      // 2. Open the modal immediately
+
+      _showModal(cueFuture);
+
+      // Separately, wait for the future to finish to save the word locally
+      final fetchedCue = await cueFuture;
+
+      if (fetchedCue != null) {
+        setState(() {
+          _likelyWord = fetchedCue.likelyWord;
+        });
+      }
+    } else {
+      // 1. Create a Future that is already finished with null data
+      final noCueFuture = Future<Cue?>.value(null);
+
+      // 2. Open the modal immediately
+      _showModal(noCueFuture);
     }
   }
 
   void _showModal(Future<Cue?> fetchedCue) {
     _cueCompleteNotifier.value = false;
-    _currentPromptStateModal.value = PromptState.idle;
+    _currentMicrophoneStateModal.value = MicrophoneState.idle;
 
     showModalBottomSheet(
       context: context,
@@ -220,24 +237,13 @@ class _SessionPageState extends State<SessionPage> {
         // AnimatedBuilder is the correct widget for Listenable.merge
         return AnimatedBuilder(
           animation: Listenable.merge([
-            _currentPromptStateModal,
+            _currentMicrophoneStateModal,
             _cueCompleteNotifier,
             _cueResultStringNotifier,
             _cueNumberNotifier,
           ]),
           builder: (context, _) {
-            return CueModal(
-              cueFuture: fetchedCue,
-              startRecording: _startRecording,
-              updateCurrentPromptState: updateCurrentPromptStateModal,
-              currentPromptState: _currentPromptStateModal.value,
-              cueComplete: _cueCompleteNotifier.value,
-              cueResultString: _cueResultStringNotifier.value,
-              cueNumber: _cueNumberNotifier.value,
-              updateCueNumber: updateCueNumber,
-              resetCueComplete: resetCueComplete,
-              resetCueResultString: resetCueResultString,
-            );
+            return CueModal(cueFuture: fetchedCue);
           },
         );
       },
@@ -268,25 +274,6 @@ class _SessionPageState extends State<SessionPage> {
                 );
               },
               child: const Text('Go to scenario'),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 50),
-              child: ValueListenableBuilder<PromptState>(
-                valueListenable: _currentPromptState,
-                builder: (context, state, child) {
-                  // 'state' here is the current value of _currentPromptState
-                  return MicAndHintButton(
-                    currentPrompt: "",
-                    hintButtonPressed: _hintButtonPressed,
-                    currentPromptState:
-                        state, // Use the 'state' from the builder
-                    updateCurrentPromptState: updateCurrentPromptState,
-                    toggleHintButton: toggleHintButton,
-                    onPressedMic: _handleMicToggle,
-                    handleHintPressed: _handleHintPressed,
-                  );
-                },
-              ),
             ),
           ],
         ),
