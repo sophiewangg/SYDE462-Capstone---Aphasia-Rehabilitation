@@ -1,6 +1,8 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class MicButtonIdle extends StatefulWidget {
   const MicButtonIdle({super.key});
@@ -12,9 +14,11 @@ class MicButtonIdle extends StatefulWidget {
 class _MicButtonIdleState extends State<MicButtonIdle> {
   @override
   Widget build(BuildContext context) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return ElevatedButton(
       onPressed: () {
-        // TODO: Implement audio play logic
+        scenarioSimManager.handleMicToggle();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
@@ -27,10 +31,7 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
       ),
       child: SvgPicture.asset(
         'assets/icons/mic_button.svg',
-        colorFilter: const ColorFilter.mode(
-          Colors.black,
-          BlendMode.srcIn,
-        ),
+        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
         width: 30,
       ),
     );
