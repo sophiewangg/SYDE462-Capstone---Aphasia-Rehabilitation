@@ -7,17 +7,12 @@ import '../../../services/transcription_service.dart';
 import '../../../services/cue_service.dart';
 import '../../../models/microphone_state.dart';
 import '../../../models/cue_model.dart';
+import '../../../models/scenario_step.dart';
+import '../../../data/restaurant_scenario.dart';
 import '../widgets/cue_modal.dart';
 
 class ScenarioSimManager extends ChangeNotifier {
-  List<String> prompts = [
-    "Hello! How are you doing?",
-    "Would you like something to drink?",
-    "What would you like to order?",
-    "Here is your food. Enjoy your meal!",
-    "Can I get you anything else?",
-    "Thank you! Have a great day!",
-  ];
+  final List<ScenarioStep> scenarioSteps = restaurantScenarioSteps;
 
   // --- Services ---
   final TranscriptionService _transcriptionService = TranscriptionService();
@@ -37,13 +32,9 @@ class ScenarioSimManager extends ChangeNotifier {
   String? _likelyWord;
   bool _hintButtonPressed = false;
 
-  // --- State Variables: Prompt Modal ---
-  int _currentPromptIndex = 0;
-  String _currentPrompt = "";
-
-  // --- State Variables: Character and Audio ---
-  String currentCharacter = "assets/characters/intro_hello.png";
-  String currentAudio = "audio_clips/server_speech_1.mp3";
+  // --- State Variables: Scenario Step ---
+  int _currentStepIndex = 0;
+  String? _promptOverride; // Overrides step prompt after simplification
 
   // --- ValueNotifiers (For Modal UI) ---
   final cueCompleteNotifier = ValueNotifier<bool>(false);
@@ -61,13 +52,16 @@ class ScenarioSimManager extends ChangeNotifier {
   bool get isModalOpen => _isModalOpen;
   bool get hintButtonPressed => _hintButtonPressed;
   bool get modalIsWordFinding => _modalIsWordFinding;
-  int get currentPromptIndex => _currentPromptIndex;
-  String get currentPrompt => _currentPrompt;
+  int get currentStepIndex => _currentStepIndex;
+  String get currentPrompt => _promptOverride ?? _currentStep.prompt;
+  String get currentCharacter => _currentStep.characterAsset;
+  String get currentAudio =>
+      _currentStep.audioAsset ?? "audio_clips/server_speech_1.mp3";
+
+  ScenarioStep get _currentStep => scenarioSteps[_currentStepIndex];
 
   ScenarioSimManager() {
     _initTranscriptionListener();
-    _currentPrompt =
-        prompts[_currentPromptIndex]; // Initialize the first prompt
     playCharacterAudio(); // Play initial character audio
   }
 
@@ -126,12 +120,12 @@ class ScenarioSimManager extends ChangeNotifier {
     if (_isModalOpen) {
       processCueSpeech();
     } else {
-      // TODO: actually process speech, update prompt, update character/audio
-      // Mock processing of speech
+      // TODO: actually process speech and determine next step
+      // Mock processing: advance to next scenario step
       await Future.delayed(const Duration(seconds: 2));
-      _currentPromptIndex =
-          (_currentPromptIndex + 1) % prompts.length; // Loop prompts
-      _currentPrompt = prompts[_currentPromptIndex];
+      _currentStepIndex =
+          (_currentStepIndex + 1) % scenarioSteps.length;
+      _promptOverride = null; // Clear override when advancing
       _currentMicrophoneState = MicrophoneState.idle;
       currentMicrophoneStateModal.value = MicrophoneState.idle;
       notifyListeners();
@@ -162,7 +156,7 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
 
     if (isWordFinding) {
-      final cueFuture = _cueService.getCues(_transcription, _currentPrompt);
+      final cueFuture = _cueService.getCues(_transcription, currentPrompt);
       _showModal(context, cueFuture);
 
       final fetchedCue = await cueFuture;
@@ -205,8 +199,8 @@ class ScenarioSimManager extends ChangeNotifier {
     cueResultStringNotifier.value = "Return to exercise.";
     _currentMicrophoneState = MicrophoneState.idle;
     currentMicrophoneStateModal.value = MicrophoneState.idle;
-    final response = await _cueService.getSimplifiedPrompt(_currentPrompt);
-    _currentPrompt = response?.simplifiedPrompt ?? _currentPrompt;
+    final response = await _cueService.getSimplifiedPrompt(currentPrompt);
+    _promptOverride = response?.simplifiedPrompt ?? _promptOverride;
 
     notifyListeners();
   }
