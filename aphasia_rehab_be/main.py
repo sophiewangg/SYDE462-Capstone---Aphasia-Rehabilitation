@@ -192,3 +192,7 @@ async def list_detections():
     # Sort by name (which is timestamped) so newest are at the top
     files.sort(reverse=True)
     return files
+
+@app.post("/clear_detections")
+def clear_detections():
+    disfluency_detection_service.clear_detections()

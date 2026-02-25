@@ -33,9 +33,7 @@ class DisfluencyDetectionService:
         self.detections_dir = os.path.join(self.project_root, "detections")
         os.makedirs(self.detections_dir, exist_ok=True)
 
-    def detect_disfluencies(self, raw_filename):
-        from worker import process_recording_pipeline
-        
+    def clear_detections(self):
         # Path to the detections folder
         detections_dir = './detections'
     
@@ -50,6 +48,10 @@ class DisfluencyDetectionService:
                         shutil.rmtree(file_path) # Delete subdirectories
                 except Exception as e:
                     print(f'Failed to delete {file_path}. Reason: {e}')
+
+    def detect_disfluencies(self, raw_filename):
+        from worker import process_recording_pipeline
+        
         process_recording_pipeline.delay(raw_filename)
         
     def _load_assets(self):

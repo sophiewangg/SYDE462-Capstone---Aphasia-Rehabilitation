@@ -4,6 +4,14 @@ import 'package:http/http.dart' as http;
 class SessionDashboardService {
   final String baseUrl = "http://127.0.0.1:8000";
 
+  void clearDetections() async {
+    try {
+      await http.post(Uri.parse("$baseUrl/clear_detections"));
+    } catch (e) {
+      print("Error fetching detections: $e");
+    }
+  }
+
   Future<List<String>> fetchSavedDetections() async {
     try {
       final response = await http.get(Uri.parse("$baseUrl/list_detections"));
