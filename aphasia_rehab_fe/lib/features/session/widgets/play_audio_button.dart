@@ -25,7 +25,7 @@ class _PlayAudioButtonState extends State<PlayAudioButton> {
         foregroundColor: AppColors.textPrimary,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(10),
-        elevation: 2,
+        elevation: 0,
       ),
       child: SvgPicture.asset(
         'assets/icons/audio_icon.svg',

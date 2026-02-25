@@ -24,7 +24,6 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         shape: const StadiumBorder(),
-        side: const BorderSide(color: Colors.black, width: 1.0),
         fixedSize: const Size(250, 75),
         padding: EdgeInsets.zero,
         elevation: 2,
