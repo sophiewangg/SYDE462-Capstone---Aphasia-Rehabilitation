@@ -42,7 +42,7 @@ class ScenarioSimManager extends ChangeNotifier {
   String _currentPrompt = "";
 
   // --- State Variables: Character and Audio ---
-  String currentCharacter = "assets/characters/server_1.png";
+  String currentCharacter = "assets/characters/intro_hello.png";
   String currentAudio = "audio_clips/server_speech_1.mp3";
 
   // --- ValueNotifiers (For Modal UI) ---
