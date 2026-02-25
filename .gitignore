@@ -30,6 +30,7 @@ chroma_db/
 .pub-cache/
 .pub/
 build/
+devtools_options.yaml
 # iOS/macOS specific
 ios/Pods/
 ios/.symlinks/
@@ -49,3 +50,4 @@ macos/.symlinks/
 .DS_Store?
 ._*
 Thumbs.db
+
