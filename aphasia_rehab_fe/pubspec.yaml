@@ -61,24 +61,11 @@ dev_dependencies:
 # The following section is specific to Flutter packages.
 flutter:
   assets:
-    - assets/icons/home_icon.svg
-    - assets/icons/practice_icon.svg
-    - assets/icons/profile_icon.svg
-    - assets/icons/start_icon.svg
-    - assets/images/restaurant_image.png
-    - assets/backgrounds/restaurant_background.png
-    - assets/icons/hint_icon.svg
-    - assets/icons/settings_icon.svg
-    - assets/icons/audio_icon.svg
-    - assets/icons/mic_button.svg
-    - assets/images/help_finding_word_image.png
-    - assets/images/i_dont_understand_image.png
-    - assets/characters/server_1.png
-    - assets/icons/processing_icon.svg
-    - assets/audio_clips/server_speech_1.mp3
-    - assets/images/table_image.png
-    - assets/images/speech_bubble_tip_image.png
-    - assets/icons/pause_icon.svg
+    - assets/icons/
+    - assets/images/
+    - assets/backgrounds/
+    - assets/characters/
+    - assets/audio_clips/
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
