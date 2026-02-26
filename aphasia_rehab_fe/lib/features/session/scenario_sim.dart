@@ -348,6 +348,8 @@ class _ScenarioSimState extends State<ScenarioSim> {
             right: 20,
             child: ElevatedButton(
               onPressed: () {
+                scenarioSimManager.stopRecording();
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
