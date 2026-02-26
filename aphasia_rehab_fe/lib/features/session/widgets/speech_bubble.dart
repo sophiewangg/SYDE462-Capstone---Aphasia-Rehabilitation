@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import 'play_audio_button.dart';
 
 class SpeechBubble extends StatefulWidget {
-  const SpeechBubble({super.key});
+  final String prompt;
+
+  const SpeechBubble({super.key, required this.prompt});
 
   @override
   State<SpeechBubble> createState() => _SpeechBubbleState();

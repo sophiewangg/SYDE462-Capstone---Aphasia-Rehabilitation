@@ -21,14 +21,19 @@ class TranscriptionService:
         self.client = None
 
     def connect_to_assemblyai(self, websocket, loop):
-        # 1. Initialize with REQUIRED options
+        if self.client is not None:
+            logger.info("🧹 Found existing session, closing it first...")
+        try:
+            self.client.disconnect(terminate=True)
+        except Exception:
+            pass
+
         options = StreamingClientOptions(
             api_key=self.api_key
         )
 
         self.client = StreamingClient(options=options)
 
-        # 2. Define Event Handlers (same as before)
         def on_begin(client, event: BeginEvent):
             logger.info(f"🟢 Session Started: {event.id}")
 
@@ -78,6 +83,10 @@ class TranscriptionService:
 
     def close(self):
         if self.client:
-            # Graceful disconnect
-            self.client.disconnect(terminate=True)
-            self.client = None
+            try:
+                logger.info("🔌 Disconnecting from AssemblyAI...")
+                self.client.disconnect(terminate=True)
+            except Exception as e:
+                logger.error(f"Error during disconnect: {e}")
+            finally:
+                self.client = None

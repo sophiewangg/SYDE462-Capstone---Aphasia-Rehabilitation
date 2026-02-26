@@ -1,0 +1,642 @@
+[
+  {
+    "id": "scenario_drink_water",
+    "text": "just water for me please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_water"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "i'll have a soda",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "i'll have a coke",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "i'll have a sprite",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee",
+    "text": "can i get a coffee",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_tea",
+    "text": "i'll have an iced tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_tea",
+    "text": "can i get a hot tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_lemonade",
+    "text": "i'd like a lemonade",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_juice",
+    "text": "orange juice please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_juice",
+    "text": "apple juice for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_juice",
+    "text": "can i have a cranberry juice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "i'll take a red wine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "a glass of white wine please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "i'd like a beer",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "can i get an ipa",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "i'll have a margarita",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "a gin and tonic please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "i'll take an old fashioned",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol",
+    "text": "can i have a martini",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "ginger ale please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "i'd like a root beer",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "can i get a dr pepper",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee",
+    "text": "i'd like an espresso",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee",
+    "text": "can i get a cappuccino",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee",
+    "text": "i'll have a latte",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_milk",
+    "text": "a glass of milk please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_milkshake",
+    "text": "i'll take a chocolate milkshake",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_smoothie",
+    "text": "can i have a strawberry smoothie",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_mocktail",
+    "text": "i'd like a shirley temple",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_hotcocoa",
+    "text": "hot chocolate please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_tea",
+    "text": "can i get a matcha latte",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_tea",
+    "text": "i'd like a chai tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_juice",
+    "text": "tomato juice please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_juice",
+    "text": "can i have a pineapple juice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_drink_soda",
+    "text": "i'll take a club soda",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other"
+    }
+  },
+  {
+    "id": "scenario_water_sti'll",
+    "text": "sti'll water please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_sti'll"
+    }
+  },
+  {
+    "id": "scenario_water_sparkling",
+    "text": "sparkling water please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_sparkling"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "yes i would like ice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "yes ice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "no ice for me please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "no ice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "lots of ice please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "easy on the ice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "just a little bit of ice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "extra ice would be great",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "ice is fine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "without ice please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "no ice needed",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "i'd prefer no ice",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "actually no ice for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "ice_question",
+    "text": "keep the ice out",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "yes im ready to order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "im ready to order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "yes ready",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "no i need a bit more time",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "no can you give me a second",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "no i am not ready",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "i think we are all set to order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "we are good to go",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "yeah i know what i want",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "we are all ready over here",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_yes",
+    "text": "im ready whenever you are",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "just a couple more minutes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "not quite yet",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "could you come back in a few",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "we sti'll need to look at the menu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ready_no",
+    "text": "sti'll deciding",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no"
+    }
+  },
+  {
+    "id": "scenario_ask_specials",
+    "text": "what are todays specials",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ask_specials"
+    }
+  },
+  {
+    "id": "scenario_ask_soup",
+    "text": "whats the soup of the day",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ask_soup"
+    }
+  },
+  {
+    "id": "scenario_ask_recommendations",
+    "text": "what do you recommend",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ask_recommendations"
+    }
+  },
+  {
+    "id": "scenario_order_steak",
+    "text": "i'd like the steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_steak"
+    }
+  },
+  {
+    "id": "scenario_order_chicken",
+    "text": "i'll have the chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_chicken"
+    }
+  },
+  {
+    "id": "scenario_order_pasta",
+    "text": "i'll get the pasta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta"
+    }
+  },
+  {
+    "id": "scenario_steak_rare",
+    "text": "rare please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium",
+    "text": "medium please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness"
+    }
+  },
+  {
+    "id": "scenario_steak_welldone",
+    "text": "well done please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness"
+    }
+  },
+  {
+    "id": "scenario_side_salad",
+    "text": "salad please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad"
+    }
+  },
+  {
+    "id": "scenario_side_fries",
+    "text": "fries please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_fries"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes",
+    "text": "yes thats all for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_no",
+    "text": "no i want to add more",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_no"
+    }
+  }
+]

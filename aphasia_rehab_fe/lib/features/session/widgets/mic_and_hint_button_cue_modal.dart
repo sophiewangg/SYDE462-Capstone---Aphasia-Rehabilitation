@@ -43,10 +43,7 @@ class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
-          children: [
-            HintButtonCueModal(),
-            _buildMicButton(scenarioSimManager),
-          ],
+          children: [HintButtonCueModal(), _buildMicButton(scenarioSimManager)],
         ),
       ],
     );
