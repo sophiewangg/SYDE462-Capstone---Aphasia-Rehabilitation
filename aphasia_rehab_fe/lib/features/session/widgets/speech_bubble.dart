@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import 'play_audio_button.dart';
 
 class SpeechBubble extends StatefulWidget {
-  final String prompt;
-
-  const SpeechBubble({super.key, required this.prompt});
+  const SpeechBubble({super.key});
 
   @override
   State<SpeechBubble> createState() => _SpeechBubbleState();
@@ -60,6 +58,23 @@ class _SpeechBubbleState extends State<SpeechBubble> {
               child: Image.asset(
                 'assets/images/speech_bubble_tip_image.png',
                 width: 150,
+              ),
+            ),
+            SizedBox(
+              height: 46,
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: (scenarioSimManager.systemMessage == null)
+                    ? const SizedBox.shrink()
+                    : Text(
+                        scenarioSimManager.systemMessage!,
+                        key: const ValueKey("system_message"),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        softWrap: true,
+                      ),
               ),
             ),
           ],
