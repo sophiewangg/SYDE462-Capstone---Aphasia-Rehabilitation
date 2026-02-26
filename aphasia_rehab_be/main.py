@@ -75,6 +75,10 @@ async def websocket_endpoint(websocket: WebSocket):
 async def generate_cues(transcription: str = Body(..., embed=True), goal: str = Body(..., embed=True)):
     return cue_service.generate_cues(transcription, goal)
 
+@app.post("/simplify_prompt/")
+async def simplify_prompt(prompt: str = Body(..., embed=True)):
+    return cue_service.simplify_prompt(prompt)
+
 @app.post("/seed_exercises/")
 def seed_exercises():
     base_path = Path(__file__).parent

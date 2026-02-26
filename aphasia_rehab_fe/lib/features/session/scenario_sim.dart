@@ -1,3 +1,6 @@
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
@@ -7,13 +10,15 @@ import '../../api_service.dart';
 import '../../services/transcription_service.dart';
 import 'scenario_complete_page.dart';
 import 'widgets/character.dart';
-import 'widgets/hint_button.dart';
+import 'package:provider/provider.dart';
 import 'widgets/mic_button_idle.dart';
 import 'widgets/mic_button_processing.dart';
 import 'widgets/mic_button_speaking.dart';
 import 'widgets/select_hint.dart';
 import 'widgets/settings_button.dart';
-import 'widgets/speech_bubble.dart';
+import 'widgets/character.dart';
+import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
 
 class ScenarioSim extends StatefulWidget {
   const ScenarioSim({super.key});
@@ -21,8 +26,6 @@ class ScenarioSim extends StatefulWidget {
   @override
   State<ScenarioSim> createState() => _ScenarioSimState();
 }
-
-enum PromptState { userSpeaking, characterSpeaking, processing }
 
 enum ScenarioStep {
   drinksOffer,
@@ -366,6 +369,26 @@ class _ScenarioSimState extends State<ScenarioSim> {
               'assets/images/table_image.png',
               height: 250,
               fit: BoxFit.contain,
+            ),
+          ),
+          Positioned(
+            top: 75,
+            left: 20,
+            child: Container(
+              width: 64, // Total width of the circle
+              height: 64, // Total height of the circle
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero, // Centers the icon perfectly
+                iconSize: 32, // Size of the actual arrow icon
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
           ),
 
