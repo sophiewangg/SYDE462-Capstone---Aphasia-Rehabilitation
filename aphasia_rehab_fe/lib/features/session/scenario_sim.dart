@@ -193,7 +193,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      "Grilled steak cooked to your liking, served\nwith roasted potatoes and vegetables.",
+                                      "Grilled steak cooked to your liking, served\nwith a side of either fries or salad.",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 14),
                                     ),

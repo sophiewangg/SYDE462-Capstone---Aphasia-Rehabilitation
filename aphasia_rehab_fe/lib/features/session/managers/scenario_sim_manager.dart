@@ -17,6 +17,7 @@ enum ScenarioStep {
   iceQuestion,
   readyToOrder,
   appetizers,
+  entrees,
   steakDoneness,
   sideChoice,
   isThatAll,
@@ -64,6 +65,10 @@ class ScenarioSimManager extends ChangeNotifier {
   String? _promptOverride;
   final List<String> _orderItems = [];
 
+  bool _isScenarioComplete = false;
+
+  bool get isScenarioComplete => _isScenarioComplete;
+
   final Map<ScenarioStep, ScenarioPrompt> _prompts = {
     ScenarioStep.drinksOffer: const ScenarioPrompt(
       id: 'drinks_offer',
@@ -84,6 +89,10 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.appetizers: const ScenarioPrompt(
       id: 'appetizers',
       text: "Any appetizers to get you started?",
+    ),
+    ScenarioStep.entrees: const ScenarioPrompt(
+      id: 'entrees',
+      text: 'Would you like to order any entrees?',
     ),
     ScenarioStep.steakDoneness: const ScenarioPrompt(
       id: 'steak_doneness',
@@ -224,7 +233,9 @@ class ScenarioSimManager extends ChangeNotifier {
       }
 
       if (_currentStep == ScenarioStep.allergies) {
-        // UI should listen for completion, but logic ends here
+        // Mark the scenario as complete and notify the UI
+        _isScenarioComplete = true;
+        notifyListeners();
         return;
       }
 
@@ -242,16 +253,18 @@ class ScenarioSimManager extends ChangeNotifier {
 
     switch (_currentStep) {
       case ScenarioStep.drinksOffer:
-        if (intent == 'beverage_water')
+        if (intent == 'beverage_water') {
           _currentStep = ScenarioStep.waterType;
-        else if (intent == 'water_still' ||
+        } else if (intent == 'water_still' ||
             intent == 'water_sparkling' ||
-            intent == 'beverage_other')
+            intent == 'beverage_other') {
           _currentStep = ScenarioStep.iceQuestion;
+        }
         break;
       case ScenarioStep.waterType:
-        if (intent == 'water_still' || intent == 'water_sparkling')
+        if (intent == 'water_still' || intent == 'water_sparkling') {
           _currentStep = ScenarioStep.iceQuestion;
+        }
         break;
       case ScenarioStep.iceQuestion:
         _currentStep = ScenarioStep.readyToOrder;
@@ -267,13 +280,25 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
       case ScenarioStep.appetizers:
-        if (intent == 'ask_specials' || intent == 'ask_soup')
+        if (intent == 'ask_specials' || intent == 'ask_soup') {
           _systemMessage = "Today's soup is creamy roasted garlic.";
-        else if (intent == 'ask_recommendations')
+        } else if (intent == 'ask_recommendations') {
           _systemMessage = "My personal favourite is the lobster pasta.";
-        else if (intent == 'order_steak')
+        } else if (intent == 'order_steak') {
           _currentStep = ScenarioStep.steakDoneness;
-        else if (intent == 'order_chicken' || intent == 'order_pasta') {
+        } else if (intent == 'order_chicken' || intent == 'order_pasta') {
+          _orderItems.add(intent!);
+          _currentStep = ScenarioStep.isThatAll;
+        } else if (intent == 'order_soup' || intent == 'order_bruschetta') {
+          //TODO: there was another app
+          _orderItems.add(intent!);
+          _currentStep = ScenarioStep.entrees;
+        }
+        break;
+      case ScenarioStep.entrees:
+        if (intent == 'order_steak') {
+          _currentStep = ScenarioStep.steakDoneness;
+        } else if (intent == 'order_chicken' || intent == 'order_pasta') {
           _orderItems.add(intent!);
           _currentStep = ScenarioStep.isThatAll;
         }
@@ -288,15 +313,53 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
       case ScenarioStep.isThatAll:
-        if (intent == 'is_that_all_yes')
+        if (intent == 'is_that_all_yes') {
           _currentStep = ScenarioStep.allergies;
-        else if (intent == 'is_that_all_no')
+        } else if (intent == 'is_that_all_no') {
           _currentStep = ScenarioStep.appetizers;
+        }
         break;
       case ScenarioStep.allergies:
       case ScenarioStep.notReadyToOrder:
         break;
     }
+    notifyListeners();
+  }
+
+  void resetScenario() {
+    print("--- 🔄 RESETTING SCENARIO ---");
+
+    // Reset core progression
+    _currentStep = ScenarioStep.drinksOffer;
+    _isScenarioComplete = false; // from our previous update
+    _orderItems.clear();
+
+    // Reset text states
+    _transcription = "";
+    _systemMessage = null;
+    _promptPrefix = null;
+    _promptOverride = null;
+
+    // Reset modal states
+    _isModalOpen = false;
+    _modalIsWordFinding = false;
+    _likelyWord = null;
+    _hintButtonPressed = false;
+
+    // Reset UI Notifiers
+    cueCompleteNotifier.value = false;
+    cueResultStringNotifier.value = null;
+    cueNumberNotifier.value = 0;
+    currentMicrophoneStateModal.value = MicrophoneState.idle;
+
+    // Make sure audio is stopped
+    _audioPlayer.stop();
+    if (_isRecording) {
+      _transcriptionService.stopStreaming();
+      _isRecording = false;
+      _currentMicrophoneState = MicrophoneState.idle;
+    }
+
     notifyListeners();
   }
 

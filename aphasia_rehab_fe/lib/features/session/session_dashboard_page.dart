@@ -1,3 +1,4 @@
+import 'package:aphasia_rehab_fe/features/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -20,7 +21,6 @@ class _SessionDashboardPageState extends State<SessionDashboardPage> {
     _detectionsFuture = _dashboardService.fetchSavedDetections();
   }
 
-  // Method to manually refresh the list
   void _refreshDetections() {
     setState(() {
       _detectionsFuture = _dashboardService.fetchSavedDetections();
@@ -82,20 +82,14 @@ class _SessionDashboardPageState extends State<SessionDashboardPage> {
                           subtitle: const Text("Tap to play detection"),
                           trailing: const Icon(Icons.play_arrow),
                           onTap: () async {
-                            // 2. Show the snackbar so the user knows something is happening
                             _showPlaybackSnackBar(filename);
-
-                            // 3. Get the full URL (e.g., http://127.0.0.1:8000/detections/file.wav)
                             String url = _dashboardService.getAudioUrl(
                               filename,
                             );
-
                             try {
-                              // 4. Actually trigger the audio engine
                               await _audioPlayer.play(UrlSource(url));
                             } catch (e) {
                               print("Error playing audio: $e");
-                              // Optional: Show an error snackbar if it fails
                             }
                           },
                         ),
@@ -105,6 +99,30 @@ class _SessionDashboardPageState extends State<SessionDashboardPage> {
                 },
               ),
             ),
+            const SizedBox(height: 20),
+            // --- NEW RETURN HOME BUTTON ---
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.home),
+                label: const Text("Return Home"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue, // Adjust to match your theme
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  // Push and remove until clears the back-stack so the user
+                  // can't accidentally swipe back into the finished scenario.
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    (Route<dynamic> route) => false,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
