@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class MicButtonSpeaking extends StatefulWidget {
-  final Function() updateCurrentPromptState;
+  final Function() onStopSpeaking;
 
-  const MicButtonSpeaking({super.key, required this.updateCurrentPromptState});
+  const MicButtonSpeaking({super.key, required this.onStopSpeaking});
 
   @override
   State<MicButtonSpeaking> createState() => _MicButtonSpeakingState();
@@ -16,7 +16,7 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking> {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        widget.updateCurrentPromptState();
+        widget.onStopSpeaking();
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
