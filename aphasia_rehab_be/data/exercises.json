@@ -280,11 +280,11 @@
     }
   },
   {
-    "id": "scenario_water_sti'll",
-    "text": "sti'll water please",
+    "id": "scenario_water_still",
+    "text": "still water please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "water_sti'll"
+      "intent": "water_still"
     }
   },
   {
@@ -521,7 +521,7 @@
   },
   {
     "id": "scenario_ready_no",
-    "text": "we sti'll need to look at the menu",
+    "text": "we still need to look at the menu",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_no"
@@ -529,7 +529,7 @@
   },
   {
     "id": "scenario_ready_no",
-    "text": "sti'll deciding",
+    "text": "still deciding",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_no"
