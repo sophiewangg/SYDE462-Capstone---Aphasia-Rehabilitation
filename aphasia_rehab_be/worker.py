@@ -55,37 +55,55 @@ def classify_interjection_task(audio_buffer_bytes, threshold=0.74):
     
     return {"label": label, "confidence": confidence}
 
+def is_audible(chunk):
+    """
+    Calibrated based on logs:
+    - Real speech: ~ -44dB / 850 Max
+    - Real silence: ~ -65dB / 90 Max
+    """
+    # -55.0 is a safe floor that sits between your silence (-65) and speech (-44)
+    db_threshold = -55.0
+    # 500 is a safe peak floor that sits between your silence (90) and speech (868)
+    peak_threshold = 500
+
+    # Use 'or' so that even a soft, long sound OR a sharp, short word triggers it
+    passed = chunk.dBFS > db_threshold or chunk.max > peak_threshold
+    
+    print(f"DEBUG: {'PASSING' if passed else 'SKIPPING'} - dBFS: {chunk.dBFS:.2f}, Max: {chunk.max}")
+    return passed
+
 @celery_app.task(name="worker.chunk_audio")
 def chunk_audio(wav_bytes: bytes):
-    # Robust loading
     audio = AudioSegment.from_file(io.BytesIO(wav_bytes), format="wav")
-    
     total_ms = len(audio)
-    print(f"DEBUG: Processing {total_ms}ms of audio")
     
     chunk_length_ms = 3000
     signatures_sound_rep = []
     signatures_interjection = []
 
-    
     for i in range(0, total_ms, chunk_length_ms):
         chunk = audio[i:i + chunk_length_ms]
         
-        # Skip 'silence' or tiny fragments at the very end (e.g., < 500ms)
+        # 1. Reject tiny fragments
         if len(chunk) < 3000:
+            continue
+            
+        # 2. CALL THE STRICT CHECK
+        # Adjust thresholds here to make it even stricter if needed
+        if not is_audible(chunk):
+            print(f"DEBUG: Skipping silent/noisy chunk at {i}ms")
             continue
             
         buffer = io.BytesIO()
         chunk.export(buffer, format="wav")
+        chunk_data = buffer.getvalue()
         
-        # We use .s() for a signature
-        signatures_sound_rep.append(classify_sound_rep_task.s(buffer.getvalue()))
-        signatures_interjection.append(classify_interjection_task.s(buffer.getvalue()))
+        signatures_sound_rep.append(classify_sound_rep_task.s(chunk_data))
+        signatures_interjection.append(classify_interjection_task.s(chunk_data))
 
     if not signatures_sound_rep:
-        return {"status": "skipped", "reason": "audio_too_short"}
+        return {"status": "skipped", "reason": "no_audible_content"}
 
-    # Launch the group
     job_sound_rep = group(signatures_sound_rep).apply_async()
     job_interjection = group(signatures_interjection).apply_async()
     
@@ -93,6 +111,5 @@ def chunk_audio(wav_bytes: bytes):
         "status": "fanned_out", 
         "total_chunks": len(signatures_sound_rep), 
         "sound_rep_group_id": job_sound_rep.id,
-        "interjection_group_id": job_interjection.id,
-        "total_duration_ms": total_ms
+        "interjection_group_id": job_interjection.id
     }

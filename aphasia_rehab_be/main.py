@@ -61,7 +61,7 @@ async def websocket_endpoint(websocket: WebSocket):
     loop = asyncio.get_running_loop()
     
     try:
-        service.connect_to_assemblyai(websocket, loop)
+        transcription_service.connect_to_assemblyai(websocket, loop)
     except Exception as e:
         logger.info(f"❌ Failed to connect to AssemblyAI: {e}")
         await websocket.close()
