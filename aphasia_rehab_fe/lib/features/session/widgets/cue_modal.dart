@@ -15,8 +15,9 @@ class CueModal extends StatefulWidget {
 }
 
 class _CueModalState extends State<CueModal> {
+  bool _autoCloseScheduled = false;
+
   String _getHintText(int stage, Cue? fetchedCue) {
-    // If we have no cue data (the "else" case from your handlePressed)
     if (fetchedCue == null) {
       return "Try saying \"I didn't understand that\"";
     }
@@ -33,9 +34,30 @@ class _CueModalState extends State<CueModal> {
     }
   }
 
+  void _scheduleAutoClose(BuildContext context, ScenarioSimManager scenarioSimManager) {
+    if (_autoCloseScheduled) return;
+    _autoCloseScheduled = true;
+
+    Future.delayed(const Duration(seconds: 0.5), () {
+      if (!mounted) return;
+      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 300), () {
+        scenarioSimManager.updateCueNumber(reset: true);
+        scenarioSimManager.resetCueComplete();
+        scenarioSimManager.resetCueResultString();
+        scenarioSimManager.setIsModalOpen(false);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
+
+    // Trigger auto-close when the modal turns green
+    if (scenarioSimManager.cueCompleteNotifier.value) {
+      _scheduleAutoClose(context, scenarioSimManager);
+    }
 
     return FutureBuilder<Cue?>(
       future: widget.cueFuture,
@@ -80,7 +102,7 @@ class _CueModalState extends State<CueModal> {
 
               const SizedBox(height: 10),
 
-              // The Hint Text (Now handles null fetchedCue inside the helper)
+              // The Hint Text
               _buildMessageBox(
                 _getHintText(
                   scenarioSimManager.cueNumberNotifier.value,
