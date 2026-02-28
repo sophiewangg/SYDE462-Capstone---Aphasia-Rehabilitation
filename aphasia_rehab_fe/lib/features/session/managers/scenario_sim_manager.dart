@@ -65,6 +65,9 @@ class ScenarioSimManager extends ChangeNotifier {
   String? _promptOverride;
   final List<String> _orderItems = [];
 
+  // --- State Variables: Scenario Progression ---
+  bool _isBobEateryModalOpen = false;
+
   bool _isScenarioComplete = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
@@ -133,6 +136,7 @@ class ScenarioSimManager extends ChangeNotifier {
   bool get hintButtonPressed => _hintButtonPressed;
   bool get modalIsWordFinding => _modalIsWordFinding;
   String? get systemMessage => _systemMessage;
+  bool get isBobEateryModalOpen => _isBobEateryModalOpen;
 
   String get currentPrompt {
     final base = _prompts[_currentStep]?.text ?? "";
@@ -143,22 +147,17 @@ class ScenarioSimManager extends ChangeNotifier {
 
   ScenarioSimManager() {
     _initTranscriptionListener();
-    _playPromptAndListen();
+    _playPrompt();
   }
 
   // --- Core Scenario Flow Logic ---
 
-  Future<void> _playPromptAndListen() async {
-    _currentMicrophoneState = MicrophoneState.idle;
-    notifyListeners();
-
+  Future<void> _playPrompt() async {
     final prompt = _prompts[_currentStep];
     if (prompt?.audioAsset != null) {
       await _audioPlayer.play(AssetSource(prompt!.audioAsset!));
       await _audioPlayer.onPlayerComplete.first;
     }
-
-    startRecording();
   }
 
   void _initTranscriptionListener() {
@@ -166,10 +165,6 @@ class ScenarioSimManager extends ChangeNotifier {
       _transcription = result.text;
       print("Transcript: $_transcription");
       notifyListeners();
-
-      if (result.isEndOfTurn) {
-        handleEndOfTurn();
-      }
     });
   }
 
@@ -198,7 +193,10 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void handleEndOfTurn() {
+  Future<void> handleEndOfTurn() async {
+    // Wait for 1 second to not cut off words currently being transcribed
+    await Future.delayed(const Duration(seconds: 2));
+
     stopRecording();
   }
 
@@ -217,7 +215,8 @@ class ScenarioSimManager extends ChangeNotifier {
 
       if (transcript.isEmpty) {
         _promptPrefix = "I didn't quite hear that. Could you try again? ";
-        startRecording();
+        _currentMicrophoneState = MicrophoneState.idle;
+        notifyListeners();
         return;
       }
 
@@ -228,7 +227,8 @@ class ScenarioSimManager extends ChangeNotifier {
       if (classification == null || !classification.match) {
         _systemMessage =
             "I'm not sure I understood. Could you try saying that another way?";
-        startRecording();
+        _currentMicrophoneState = MicrophoneState.idle;
+        notifyListeners();
         return;
       }
 
@@ -240,7 +240,8 @@ class ScenarioSimManager extends ChangeNotifier {
       }
 
       _advanceScenario(classification.intent);
-      await _playPromptAndListen();
+      _currentMicrophoneState = MicrophoneState.idle;
+      notifyListeners();
     }
   }
 
@@ -486,6 +487,11 @@ class ScenarioSimManager extends ChangeNotifier {
 
   void handleUserTurnCompleted() {
     handleEndOfTurn();
+  }
+
+  void toggleBobEateryModal() {
+    _isBobEateryModalOpen = !_isBobEateryModalOpen;
+    notifyListeners();
   }
 
   @override

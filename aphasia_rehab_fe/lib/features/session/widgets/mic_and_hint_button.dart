@@ -32,25 +32,23 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
 
   @override
   Widget build(BuildContext context) {
-    final transcriptionManager = context.watch<ScenarioSimManager>();
     final scenarioSimManager = context.watch<ScenarioSimManager>();
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 10.0,
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        SizedBox(
-          height: 150,
-          child: scenarioSimManager.hintButtonPressed
-              ? SelectHint()
-              : const SizedBox.shrink(),
-        ),
+        if (scenarioSimManager.hintButtonPressed)
+          Positioned(
+            bottom: 110,
+            left: 0,
+            child: SizedBox(height: 150, width: 300, child: SelectHint()),
+          ),
+
         Row(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
-          children: [HintButton(), _buildMicButton(transcriptionManager)],
+          children: [HintButton(), _buildMicButton(scenarioSimManager)],
         ),
       ],
     );
