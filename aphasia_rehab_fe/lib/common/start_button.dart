@@ -1,5 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/session_page.dart';
+import 'package:aphasia_rehab_fe/features/session/scenario_sim.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,7 +21,7 @@ class _StartButtonState extends State<StartButton> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const SessionPage(title: "My Session"),
+              builder: (context) => const ScenarioSim(),
             ),
           );
         },

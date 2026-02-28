@@ -5,13 +5,9 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 class TranscriptionResult {
   final String text;
-  final double endOfTurnConfidence;
-  final bool isEndOfTurn;
 
   TranscriptionResult({
     required this.text,
-    required this.endOfTurnConfidence,
-    required this.isEndOfTurn,
   });
 }
 
@@ -46,10 +42,6 @@ class TranscriptionService {
               _textController.add(
                 TranscriptionResult(
                   text: data['text'],
-                  endOfTurnConfidence: (data['end_of_turn_confidence'] is num)
-                      ? data['end_of_turn_confidence'].toDouble()
-                      : 0.0,
-                  isEndOfTurn: data['end_of_turn'] ?? false,
                 ),
               );
             }
