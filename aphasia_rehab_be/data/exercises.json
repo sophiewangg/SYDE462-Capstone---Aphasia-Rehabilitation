@@ -65,7 +65,7 @@
   },
   {
     "id": "scenario_drink_juice",
-    "text": "orange juice please",
+    "text": "lemon juice please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "beverage_other"
@@ -73,7 +73,7 @@
   },
   {
     "id": "scenario_drink_juice",
-    "text": "apple juice for me",
+    "text": "beer for me",
     "metadata": {
       "type": "scenario_menu",
       "intent": "beverage_other"
@@ -81,7 +81,7 @@
   },
   {
     "id": "scenario_drink_juice",
-    "text": "can i have a cranberry juice",
+    "text": "i'll have the white wine",
     "metadata": {
       "type": "scenario_menu",
       "intent": "beverage_other"
@@ -121,31 +121,7 @@
   },
   {
     "id": "scenario_drink_alcohol",
-    "text": "i'll have a margarita",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "a gin and tonic please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "i'll take an old fashioned",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "can i have a martini",
+    "text": "i'll have a bottle of wine",
     "metadata": {
       "type": "scenario_menu",
       "intent": "beverage_other"
@@ -162,14 +138,6 @@
   {
     "id": "scenario_drink_soda",
     "text": "i'd like a root beer",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_soda",
-    "text": "can i get a dr pepper",
     "metadata": {
       "type": "scenario_menu",
       "intent": "beverage_other"
@@ -200,46 +168,6 @@
     }
   },
   {
-    "id": "scenario_drink_milk",
-    "text": "a glass of milk please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_milkshake",
-    "text": "i'll take a chocolate milkshake",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_smoothie",
-    "text": "can i have a strawberry smoothie",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_mocktail",
-    "text": "i'd like a shirley temple",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_hotcocoa",
-    "text": "hot chocolate please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
     "id": "scenario_drink_tea",
     "text": "can i get a matcha latte",
     "metadata": {
@@ -250,22 +178,6 @@
   {
     "id": "scenario_drink_tea",
     "text": "i'd like a chai tea",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_juice",
-    "text": "tomato juice please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_juice",
-    "text": "can i have a pineapple juice",
     "metadata": {
       "type": "scenario_menu",
       "intent": "beverage_other"
@@ -293,6 +205,14 @@
     "metadata": {
       "type": "scenario_menu",
       "intent": "water_sparkling"
+    }
+  },
+  {
+    "id": "scenario_water_sparkling",
+    "text": "tap water please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_tap"
     }
   },
   {
@@ -560,6 +480,54 @@
     }
   },
   {
+    "id": "scenario_order_soup",
+    "text": "i'd like the soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_soup"
+    }
+  },
+  {
+    "id": "scenario_order_soup",
+    "text": "i'll have the soup of the day",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_soup"
+    }
+  },
+  {
+    "id": "scenario_order_soup",
+    "text": "yeah i'll take that soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_soup"
+    }
+  },
+  {
+    "id": "scenario_order_bruschetta",
+    "text": "i'll get the bruschetta ",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_bruschetta"
+    }
+  },
+  {
+    "id": "scenario_order_steak",
+    "text": "i'd like the ribeye",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_steak"
+    }
+  },
+  {
+    "id": "scenario_order_steak",
+    "text": "i'd like the ribeye steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_steak"
+    }
+  },
+  {
     "id": "scenario_order_steak",
     "text": "i'd like the steak",
     "metadata": {
@@ -576,8 +544,40 @@
     }
   },
   {
+    "id": "scenario_order_chicken",
+    "text": "i'll have the chicken katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_chicken"
+    }
+  },
+  {
+    "id": "scenario_order_chicken",
+    "text": "i'll have the katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_chicken"
+    }
+  },
+  {
     "id": "scenario_order_pasta",
     "text": "i'll get the pasta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta"
+    }
+  },
+  {
+    "id": "scenario_order_pasta",
+    "text": "i'll get the seafood alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta"
+    }
+  },
+  {
+    "id": "scenario_order_pasta",
+    "text": "i'll get the alfredo",
     "metadata": {
       "type": "scenario_menu",
       "intent": "order_pasta"
@@ -637,6 +637,174 @@
     "metadata": {
       "type": "scenario_menu",
       "intent": "is_that_all_no"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "no i don't have any allergies",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "nope im all good thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "no allergies here",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "i can eat anything",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "none at all but thanks for asking",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "nothing to worry about on my end",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "no dietary restrictions for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "yes im highly allergic to peanuts",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "i actually have a gluten intolerance",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "im allergic to shellfish so nothing with shrimp or crab please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "just tree nuts for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "i have a severe dairy allergy",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "im lactose intolerant",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "yes i cant have any soy",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "are there any sesame seeds in the dishes i have a mild allergy",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "im deathly allergic to eggs",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "has_allergies"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "not an allergy but i am strictly vegetarian",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "dietary_restriction"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "no allergies but i prefer to avoid spicy foods",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "dietary_restriction"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "i have a slight sensitivity to raw onions",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "dietary_restriction"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "no im fine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "other_person_allergy"
+    }
+  },
+  {
+    "id": "allergies",
+    "text": "nope we are all clear at this table",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_allergies"
     }
   }
 ]

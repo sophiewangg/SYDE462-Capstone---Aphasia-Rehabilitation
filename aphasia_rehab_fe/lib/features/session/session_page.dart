@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:aphasia_rehab_fe/features/session/session_dashboard_page.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../../models/cue_model.dart';
@@ -136,6 +137,17 @@ class _SessionPageState extends State<SessionPage> {
                 isRecording: _isRecording,
                 onPressed: _handleMicToggle,
               ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SessionDashboardPage(),
+                  ),
+                );
+              },
+              child: const Text('End Session'),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 50),

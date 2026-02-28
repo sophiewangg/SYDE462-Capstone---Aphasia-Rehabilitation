@@ -8,23 +8,27 @@ import uuid
 from database import database, models
 from dotenv import load_dotenv
 from fastapi import Body, Depends, FastAPI, WebSocket, WebSocketDisconnect
-from services import (CueService, TranscriptionService, UserService, VectorService)
+from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService)
 from services.vector_service import VectorService
 from sqlalchemy.orm import Session
 from fastapi import Query
+from fastapi.staticfiles import StaticFiles
+from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn")
-load_dotenv()
+load_dotenv() # Loads API key from your .env file
 
 #create postgres models (defined within models.py) before app starts
 models.Base.metadata.create_all(bind=database.engine)
 
 app = FastAPI()
+app.mount("/detections", StaticFiles(directory="detections"), name="detections")
 
 transcription_service = TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_KEY")) # type: ignore
 cue_service = CueService(api_key=os.getenv("GPT_API_KEY")) # type: ignore
 vector_service = VectorService()
+disfluency_detection_service = DisfluencyDetectionService()
 
 def get_user_service(db: Session = Depends(database.get_db)):
     return UserService(db)
@@ -47,29 +51,44 @@ def create_module_attempt(user_id: uuid.UUID, module_id: uuid.UUID, stats: dict,
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     logger.info("📱 Flutter client connected")
-    
-    service = TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_KEY"))
-    
+
+    # Create a unique filename for the backend recording
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    raw_filename = f"recordings/session_{timestamp}.raw"
+    wav_filename = f"recordings/session_{timestamp}.wav"    
+    os.makedirs("recordings", exist_ok=True)
+    # Use get_running_loop for better compatibility with FastAPI
     loop = asyncio.get_running_loop()
     
     try:
-        service.connect_to_assemblyai(websocket, loop)
+        transcription_service.connect_to_assemblyai(websocket, loop)
     except Exception as e:
         logger.info(f"❌ Failed to connect to AssemblyAI: {e}")
         await websocket.close()
         return
 
-    try:
-        while True:
-            data = await websocket.receive_bytes()
-            service.feed_audio(data)
-            
-    except WebSocketDisconnect:
-        logger.info("📱 Flutter client disconnected")
-    except Exception as e:
-        logger.info(f"🚨 Unexpected error in loop: {e}")
-    finally:
-        service.close()
+    # Open the file in 'append binary' mode
+    with open(raw_filename, "wb") as audio_file:
+        try:
+            while True:
+                # Receive binary audio from Flutter
+                data = await websocket.receive_bytes()
+                
+                # ACTION A: Write to the backend file
+                audio_file.write(data)
+                
+                # ACTION B: Send to AssemblyAI
+                transcription_service.feed_audio(data)
+                
+        except WebSocketDisconnect:
+            logger.info("📱 Flutter client disconnected")
+        except Exception as e:
+            logger.error(f"🚨 Unexpected error in loop: {e}")
+        finally:
+            transcription_service.close()
+            if os.path.exists(raw_filename):
+                disfluency_detection_service.detect_disfluencies(os.path.abspath(raw_filename))
+                logger.info(f"🚀 Handed off {raw_filename} to Celery pipeline")
 
 @app.post("/generate_cues/")
 async def generate_cues(transcription: str = Body(..., embed=True), goal: str = Body(..., embed=True)):
@@ -160,3 +179,20 @@ async def classify_utterance(
         "intent": metadata.get("intent"),
         "text": document,
     }
+
+
+@app.get("/list_detections")
+async def list_detections():
+    detection_dir = "detections"
+    if not os.path.exists(detection_dir):
+        return []
+    
+    # Get all .wav files in the folder
+    files = [f for f in os.listdir(detection_dir) if f.endswith(".wav")]
+    # Sort by name (which is timestamped) so newest are at the top
+    files.sort(reverse=True)
+    return files
+
+@app.post("/clear_detections")
+def clear_detections():
+    disfluency_detection_service.clear_detections()

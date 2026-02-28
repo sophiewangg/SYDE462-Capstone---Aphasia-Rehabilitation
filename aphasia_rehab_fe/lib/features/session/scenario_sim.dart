@@ -1,12 +1,13 @@
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
+import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'widgets/settings_button.dart';
 import 'widgets/character.dart';
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:aphasia_rehab_fe/features/session/session_dashboard_page.dart';
 
 class ScenarioSim extends StatefulWidget {
   const ScenarioSim({super.key});
@@ -18,9 +19,13 @@ class ScenarioSim extends StatefulWidget {
 class _ScenarioSimState extends State<ScenarioSim> {
   bool _isBobEateryModalOpen = false;
 
+  final SessionDashboardService _dashboardService = SessionDashboardService();
+
   @override
   void initState() {
     super.initState();
+
+    _dashboardService.clearDetections();
 
     // Use context.read here because we only want to trigger the action once,
     // not "watch" for updates during the init phase.
@@ -188,7 +193,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
                                     ),
                                     SizedBox(height: 4),
                                     Text(
-                                      "Grilled steak cooked to your liking, served\nwith roasted potatoes and vegetables.",
+                                      "Grilled steak cooked to your liking, served\nwith a side of either fries or salad.",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 14),
                                     ),
@@ -337,6 +342,24 @@ class _ScenarioSimState extends State<ScenarioSim> {
           ),
 
           Positioned(top: 75, right: 20, child: SettingsButton()),
+
+          Positioned(
+            top: 150,
+            right: 20,
+            child: ElevatedButton(
+              onPressed: () {
+                scenarioSimManager.stopRecording();
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SessionDashboardPage(),
+                  ),
+                );
+              },
+              child: const Text('End Session'),
+            ),
+          ),
 
           // Menu button positioned on the left side, 12px above MicAndHintButton
           if (!_isBobEateryModalOpen)

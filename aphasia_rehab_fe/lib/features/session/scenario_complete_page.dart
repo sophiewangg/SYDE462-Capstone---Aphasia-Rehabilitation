@@ -1,4 +1,6 @@
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ScenarioCompletePage extends StatelessWidget {
   const ScenarioCompletePage({super.key});
@@ -19,6 +21,8 @@ class ScenarioCompletePage extends StatelessWidget {
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () {
+                  context.read<ScenarioSimManager>().resetScenario();
+
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 child: const Text("Back to Home"),
@@ -30,4 +34,3 @@ class ScenarioCompletePage extends StatelessWidget {
     );
   }
 }
-
