@@ -38,7 +38,7 @@ class _CueModalState extends State<CueModal> {
     if (_autoCloseScheduled) return;
     _autoCloseScheduled = true;
 
-    Future.delayed(const Duration(seconds: 0.5), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 300), () {
