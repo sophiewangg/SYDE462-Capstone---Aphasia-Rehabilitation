@@ -1,6 +1,8 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class MicButtonSpeaking extends StatefulWidget {
   const MicButtonSpeaking({super.key});
@@ -12,8 +14,12 @@ class MicButtonSpeaking extends StatefulWidget {
 class _MicButtonSpeakingState extends State<MicButtonSpeaking> {
   @override
   Widget build(BuildContext context) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        scenarioSimManager.handleMicToggle();
+      },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,

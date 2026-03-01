@@ -17,6 +17,7 @@ enum ScenarioStep {
   iceQuestion,
   readyToOrder,
   appetizers,
+  entrees,
   steakDoneness,
   sideChoice,
   isThatAll,
@@ -64,6 +65,13 @@ class ScenarioSimManager extends ChangeNotifier {
   String? _promptOverride;
   final List<String> _orderItems = [];
 
+  // --- State Variables: Scenario Progression ---
+  bool _isBobEateryModalOpen = false;
+
+  bool _isScenarioComplete = false;
+
+  bool get isScenarioComplete => _isScenarioComplete;
+
   final Map<ScenarioStep, ScenarioPrompt> _prompts = {
     ScenarioStep.drinksOffer: const ScenarioPrompt(
       id: 'drinks_offer',
@@ -84,6 +92,10 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.appetizers: const ScenarioPrompt(
       id: 'appetizers',
       text: "Any appetizers to get you started?",
+    ),
+    ScenarioStep.entrees: const ScenarioPrompt(
+      id: 'entrees',
+      text: 'Would you like to order any entrees?',
     ),
     ScenarioStep.steakDoneness: const ScenarioPrompt(
       id: 'steak_doneness',
@@ -124,6 +136,7 @@ class ScenarioSimManager extends ChangeNotifier {
   bool get hintButtonPressed => _hintButtonPressed;
   bool get modalIsWordFinding => _modalIsWordFinding;
   String? get systemMessage => _systemMessage;
+  bool get isBobEateryModalOpen => _isBobEateryModalOpen;
 
   String get currentPrompt {
     final base = _prompts[_currentStep]?.text ?? "";
@@ -134,22 +147,17 @@ class ScenarioSimManager extends ChangeNotifier {
 
   ScenarioSimManager() {
     _initTranscriptionListener();
-    _playPromptAndListen();
+    _playPrompt();
   }
 
   // --- Core Scenario Flow Logic ---
 
-  Future<void> _playPromptAndListen() async {
-    _currentMicrophoneState = MicrophoneState.idle;
-    notifyListeners();
-
+  Future<void> _playPrompt() async {
     final prompt = _prompts[_currentStep];
     if (prompt?.audioAsset != null) {
       await _audioPlayer.play(AssetSource(prompt!.audioAsset!));
       await _audioPlayer.onPlayerComplete.first;
     }
-
-    startRecording();
   }
 
   void _initTranscriptionListener() {
@@ -157,10 +165,6 @@ class ScenarioSimManager extends ChangeNotifier {
       _transcription = result.text;
       print("Transcript: $_transcription");
       notifyListeners();
-
-      if (result.isEndOfTurn) {
-        handleEndOfTurn();
-      }
     });
   }
 
@@ -189,7 +193,10 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void handleEndOfTurn() {
+  Future<void> handleEndOfTurn() async {
+    // Wait for 1 second to not cut off words currently being transcribed
+    await Future.delayed(const Duration(seconds: 2));
+
     stopRecording();
   }
 
@@ -208,7 +215,8 @@ class ScenarioSimManager extends ChangeNotifier {
 
       if (transcript.isEmpty) {
         _promptPrefix = "I didn't quite hear that. Could you try again? ";
-        startRecording();
+        _currentMicrophoneState = MicrophoneState.idle;
+        notifyListeners();
         return;
       }
 
@@ -219,17 +227,21 @@ class ScenarioSimManager extends ChangeNotifier {
       if (classification == null || !classification.match) {
         _systemMessage =
             "I'm not sure I understood. Could you try saying that another way?";
-        startRecording();
+        _currentMicrophoneState = MicrophoneState.idle;
+        notifyListeners();
         return;
       }
 
       if (_currentStep == ScenarioStep.allergies) {
-        // UI should listen for completion, but logic ends here
+        // Mark the scenario as complete and notify the UI
+        _isScenarioComplete = true;
+        notifyListeners();
         return;
       }
 
       _advanceScenario(classification.intent);
-      await _playPromptAndListen();
+      _currentMicrophoneState = MicrophoneState.idle;
+      notifyListeners();
     }
   }
 
@@ -242,16 +254,18 @@ class ScenarioSimManager extends ChangeNotifier {
 
     switch (_currentStep) {
       case ScenarioStep.drinksOffer:
-        if (intent == 'beverage_water')
+        if (intent == 'beverage_water') {
           _currentStep = ScenarioStep.waterType;
-        else if (intent == 'water_still' ||
+        } else if (intent == 'water_still' ||
             intent == 'water_sparkling' ||
-            intent == 'beverage_other')
+            intent == 'beverage_other') {
           _currentStep = ScenarioStep.iceQuestion;
+        }
         break;
       case ScenarioStep.waterType:
-        if (intent == 'water_still' || intent == 'water_sparkling')
+        if (intent == 'water_still' || intent == 'water_sparkling') {
           _currentStep = ScenarioStep.iceQuestion;
+        }
         break;
       case ScenarioStep.iceQuestion:
         _currentStep = ScenarioStep.readyToOrder;
@@ -267,13 +281,25 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
       case ScenarioStep.appetizers:
-        if (intent == 'ask_specials' || intent == 'ask_soup')
+        if (intent == 'ask_specials' || intent == 'ask_soup') {
           _systemMessage = "Today's soup is creamy roasted garlic.";
-        else if (intent == 'ask_recommendations')
+        } else if (intent == 'ask_recommendations') {
           _systemMessage = "My personal favourite is the lobster pasta.";
-        else if (intent == 'order_steak')
+        } else if (intent == 'order_steak') {
           _currentStep = ScenarioStep.steakDoneness;
-        else if (intent == 'order_chicken' || intent == 'order_pasta') {
+        } else if (intent == 'order_chicken' || intent == 'order_pasta') {
+          _orderItems.add(intent!);
+          _currentStep = ScenarioStep.isThatAll;
+        } else if (intent == 'order_soup' || intent == 'order_bruschetta') {
+          //TODO: there was another app
+          _orderItems.add(intent!);
+          _currentStep = ScenarioStep.entrees;
+        }
+        break;
+      case ScenarioStep.entrees:
+        if (intent == 'order_steak') {
+          _currentStep = ScenarioStep.steakDoneness;
+        } else if (intent == 'order_chicken' || intent == 'order_pasta') {
           _orderItems.add(intent!);
           _currentStep = ScenarioStep.isThatAll;
         }
@@ -288,15 +314,53 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
       case ScenarioStep.isThatAll:
-        if (intent == 'is_that_all_yes')
+        if (intent == 'is_that_all_yes') {
           _currentStep = ScenarioStep.allergies;
-        else if (intent == 'is_that_all_no')
+        } else if (intent == 'is_that_all_no') {
           _currentStep = ScenarioStep.appetizers;
+        }
         break;
       case ScenarioStep.allergies:
       case ScenarioStep.notReadyToOrder:
         break;
     }
+    notifyListeners();
+  }
+
+  void resetScenario() {
+    print("--- 🔄 RESETTING SCENARIO ---");
+
+    // Reset core progression
+    _currentStep = ScenarioStep.drinksOffer;
+    _isScenarioComplete = false; // from our previous update
+    _orderItems.clear();
+
+    // Reset text states
+    _transcription = "";
+    _systemMessage = null;
+    _promptPrefix = null;
+    _promptOverride = null;
+
+    // Reset modal states
+    _isModalOpen = false;
+    _modalIsWordFinding = false;
+    _likelyWord = null;
+    _hintButtonPressed = false;
+
+    // Reset UI Notifiers
+    cueCompleteNotifier.value = false;
+    cueResultStringNotifier.value = null;
+    cueNumberNotifier.value = 0;
+    currentMicrophoneStateModal.value = MicrophoneState.idle;
+
+    // Make sure audio is stopped
+    _audioPlayer.stop();
+    if (_isRecording) {
+      _transcriptionService.stopStreaming();
+      _isRecording = false;
+      _currentMicrophoneState = MicrophoneState.idle;
+    }
+
     notifyListeners();
   }
 
@@ -423,6 +487,11 @@ class ScenarioSimManager extends ChangeNotifier {
 
   void handleUserTurnCompleted() {
     handleEndOfTurn();
+  }
+
+  void toggleBobEateryModal() {
+    _isBobEateryModalOpen = !_isBobEateryModalOpen;
+    notifyListeners();
   }
 
   @override
