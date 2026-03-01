@@ -31,6 +31,12 @@ class AppColors {
   /// Cue modal in progress background
   static const Color cueModalInProgress = Color.fromARGB(255, 239, 199, 135);
 
+  /// Cue modal in complete background
   static const Color cueModalComplete = Color.fromARGB(210, 166, 227, 142);
 
+  /// Dashboard page background colour
+  static const Color dashboardBackground = Color(0xFFF2EFEA);
+
+  /// Dashboard Page checkmark success
+  static const Color checkmarkSuccess = Color(0xFF30832F);
 }

@@ -1,30 +1,23 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
-class PlayAudioButton extends StatefulWidget {
-  const PlayAudioButton({super.key});
-
-  @override
-  State<PlayAudioButton> createState() => _PlayAudioButtonState();
-}
-
-class _PlayAudioButtonState extends State<PlayAudioButton> {
+class HintAudioButton extends StatelessWidget {
+  const HintAudioButton({super.key});
   @override
   Widget build(BuildContext context) {
-    final scenarioSimManager = context.watch<ScenarioSimManager>();
     return ElevatedButton(
       onPressed: () {
-        scenarioSimManager.playCharacterAudio();
+        // TODO: play hint audio
       },
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.grey100,
+        backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
         shape: const CircleBorder(),
         padding: const EdgeInsets.all(10),
         elevation: 0,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        minimumSize: Size.zero,
       ),
       child: SvgPicture.asset(
         'assets/icons/audio_icon.svg',

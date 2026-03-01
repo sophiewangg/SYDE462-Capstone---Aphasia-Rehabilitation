@@ -1,4 +1,5 @@
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/dashboard/dashboard_page.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/menu.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
@@ -8,7 +9,6 @@ import 'package:provider/provider.dart';
 import 'widgets/settings_button.dart';
 import 'widgets/character.dart';
 import 'dart:async';
-import 'package:aphasia_rehab_fe/features/session/session_dashboard_page.dart';
 
 class ScenarioSim extends StatefulWidget {
   const ScenarioSim({super.key});
@@ -26,8 +26,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
 
     _dashboardService.clearDetections();
 
-    // Use context.read here because we only want to trigger the action once,
-    // not "watch" for updates during the init phase.
     Future.microtask(() {
       if (mounted) {
         context.read<ScenarioSimManager>().requestMicPermission();
@@ -113,7 +111,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SessionDashboardPage(),
+                    builder: (context) => const DashboardPage(),
                   ),
                 );
               },
