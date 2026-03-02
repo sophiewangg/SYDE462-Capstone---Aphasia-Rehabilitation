@@ -45,10 +45,32 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
           ),
 
         Row(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
-          children: [HintButton(), _buildMicButton(scenarioSimManager)],
+          children: [
+            HintButton(),
+            Column(
+              spacing: 5.0,
+              children: [
+                ElevatedButton( //adding menu button
+                  onPressed: scenarioSimManager.toggleBobEateryModal,
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    fixedSize: const Size(72, 72),
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.all(12),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  child: const Icon(Icons.restaurant),
+                ),
+                Text("Menu", style: TextStyle(color: Colors.white)),
+              ],
+            ),
+            _buildMicButton(scenarioSimManager),
+          ],
         ),
       ],
     );
