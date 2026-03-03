@@ -126,18 +126,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
               spacing: 10.0,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton(
-                  onPressed: scenarioSimManager.toggleBobEateryModal,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    fixedSize: const Size(72, 72),
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.all(12),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Icon(Icons.restaurant),
-                ),
                 MicAndHintButton(),
               ],
             ),

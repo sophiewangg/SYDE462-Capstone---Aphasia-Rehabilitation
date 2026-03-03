@@ -194,8 +194,13 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   Future<void> handleEndOfTurn() async {
+    // Update UI immediately so button switches right away
+    _isRecording = false;
+    _currentMicrophoneState = MicrophoneState.processing;
+    currentMicrophoneStateModal.value = MicrophoneState.processing;
+    notifyListeners();
     // Wait for 1 second to not cut off words currently being transcribed
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
 
     stopRecording();
   }

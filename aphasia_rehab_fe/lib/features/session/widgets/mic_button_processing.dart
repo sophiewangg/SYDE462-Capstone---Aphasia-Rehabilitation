@@ -1,6 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class MicButtonProcessing extends StatefulWidget {
   const MicButtonProcessing({super.key});
@@ -9,27 +8,99 @@ class MicButtonProcessing extends StatefulWidget {
   State<MicButtonProcessing> createState() => _MicButtonProcessingState();
 }
 
-class _MicButtonProcessingState extends State<MicButtonProcessing> {
+class _MicButtonProcessingState extends State<MicButtonProcessing>
+    with TickerProviderStateMixin {
+  static const Color _dotColor = Color(0xFF4A4E7A);
+  static const double _dotSize = 10.0;
+  static const int _dotCount = 3;
+
+  late final List<AnimationController> _controllers;
+  late final List<Animation<double>> _animations;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controllers = List.generate(_dotCount, (i) {
+      return AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 600),
+      );
+    });
+
+    _animations = _controllers.map((ctrl) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: ctrl, curve: Curves.easeInOut),
+      );
+    }).toList();
+
+    // Stagger each dot by 200ms
+    for (int i = 0; i < _dotCount; i++) {
+      Future.delayed(Duration(milliseconds: i * 200), () {
+        if (mounted) {
+          _controllers[i].repeat(reverse: true);
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    for (final ctrl in _controllers) {
+      ctrl.dispose();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        // TODO: Implement audio play logic
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: AppColors.textPrimary,
-        shape: const StadiumBorder(),
-        side: const BorderSide(color: Colors.black, width: 1.0),
-        fixedSize: const Size(250, 75),
-        padding: EdgeInsets.zero,
-        elevation: 2,
-      ),
-      child: SvgPicture.asset(
-        'assets/icons/processing_icon.svg',
-        colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-        width: 30,
-      ),
+    return Column(
+      spacing: 5.0,
+      children: [
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFFD6D9E8),
+            foregroundColor: AppColors.textPrimary,
+            shape: const StadiumBorder(),
+            fixedSize: const Size(170, 72),
+            padding: EdgeInsets.zero,
+            elevation: 2,
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: List.generate(_dotCount, (i) {
+              return Padding(
+                padding: EdgeInsets.only(right: i < _dotCount - 1 ? 10.0 : 0),
+                child: AnimatedBuilder(
+                  animation: _animations[i],
+                  builder: (context, _) {
+                    // Fade + scale up/down
+                    final value = _animations[i].value;
+                    return Opacity(
+                      opacity: 0.3 + (value * 0.7),
+                      child: Transform.scale(
+                        scale: 0.6 + (value * 0.4),
+                        child: Container(
+                          width: _dotSize,
+                          height: _dotSize,
+                          decoration: const BoxDecoration(
+                            color: _dotColor,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
+          ),
+        ) ,
+        Text("Processing...", style: TextStyle(color: Colors.white)),
+      ],
     );
   }
 }

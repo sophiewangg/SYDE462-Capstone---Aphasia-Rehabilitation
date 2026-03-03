@@ -32,6 +32,7 @@ class _MenuState extends State<Menu> {
                 ),
                 child: SafeArea(
                   top: false,
+                  bottom: false,
                   child: Stack(
                     children: [
                       // Scrollable menu content
@@ -40,7 +41,7 @@ class _MenuState extends State<Menu> {
                           24,
                           24 + 40,
                           24,
-                          120,
+                          0,
                         ),
                         child: SingleChildScrollView(
                           child: Column(
@@ -168,51 +169,55 @@ class _MenuState extends State<Menu> {
                               const SizedBox(height: 32),
 
                               // Drinks and Alcohol columns
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
-                                  // Drinks
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "DRINKS",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: 1.2,
-                                        ),
+                              // added padding to bottom so the bottom of the modal is not cut off
+                              Padding(
+                                padding: EdgeInsets.only(bottom: 170),
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: const [
+                                      // Drinks
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "DRINKS",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 1.2,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text("Soda · 4"),
+                                          Text("Lemonade · 4.50"),
+                                          Text("Tea · 4.50"),
+                                          Text("Coffee · 4"),
+                                        ],
                                       ),
-                                      SizedBox(height: 8),
-                                      Text("Soda · 4"),
-                                      Text("Lemonade · 4.50"),
-                                      Text("Tea · 4.50"),
-                                      Text("Coffee · 4"),
+                                      // Alcohol
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "ALCOHOL",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w700,
+                                              letterSpacing: 1.2,
+                                            ),
+                                          ),
+                                          SizedBox(height: 8),
+                                          Text("Beer · 6"),
+                                          Text("Wine · 100g · 7"),
+                                        ],
+                                      ),
                                     ],
                                   ),
-                                  // Alcohol
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "ALCOHOL",
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          letterSpacing: 1.2,
-                                        ),
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text("Beer · 6"),
-                                      Text("Wine · 100g · 7"),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              )
+                    
                             ],
                           ),
                         ),
@@ -231,12 +236,28 @@ class _MenuState extends State<Menu> {
                             icon: const Icon(Icons.close),
                             iconSize: 20,
                             color: Colors.black87,
-                            padding: const EdgeInsets.all(4),
+                            padding: const EdgeInsets.all(2),
                             constraints: const BoxConstraints(),
                             onPressed: scenarioSimManager.toggleBobEateryModal,
                           ),
                         ),
                       ),
+                      
+                      Positioned( // bottom rectangle for the hint, mic, and menu buttons
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          height: 150,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF4D4F75),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30),
+                            ),
+                          ),
+                        ),
+                      ),  
                     ],
                   ),
                 ),
