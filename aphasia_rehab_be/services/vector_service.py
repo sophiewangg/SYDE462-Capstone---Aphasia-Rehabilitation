@@ -15,15 +15,16 @@ class VectorService:
         )
 
     def add_exercise(self, exercise_id: str, text: str, metadata: dict):
-        self.collection.add(
+        self.collection.upsert(
             ids=[exercise_id],
             documents=[text],
             metadatas=[metadata]
         )
 
-    def search_exercises(self, query_text: str, n_results: int = 3):
+    def search_exercises(self, query_text: str, n_results: int = 1, filter_metadata: dict = None):
+    # 'where' is the parameter Chroma uses for metadata filtering
         return self.collection.query(
             query_texts=[query_text],
             n_results=n_results,
-            include=["documents", "metadatas", "distances"],
-        )
+            where=filter_metadata  # Add this line
+    )

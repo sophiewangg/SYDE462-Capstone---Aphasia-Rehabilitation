@@ -1,26 +1,32 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 class UtteranceClassification {
   final bool match;
-  final String? intent;
+  final List<String> intents; // Changed to support multiple intents
   final Map<String, dynamic>? metadata;
   final double? distance;
   final String? text;
 
   UtteranceClassification({
     required this.match,
-    this.intent,
+    this.intents = const [],
     this.metadata,
     this.distance,
     this.text,
   });
 
   factory UtteranceClassification.fromJson(Map<String, dynamic> json) {
+    List<String> parsedIntents = [];
+    if (json['intents'] != null) {
+      parsedIntents = List<String>.from(json['intents']);
+    } else if (json['intent'] != null) {
+      parsedIntents = [json['intent'] as String];
+    }
+
     return UtteranceClassification(
       match: json['match'] as bool? ?? false,
-      intent: json['intent'] as String?,
+      intents: parsedIntents,
       metadata: (json['metadata'] as Map?)?.cast<String, dynamic>(),
       distance: (json['distance'] is num)
           ? (json['distance'] as num).toDouble()
@@ -35,23 +41,27 @@ class ScenarioApiService {
 
   Future<UtteranceClassification?> classifyUtterance(
     String transcription,
+    String? currentStep,
   ) async {
     try {
       final response = await http.post(
         Uri.parse(_classifyUrl),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"transcription": transcription}),
+        body: jsonEncode({
+          "transcription": transcription,
+          "current_step": currentStep,
+        }),
       );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        // ignore: avoid_print
         print("🔎 classify_utterance response: $jsonData");
         return UtteranceClassification.fromJson(jsonData);
       } else {
         return null;
       }
-    } catch (_) {
+    } catch (e) {
+      print("❌ Error in classifyUtterance: $e");
       return null;
     }
   }

@@ -135,16 +135,22 @@ async def find_exercise(transcription: str = Body(..., embed=True)):
 
 @app.post("/classify_utterance/")
 async def classify_utterance(
-    transcription: str = Body(..., embed=True),
-    threshold: float = Query(0.40, description="Maximum allowed distance for a match"),
-):
+transcription: str = Body(..., embed=True),
+    current_step: str = Body(None, embed=True), 
+    threshold: float = Query(0.40),):
     """
     Use the vector store to find the closest matching utterance.
     If the closest match is within the given distance threshold,
     return its metadata (including the `intent` field).
     """
-    results = vector_service.search_exercises(query_text=transcription, n_results=1)
+    step_filter = {"step": current_step} if current_step else None
 
+    results = vector_service.search_exercises(
+        query_text=transcription, 
+        n_results=1,
+        filter_metadata=step_filter
+    )
+    
     # Chroma returns lists-of-lists for distances / docs / metadatas.
     # If the collection is empty (or query returns no candidates), these can be empty.
     distances = results.get("distances") or []
