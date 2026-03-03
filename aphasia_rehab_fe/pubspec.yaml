@@ -79,6 +79,13 @@ flutter:
     - assets/images/table_image.png
     - assets/images/speech_bubble_tip_image.png
     - assets/icons/pause_icon.svg
+    - assets/icons/share_icon.svg
+    - assets/images/character_dashboard.png
+    - assets/icons/checkmark_icon.svg
+    - assets/icons/overflow_menu_icon.svg
+    - assets/images/confident.png
+    - assets/images/okay.png
+    - assets/images/frustrated.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
