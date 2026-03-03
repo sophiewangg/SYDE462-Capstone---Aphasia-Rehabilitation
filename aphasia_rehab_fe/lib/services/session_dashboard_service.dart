@@ -12,9 +12,11 @@ class SessionDashboardService {
     }
   }
 
-  Future<List<String>> fetchSavedDetections() async {
+  Future<List<String>> fetchSavedDetections(String disfluencyType) async {
     try {
-      final response = await http.get(Uri.parse("$baseUrl/list_detections"));
+      final response = await http.get(
+        Uri.parse("$baseUrl/list_detections?disfluency_type=$disfluencyType"),
+      );
 
       if (response.statusCode == 200) {
         List<dynamic> data = jsonDecode(response.body);
@@ -29,7 +31,7 @@ class SessionDashboardService {
   }
 
   // Helper to get the full playable URL for a specific file
-  String getAudioUrl(String filename) {
-    return "$baseUrl/detections/$filename";
+  String getAudioUrl(String filename, disfluency_type) {
+    return "$baseUrl/detections/$disfluency_type/$filename";
   }
 }

@@ -1,14 +1,31 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AiAnalyticPlayButton extends StatelessWidget {
-  const AiAnalyticPlayButton({super.key});
+  final String filename;
+  final String disfluencyType;
+
+  const AiAnalyticPlayButton({
+    super.key,
+    required this.filename,
+    required this.disfluencyType,
+  });
   @override
   Widget build(BuildContext context) {
+    final SessionDashboardService dashboardService = SessionDashboardService();
+    final AudioPlayer audioPlayer = AudioPlayer();
+
     return ElevatedButton(
-      onPressed: () {
-        // TODO: play hint audio
+      onPressed: () async {
+        String url = dashboardService.getAudioUrl(filename, disfluencyType);
+        try {
+          await audioPlayer.play(UrlSource(url));
+        } catch (e) {
+          print("Error playing audio: $e");
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,

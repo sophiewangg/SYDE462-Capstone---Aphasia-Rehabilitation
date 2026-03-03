@@ -33,9 +33,9 @@ class DisfluencyDetectionService:
         self.detections_dir = os.path.join(self.project_root, "detections")
         os.makedirs(self.detections_dir, exist_ok=True)
 
-    def clear_detections(self):
+    def clear_detections(self, disfluency_type):
         # Path to the detections folder
-        detections_dir = './detections'
+        detections_dir = os.path.join(self.detections_dir, disfluency_type)
     
         # Delete everything inside the folder
         if os.path.exists(detections_dir):
@@ -233,7 +233,7 @@ class DisfluencyDetectionService:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             unique_id = str(uuid.uuid4())[:8]
             filename = f"{timestamp}_soundrep_{unique_id}.wav"
-            save_path = os.path.join(self.detections_dir, filename)
+            save_path = os.path.join(self.detections_dir + '/sound_rep', filename)
 
             try:
                 # Wrap bytes in BytesIO so pydub can 'read' it
@@ -370,7 +370,7 @@ class DisfluencyDetectionService:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             unique_id = str(uuid.uuid4())[:8]
             filename = f"{timestamp}_interjection_{unique_id}.wav"
-            save_path = os.path.join(self.detections_dir, filename)
+            save_path = os.path.join(self.detections_dir + '/interjection', filename)
 
             try:
                 # Wrap bytes in BytesIO so pydub can 'read' it

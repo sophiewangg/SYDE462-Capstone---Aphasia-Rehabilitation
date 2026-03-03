@@ -1,11 +1,16 @@
 import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/ai_analytic_play_button.dart';
-import 'package:aphasia_rehab_fe/features/dashboard/widgets/hint_audio_button.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/overflow_menu_button.dart';
 import 'package:flutter/material.dart';
 
 class AiAnalytic extends StatefulWidget {
-  const AiAnalytic({super.key});
+  final List<String> files;
+  final String disfluencyType;
+  const AiAnalytic({
+    super.key,
+    required this.files,
+    required this.disfluencyType,
+  });
 
   @override
   State<AiAnalytic> createState() => _AiAnalyticState();
@@ -14,28 +19,31 @@ class AiAnalytic extends StatefulWidget {
 class _AiAnalyticState extends State<AiAnalytic> {
   @override
   Widget build(BuildContext context) {
-    final List<String> hints = ["0:03", "0:03", "0:03", "0:03"];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8.0,
       children: [
         Text(
-          "Where you may have stuttered ",
+          widget.disfluencyType == "sound_rep"
+              ? "Where you may have stuttered"
+              : "Where you may have used filler words",
           style: Theme.of(
             context,
           ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w100),
         ),
+
         Wrap(
           spacing: 12.0,
           runSpacing: 12.0,
-          children: hints.map((hint) => _buildBox(context, hint)).toList(),
+          children: widget.files
+              .map((file) => _buildBox(context, file))
+              .toList(),
         ),
       ],
     );
   }
 
-  Widget _buildBox(BuildContext context, String text) {
+  Widget _buildBox(BuildContext context, String filename) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -50,13 +58,16 @@ class _AiAnalyticState extends State<AiAnalytic> {
         child: Row(
           mainAxisSize: MainAxisSize.min, // Keeps the box tight around content
           children: [
-            AiAnalyticPlayButton(),
+            AiAnalyticPlayButton(
+              filename: filename,
+              disfluencyType: widget.disfluencyType,
+            ),
             const SizedBox(width: 8),
             // Flexible with FlexFit.loose is the secret to keeping the UI look
             Flexible(
               fit: FlexFit.loose,
               child: Text(
-                text,
+                "0:03",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,

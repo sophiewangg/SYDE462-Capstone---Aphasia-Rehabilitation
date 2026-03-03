@@ -182,17 +182,19 @@ async def classify_utterance(
 
 
 @app.get("/list_detections")
-async def list_detections():
+async def list_detections(disfluency_type):
     detection_dir = "detections"
-    if not os.path.exists(detection_dir):
+    if not os.path.exists(detection_dir + '/' + disfluency_type):
         return []
     
     # Get all .wav files in the folder
-    files = [f for f in os.listdir(detection_dir) if f.endswith(".wav")]
+    files = [f for f in os.listdir(detection_dir + '/' + disfluency_type) if f.endswith(".wav")]
     # Sort by name (which is timestamped) so newest are at the top
     files.sort(reverse=True)
     return files
 
 @app.post("/clear_detections")
 def clear_detections():
-    disfluency_detection_service.clear_detections()
+    disfluency_detection_service.clear_detections("sound_rep")
+    disfluency_detection_service.clear_detections("interjection")
+
