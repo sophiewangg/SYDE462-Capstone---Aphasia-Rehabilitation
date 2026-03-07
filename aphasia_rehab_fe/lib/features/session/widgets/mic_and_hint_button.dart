@@ -25,54 +25,59 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
         return MicButtonSpeaking();
       case MicrophoneState.processing:
         return MicButtonProcessing();
-      default:
-        return MicButtonIdle();
     }
+  }
+
+  Widget _buildButtonRow(ScenarioSimManager scenarioSimManager) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 20.0,
+      children: [
+        HintButton(),
+        Column(
+          spacing: 5.0,
+          children: [
+            ElevatedButton(
+              onPressed: scenarioSimManager.toggleBobEateryModal,
+              style: ElevatedButton.styleFrom(
+                shape: const CircleBorder(),
+                fixedSize: const Size(72, 72),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.all(12),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: const Icon(Icons.restaurant),
+            ),
+            Text("Menu", style: TextStyle(color: Colors.white)),
+          ],
+        ),
+        _buildMicButton(scenarioSimManager),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
+    final showSelectHint = scenarioSimManager.hintButtonPressed;
 
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        if (scenarioSimManager.hintButtonPressed)
-          Positioned(
-            bottom: 110,
-            left: 0,
-            child: SizedBox(height: 150, width: 300, child: SelectHint()),
-          ),
+    // Use Column when hint is shown so SelectHint stays within hit-test bounds
+    // (Stack+Positioned caused overflow; taps were going to SpeechBubble behind)
+    if (showSelectHint) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 150, width: 300, child: SelectHint()),
+          const SizedBox(height: 10),
+          _buildButtonRow(scenarioSimManager),
+        ],
+      );
+    }
 
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20.0,
-          children: [
-            HintButton(),
-            Column(
-              spacing: 5.0,
-              children: [
-                ElevatedButton( //adding menu button
-                  onPressed: scenarioSimManager.toggleBobEateryModal,
-                  style: ElevatedButton.styleFrom(
-                    shape: const CircleBorder(),
-                    fixedSize: const Size(72, 72),
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    padding: const EdgeInsets.all(12),
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: const Icon(Icons.restaurant),
-                ),
-                Text("Menu", style: TextStyle(color: Colors.white)),
-              ],
-            ),
-            _buildMicButton(scenarioSimManager),
-          ],
-        ),
-      ],
-    );
+    return _buildButtonRow(scenarioSimManager);
   }
 }
