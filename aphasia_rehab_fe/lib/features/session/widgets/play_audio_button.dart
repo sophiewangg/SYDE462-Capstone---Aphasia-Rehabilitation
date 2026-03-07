@@ -17,7 +17,8 @@ class _PlayAudioButtonState extends State<PlayAudioButton> {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
     return ElevatedButton(
       onPressed: () {
-        scenarioSimManager.playCharacterAudio();
+        final config = createLocalImageConfiguration(context);
+        scenarioSimManager.playCharacterAudio(config);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.grey100,

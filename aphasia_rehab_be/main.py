@@ -13,7 +13,7 @@ from fastapi import Body, Depends, FastAPI, WebSocket, WebSocketDisconnect, Quer
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
-from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService)
+from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService, PromptService)
 
 
 logging.basicConfig(level=logging.INFO)
@@ -214,3 +214,14 @@ def clear_detections():
     disfluency_detection_service.clear_detections("sound_rep")
     disfluency_detection_service.clear_detections("interjection")
 
+@app.get("/next_prompt")
+def next_prompt(scenario_step_description: str, db: Session = Depends(database.get_db)):
+    prompt_service = PromptService(db)
+    res = prompt_service.next_prompt(scenario_step_description)
+    print(res)
+    return res
+
+@app.get("/generate_signed_url")
+def generate_signed_url(url: str, db: Session = Depends(database.get_db)):
+    prompt_service = PromptService(db)
+    return prompt_service.generate_signed_url('speakeasy_voice_audios', url)

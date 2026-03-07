@@ -27,7 +27,8 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
           height: 72,
           child: ElevatedButton(
             onPressed: () {
-              scenarioSimManager.handleMicToggle();
+              final config = createLocalImageConfiguration(context);
+              scenarioSimManager.handleMicToggle(config);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,
@@ -41,7 +42,10 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
             ),
             child: SvgPicture.asset(
               'assets/icons/mic_button.svg',
-              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(
+                Colors.black,
+                BlendMode.srcIn,
+              ),
               width: 30,
             ),
           ),
@@ -49,6 +53,5 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
         Text("Tap to speak", style: TextStyle(color: Colors.white)),
       ],
     );
-
   }
 }
