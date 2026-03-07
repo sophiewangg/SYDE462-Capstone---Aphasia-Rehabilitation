@@ -5,10 +5,8 @@ import 'dart:async';
 
 import '../../../api_service.dart';
 import '../../../services/transcription_service.dart';
-import '../../../services/cue_service.dart';
 import '../../../models/microphone_state.dart';
-import '../../../models/cue_model.dart';
-import '../widgets/cue_modal.dart';
+import 'hint_manager.dart';
 
 // --- ENUMS ---
 enum ScenarioStep {
@@ -42,21 +40,16 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- Services ---
   final TranscriptionService _transcriptionService = TranscriptionService();
   final ScenarioApiService _scenarioApiService = ScenarioApiService();
-  final CueService _cueService = CueService();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
   // --- State Variables: Transcription & Mic ---
+  late final HintManager hintManager;
+
   StreamSubscription<TranscriptionResult>? _subscription;
   String _transcription = "";
   bool _hasPermission = false;
   bool _isRecording = false;
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
-
-  // --- State Variables: Cue Modal ---
-  bool _isModalOpen = false;
-  bool _modalIsWordFinding = false;
-  String? _likelyWord;
-  bool _hintButtonPressed = false;
 
   // --- State Variables: Scenario Progression ---
   ScenarioStep _currentStep = ScenarioStep.drinksOffer;
@@ -119,22 +112,11 @@ class ScenarioSimManager extends ChangeNotifier {
   String currentCharacter = "assets/characters/server_1.png";
   String currentAudio = "audio_clips/server_speech_1.mp3";
 
-  // --- ValueNotifiers (For Modal UI) ---
-  final cueCompleteNotifier = ValueNotifier<bool>(false);
-  final cueResultStringNotifier = ValueNotifier<String?>(null);
-  final cueNumberNotifier = ValueNotifier<int>(0);
-  final currentMicrophoneStateModal = ValueNotifier<MicrophoneState>(
-    MicrophoneState.idle,
-  );
-
   // --- Getters ---
   String get transcription => _transcription;
   bool get isRecording => _isRecording;
   bool get hasPermission => _hasPermission;
   MicrophoneState get currentMicrophoneState => _currentMicrophoneState;
-  bool get isModalOpen => _isModalOpen;
-  bool get hintButtonPressed => _hintButtonPressed;
-  bool get modalIsWordFinding => _modalIsWordFinding;
   String? get systemMessage => _systemMessage;
   bool get isBobEateryModalOpen => _isBobEateryModalOpen;
 
@@ -146,6 +128,28 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   ScenarioSimManager() {
+    hintManager = HintManager(
+      getCurrentPrompt: () => currentPrompt,
+      onPromptSimplified: (text) {
+        _promptOverride = text;
+        notifyListeners();
+      },
+      requestStopRecording: () async {
+        if (_isRecording) {
+          await _transcriptionService.stopStreaming();
+          _isRecording = false;
+          _currentMicrophoneState = MicrophoneState.idle;
+          notifyListeners();
+        }
+      },
+      onProcessingComplete: () {
+        _currentMicrophoneState = MicrophoneState.idle;
+        notifyListeners();
+      },
+      onEnterDescribePhase: () {
+        _transcription = "";
+      },
+    );
     _initTranscriptionListener();
     _playPrompt();
   }
@@ -189,7 +193,6 @@ class ScenarioSimManager extends ChangeNotifier {
     _transcriptionService.startStreaming();
     _isRecording = true;
     _currentMicrophoneState = MicrophoneState.userSpeaking;
-    currentMicrophoneStateModal.value = MicrophoneState.userSpeaking;
     notifyListeners();
   }
 
@@ -197,7 +200,6 @@ class ScenarioSimManager extends ChangeNotifier {
     // Update UI immediately so button switches right away
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
-    currentMicrophoneStateModal.value = MicrophoneState.processing;
     notifyListeners();
     // Wait for 1 second to not cut off words currently being transcribed
     await Future.delayed(const Duration(seconds: 1));
@@ -210,44 +212,43 @@ class ScenarioSimManager extends ChangeNotifier {
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
-    currentMicrophoneStateModal.value = MicrophoneState.processing;
     notifyListeners();
 
-    if (_isModalOpen) {
-      processCueSpeech();
-    } else {
-      final transcript = _transcription.trim();
+    if (hintManager.isModalOpen) {
+      hintManager.onTranscriptReceived(_transcription);
+      return;
+    }
 
-      if (transcript.isEmpty) {
-        _promptPrefix = "I didn't quite hear that. Could you try again? ";
-        _currentMicrophoneState = MicrophoneState.idle;
-        notifyListeners();
-        return;
-      }
+    final transcript = _transcription.trim();
 
-      final classification = await _scenarioApiService.classifyUtterance(
-        transcript,
-      );
-
-      if (classification == null || !classification.match) {
-        _systemMessage =
-            "I'm not sure I understood. Could you try saying that another way?";
-        _currentMicrophoneState = MicrophoneState.idle;
-        notifyListeners();
-        return;
-      }
-
-      if (_currentStep == ScenarioStep.allergies) {
-        // Mark the scenario as complete and notify the UI
-        _isScenarioComplete = true;
-        notifyListeners();
-        return;
-      }
-
-      _advanceScenario(classification.intent);
+    if (transcript.isEmpty) {
+      _promptPrefix = "I didn't quite hear that. Could you try again? ";
       _currentMicrophoneState = MicrophoneState.idle;
       notifyListeners();
+      return;
     }
+
+    final classification = await _scenarioApiService.classifyUtterance(
+      transcript,
+    );
+
+    if (classification == null || !classification.match) {
+      _systemMessage =
+          "I'm not sure I understood. Could you try saying that another way?";
+      _currentMicrophoneState = MicrophoneState.idle;
+      notifyListeners();
+      return;
+    }
+
+    if (_currentStep == ScenarioStep.allergies) {
+      _isScenarioComplete = true;
+      notifyListeners();
+      return;
+    }
+
+    _advanceScenario(classification.intent);
+    _currentMicrophoneState = MicrophoneState.idle;
+    notifyListeners();
   }
 
   void _advanceScenario(String? intent) {
@@ -346,17 +347,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _promptPrefix = null;
     _promptOverride = null;
 
-    // Reset modal states
-    _isModalOpen = false;
-    _modalIsWordFinding = false;
-    _likelyWord = null;
-    _hintButtonPressed = false;
-
-    // Reset UI Notifiers
-    cueCompleteNotifier.value = false;
-    cueResultStringNotifier.value = null;
-    cueNumberNotifier.value = 0;
-    currentMicrophoneStateModal.value = MicrophoneState.idle;
+    hintManager.reset();
 
     // Make sure audio is stopped
     _audioPlayer.stop();
@@ -369,92 +360,6 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Cue Modal Logic (Restored) ---
-
-  void handleHintPressed({
-    required bool isWordFinding,
-    required BuildContext context,
-  }) async {
-    _modalIsWordFinding = isWordFinding;
-    cueCompleteNotifier.value = false;
-    currentMicrophoneStateModal.value = MicrophoneState.idle;
-    _hintButtonPressed = false;
-
-    if (_isRecording) {
-      await _transcriptionService.stopStreaming();
-      _isRecording = false;
-      _currentMicrophoneState = MicrophoneState.idle;
-    }
-    notifyListeners();
-
-    if (isWordFinding) {
-      final cueFuture = _cueService.getCues(_transcription, currentPrompt);
-      _showModal(context, cueFuture);
-
-      final fetchedCue = await cueFuture;
-      if (fetchedCue != null) {
-        _likelyWord = fetchedCue.likelyWord;
-        notifyListeners();
-      }
-    } else {
-      _showModal(context, Future.value(null));
-    }
-  }
-
-  void processCueSpeech() {
-    if (_modalIsWordFinding) {
-      _processSpeechWordFinding(_likelyWord ?? "");
-    } else {
-      _processSpeechUnderstanding();
-    }
-  }
-
-  void _processSpeechWordFinding(String targetWord) {
-    String cleanTranscript = _transcription.toLowerCase().trim();
-    String cleanTarget = targetWord.toLowerCase().trim();
-
-    if (cleanTranscript.contains(cleanTarget)) {
-      cueCompleteNotifier.value = true;
-      cueResultStringNotifier.value =
-          "Correct! The word is ${targetWord.toUpperCase()}";
-    } else {
-      cueResultStringNotifier.value = "Not quite. Here's another hint:";
-      updateCueNumber();
-    }
-    _currentMicrophoneState = MicrophoneState.idle;
-    currentMicrophoneStateModal.value = MicrophoneState.idle;
-    notifyListeners();
-  }
-
-  void _processSpeechUnderstanding() async {
-    cueCompleteNotifier.value = true;
-    cueResultStringNotifier.value = "Return to exercise.";
-    _currentMicrophoneState = MicrophoneState.idle;
-    currentMicrophoneStateModal.value = MicrophoneState.idle;
-    final response = await _cueService.getSimplifiedPrompt(currentPrompt);
-
-    // Note: We're applying the simplified prompt via _promptOverride
-    // so it doesn't permanently overwrite the base step text.
-    _promptOverride = response?.simplifiedPrompt ?? currentPrompt;
-    notifyListeners();
-  }
-
-  void _showModal(BuildContext context, Future<Cue?> fetchedCue) {
-    _isModalOpen = true;
-    notifyListeners();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => CueModal(cueFuture: fetchedCue),
-    ).then((_) {
-      _isModalOpen = false;
-      notifyListeners();
-    });
-  }
-
   // --- Character and Audio ---
   void playCharacterAudio() async {
     await _audioPlayer.play(AssetSource(currentAudio));
@@ -462,34 +367,6 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   // --- Utilities ---
-  void toggleHintButton() {
-    _hintButtonPressed = !_hintButtonPressed;
-    notifyListeners();
-  }
-
-  void updateCueNumber({bool reset = false}) {
-    if (reset)
-      cueNumberNotifier.value = 0;
-    else
-      cueNumberNotifier.value = cueNumberNotifier.value + 1;
-    notifyListeners();
-  }
-
-  void resetCueComplete() {
-    cueCompleteNotifier.value = false;
-    notifyListeners();
-  }
-
-  void resetCueResultString() {
-    cueResultStringNotifier.value = null;
-    notifyListeners();
-  }
-
-  void setIsModalOpen(bool isOpen) {
-    _isModalOpen = isOpen;
-    notifyListeners();
-  }
-
   void handleUserTurnCompleted() {
     handleEndOfTurn();
   }
@@ -502,10 +379,7 @@ class ScenarioSimManager extends ChangeNotifier {
   @override
   void dispose() {
     _subscription?.cancel();
-    cueCompleteNotifier.dispose();
-    cueResultStringNotifier.dispose();
-    cueNumberNotifier.dispose();
-    currentMicrophoneStateModal.dispose();
+    hintManager.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }

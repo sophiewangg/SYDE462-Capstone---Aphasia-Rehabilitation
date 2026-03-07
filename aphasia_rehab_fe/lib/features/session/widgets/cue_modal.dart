@@ -1,14 +1,12 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button_cue_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../models/cue_model.dart';
 
 class CueModal extends StatefulWidget {
-  final Future<Cue?> cueFuture;
-
-  const CueModal({super.key, required this.cueFuture});
+  const CueModal({super.key});
 
   @override
   State<CueModal> createState() => _CueModalState();
@@ -34,85 +32,101 @@ class _CueModalState extends State<CueModal> {
     }
   }
 
-  void _scheduleAutoClose(BuildContext context, ScenarioSimManager scenarioSimManager) {
+  void _scheduleAutoClose(BuildContext context, HintManager hintManager) {
     if (_autoCloseScheduled) return;
     _autoCloseScheduled = true;
 
     Future.delayed(const Duration(milliseconds: 500), () {
-      if (!mounted) return;
+      if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 300), () {
-        scenarioSimManager.updateCueNumber(reset: true);
-        scenarioSimManager.resetCueComplete();
-        scenarioSimManager.resetCueResultString();
-        scenarioSimManager.setIsModalOpen(false);
+        hintManager.updateCueNumber(reset: true);
+        hintManager.resetCueComplete();
+        hintManager.resetCueResultString();
       });
     });
   }
 
+  Widget _buildDescribePhase(BuildContext context, HintManager hintManager) {
+    return _buildBaseContainer(
+      hintManager: hintManager,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCloseButton(context, hintManager),
+          const SizedBox(height: 24),
+          _buildMessageBox("Describe the word you're looking for."),
+          const SizedBox(height: 24),
+          if (hintManager.cueResultStringNotifier.value != null)
+            _buildMessageBox(hintManager.cueResultStringNotifier.value!),
+          const SizedBox(height: 40),
+          MicAndHintButtonCueModal(showHintButton: false),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final scenarioSimManager = context.watch<ScenarioSimManager>();
+    final hintManager = context.watch<HintManager>();
 
     // Trigger auto-close when the modal turns green
-    if (scenarioSimManager.cueCompleteNotifier.value) {
-      _scheduleAutoClose(context, scenarioSimManager);
+    if (hintManager.cueCompleteNotifier.value) {
+      _scheduleAutoClose(context, hintManager);
+    }
+
+    if (hintManager.isHintDescribePhase) {
+      return ValueListenableBuilder<String?>(
+        valueListenable: hintManager.cueResultStringNotifier,
+        builder: (_, __, ___) => _buildDescribePhase(context, hintManager),
+      );
+    }
+
+    final cueFuture = hintManager.cueFutureNotifier.value;
+    if (cueFuture == null) {
+      return const SizedBox.shrink();
     }
 
     return FutureBuilder<Cue?>(
-      future: widget.cueFuture,
+      future: cueFuture,
       builder: (context, cueSnapshot) {
-        // 1. Loading State
         if (cueSnapshot.connectionState == ConnectionState.waiting) {
           return _buildBaseContainer(
-            scenarioSimManager: scenarioSimManager,
+            hintManager: hintManager,
             child: const Center(
               child: CircularProgressIndicator(strokeWidth: 3),
             ),
           );
         }
 
-        // 2. Error State (Actual network/parsing failure)
         if (cueSnapshot.hasError) {
           return _buildBaseContainer(
-            scenarioSimManager: scenarioSimManager,
+            hintManager: hintManager,
             child: const Center(child: Text("Error loading hints.")),
           );
         }
 
-        // 3. Success State (Note: data can be null here if we passed Future.value(null))
         final fetchedCue = cueSnapshot.data;
 
         return _buildBaseContainer(
-          scenarioSimManager: scenarioSimManager,
+          hintManager: hintManager,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildCloseButton(context, scenarioSimManager),
+              _buildCloseButton(context, hintManager),
               const SizedBox(height: 10),
-
-              // Result String (The "Correct!" message)
-              if (scenarioSimManager.cueResultStringNotifier.value != null)
-                _buildMessageBox(
-                  scenarioSimManager.cueResultStringNotifier.value!,
-                )
+              if (hintManager.cueResultStringNotifier.value != null)
+                _buildMessageBox(hintManager.cueResultStringNotifier.value!)
               else
                 const SizedBox(height: 25),
-
               const SizedBox(height: 10),
-
-              // The Hint Text
               _buildMessageBox(
-                _getHintText(
-                  scenarioSimManager.cueNumberNotifier.value,
-                  fetchedCue,
-                ),
+                _getHintText(hintManager.cueNumberNotifier.value, fetchedCue),
               ),
-
               const SizedBox(height: 40),
-
-              MicAndHintButtonCueModal(),
+              MicAndHintButtonCueModal(showHintButton: true),
             ],
           ),
         );
@@ -120,18 +134,16 @@ class _CueModalState extends State<CueModal> {
     );
   }
 
-  // --- Helper Builders to keep the code clean ---
-
   Widget _buildBaseContainer({
     required Widget child,
-    required ScenarioSimManager scenarioSimManager,
+    required HintManager hintManager,
   }) {
     return Container(
       width: double.infinity,
       height: 350,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: scenarioSimManager.cueCompleteNotifier.value
+        color: hintManager.cueCompleteNotifier.value
             ? AppColors.cueModalComplete
             : AppColors.cueModalInProgress,
         borderRadius: BorderRadius.circular(32.0),
@@ -156,20 +168,17 @@ class _CueModalState extends State<CueModal> {
     );
   }
 
-  Widget _buildCloseButton(
-    BuildContext context,
-    ScenarioSimManager scenarioSimManager,
-  ) {
+  Widget _buildCloseButton(BuildContext context, HintManager hintManager) {
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton.icon(
         onPressed: () async {
           Navigator.pop(context);
           await Future.delayed(const Duration(milliseconds: 300));
-          scenarioSimManager.updateCueNumber(reset: true);
-          scenarioSimManager.resetCueComplete();
-          scenarioSimManager.resetCueResultString();
-          scenarioSimManager.setIsModalOpen(false);
+          hintManager.updateCueNumber(reset: true);
+          hintManager.resetCueComplete();
+          hintManager.resetCueResultString();
+          hintManager.closeModal();
         },
         icon: const Icon(Icons.close),
         label: const Text('Cancel'),

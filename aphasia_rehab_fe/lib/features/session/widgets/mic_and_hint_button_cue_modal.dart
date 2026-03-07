@@ -8,7 +8,12 @@ import 'package:aphasia_rehab_fe/models/microphone_state.dart';
 import 'package:provider/provider.dart';
 
 class MicAndHintButtonCueModal extends StatefulWidget {
-  const MicAndHintButtonCueModal({super.key});
+  final bool showHintButton;
+
+  const MicAndHintButtonCueModal({
+    super.key,
+    this.showHintButton = true,
+  });
 
   @override
   State<MicAndHintButtonCueModal> createState() =>
@@ -25,8 +30,6 @@ class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
         return MicButtonSpeaking();
       case MicrophoneState.processing:
         return MicButtonProcessing();
-      default:
-        return MicButtonIdle();
     }
   }
 
@@ -43,7 +46,10 @@ class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
-          children: [HintButtonCueModal(), _buildMicButton(scenarioSimManager)],
+          children: [
+            if (widget.showHintButton) HintButtonCueModal(),
+            _buildMicButton(scenarioSimManager),
+          ],
         ),
       ],
     );

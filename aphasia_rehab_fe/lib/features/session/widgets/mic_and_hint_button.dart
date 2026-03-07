@@ -1,3 +1,4 @@
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/hint_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_button_idle.dart';
@@ -62,7 +63,8 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
   @override
   Widget build(BuildContext context) {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
-    final showSelectHint = scenarioSimManager.hintButtonPressed;
+    final hintManager = context.watch<HintManager>();
+    final showSelectHint = hintManager.hintButtonPressed;
 
     // Use Column when hint is shown so SelectHint stays within hit-test bounds
     // (Stack+Positioned caused overflow; taps were going to SpeechBubble behind)

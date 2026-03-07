@@ -1,5 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +13,7 @@ class SelectHint extends StatefulWidget {
 class _SelectHintState extends State<SelectHint> {
   @override
   Widget build(BuildContext context) {
-    final scenarioSimManager = context.watch<ScenarioSimManager>();
+    final hintManager = context.watch<HintManager>();
 
     const double borderRadius = 8.0;
 
@@ -32,10 +32,10 @@ class _SelectHintState extends State<SelectHint> {
             Expanded(
               flex: 35,
               child: InkWell(
-                onTap: () => scenarioSimManager.handleHintPressed(
+                onTap: () => hintManager.startHintFlow(
                   isWordFinding: true,
                   context: context,
-                ), // Call the provided callback
+                ),
                 // Wrap the image here
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
@@ -53,10 +53,10 @@ class _SelectHintState extends State<SelectHint> {
             Expanded(
               flex: 35,
               child: InkWell(
-                onTap: () => scenarioSimManager.handleHintPressed(
+                onTap: () => hintManager.startHintFlow(
                   isWordFinding: false,
                   context: context,
-                ), // Call the provided callback
+                ),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(borderRadius),
