@@ -22,14 +22,13 @@ class MicAndHintButtonCueModal extends StatefulWidget {
 
 class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
   Widget _buildMicButton(ScenarioSimManager manager) {
-    // Access the state directly from the manager we pass in
     switch (manager.currentMicrophoneState) {
       case MicrophoneState.idle:
-        return MicButtonIdle();
+        return MicButtonIdle(fillWidth: true);
       case MicrophoneState.userSpeaking:
-        return MicButtonSpeaking();
+        return MicButtonSpeaking(fillWidth: true);
       case MicrophoneState.processing:
-        return MicButtonProcessing();
+        return MicButtonProcessing(fillWidth: true);
     }
   }
 
@@ -43,12 +42,11 @@ class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
       spacing: 10.0,
       children: [
         Row(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: 20.0,
           children: [
             if (widget.showHintButton) HintButtonCueModal(),
-            _buildMicButton(scenarioSimManager),
+            Expanded(child: _buildMicButton(scenarioSimManager)),
           ],
         ),
       ],

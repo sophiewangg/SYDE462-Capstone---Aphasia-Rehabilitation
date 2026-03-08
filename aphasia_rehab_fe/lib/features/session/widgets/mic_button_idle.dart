@@ -5,7 +5,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class MicButtonIdle extends StatefulWidget {
-  const MicButtonIdle({super.key});
+  final bool fillWidth;
+
+  const MicButtonIdle({super.key, this.fillWidth = false});
 
   @override
   State<MicButtonIdle> createState() => _MicButtonIdleState();
@@ -17,24 +19,31 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       spacing: 5.0,
       children: [
-        ElevatedButton(
-          onPressed: () {
-            scenarioSimManager.handleMicToggle();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: AppColors.textPrimary,
-            shape: const StadiumBorder(),
-            fixedSize: const Size(170, 72),
-            padding: EdgeInsets.zero,
-            elevation: 2,
-          ),
-          child: SvgPicture.asset(
-            'assets/icons/mic_button.svg',
-            colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
-            width: 30,
+        SizedBox(
+          width: widget.fillWidth ? double.infinity : null,
+          height: 72,
+          child: ElevatedButton(
+            onPressed: () {
+              scenarioSimManager.handleMicToggle();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: AppColors.textPrimary,
+              shape: const StadiumBorder(),
+              minimumSize: widget.fillWidth
+                  ? const Size(double.infinity, 72)
+                  : const Size(170, 72),
+              padding: EdgeInsets.zero,
+              elevation: 2,
+            ),
+            child: SvgPicture.asset(
+              'assets/icons/mic_button.svg',
+              colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
+              width: 30,
+            ),
           ),
         ),
         Text("Tap to speak", style: TextStyle(color: Colors.white)),
