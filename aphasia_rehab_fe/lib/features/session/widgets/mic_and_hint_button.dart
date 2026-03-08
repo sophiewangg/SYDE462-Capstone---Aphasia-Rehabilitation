@@ -73,7 +73,7 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 150, width: 300, child: SelectHint()),
+          SizedBox(width: 300, child: SelectHint()),
           const SizedBox(height: 10),
           _buildButtonRow(scenarioSimManager),
         ],

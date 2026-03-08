@@ -24,52 +24,70 @@ class _SelectHintState extends State<SelectHint> {
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(color: AppColors.boxBorder, width: 1.0),
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 35,
-              child: InkWell(
-                onTap: () => hintManager.startHintFlow(
-                  isWordFinding: true,
-                  context: context,
-                ),
-                // Wrap the image here
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(borderRadius),
-                    bottomLeft: Radius.circular(borderRadius),
-                  ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildHintOption(
+            imagePath: 'assets/images/help_finding_word_image.png',
+            label: "I can't find a word",
+            onTap: () => hintManager.startHintFlow(
+              isWordFinding: true,
+              context: context,
+            ),
+          ),
+          Container(height: 1, color: AppColors.boxBorder),
+          _buildHintOption(
+            imagePath: 'assets/images/i_dont_understand_image.png',
+            label: "I don't understand",
+            onTap: () => hintManager.startHintFlow(
+              isWordFinding: false,
+              context: context,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHintOption({
+    required String imagePath,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: AppColors.grey100,
+        highlightColor: AppColors.grey100.withValues(alpha: 0.5),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
                   child: Image.asset(
-                    'assets/images/help_finding_word_image.png',
-                    fit: BoxFit.cover,
+                    imagePath,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
-            ),
-            Container(width: 1, color: AppColors.boxBorder),
-            Expanded(
-              flex: 35,
-              child: InkWell(
-                onTap: () => hintManager.startHintFlow(
-                  isWordFinding: false,
-                  context: context,
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topRight: Radius.circular(borderRadius),
-                    bottomRight: Radius.circular(borderRadius),
-                  ),
-                  child: Image.asset(
-                    'assets/images/i_dont_understand_image.png',
-                    fit: BoxFit.cover,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
