@@ -47,6 +47,24 @@ class _CueModalState extends State<CueModal> {
     });
   }
 
+  Widget _buildCompleteState(BuildContext context, HintManager hintManager) {
+    final resultText = hintManager.cueResultStringNotifier.value ?? "Done.";
+    return _buildBaseContainer(
+      hintManager: hintManager,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildCloseButton(context, hintManager),
+          const SizedBox(height: 20),
+          _buildMessageBox(resultText),
+          const SizedBox(height: 40),
+          MicAndHintButtonCueModal(showHintButton: false),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDescribePhase(BuildContext context, HintManager hintManager) {
     return _buildBaseContainer(
       hintManager: hintManager,
@@ -74,6 +92,9 @@ class _CueModalState extends State<CueModal> {
     // Trigger auto-close when the modal turns green
     if (hintManager.cueCompleteNotifier.value) {
       _scheduleAutoClose(context, hintManager);
+      // When complete, always show success UI (never SizedBox.shrink) so the
+      // modal has proper content for the closing animation
+      return _buildCompleteState(context, hintManager);
     }
 
     if (hintManager.isHintDescribePhase) {
