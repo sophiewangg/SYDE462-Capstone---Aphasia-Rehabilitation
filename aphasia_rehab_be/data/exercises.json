@@ -1,5 +1,59 @@
 [
   {
+    "id": "scenario_has_reservation_01",
+    "text": "yes i have a reservation",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_has_reservation_02",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_no_reservation_01",
+    "text": "no i don't have a reservation",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_no",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_no_reservation_02",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_no",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_number_people_01",
+    "text": "just me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_02",
+    "text": "one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
     "id": "scenario_drink_water_01",
     "text": "just water for me please",
     "metadata": {
@@ -270,6 +324,15 @@
     }
   },
   {
+    "id": "scenario_water_still_02",
+    "text": "still",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_still",
+      "step": "waterType"
+    }
+  },
+  {
     "id": "scenario_water_sparkling_01",
     "text": "sparkling water please",
     "metadata": {
@@ -280,7 +343,25 @@
   },
   {
     "id": "scenario_water_sparkling_02",
+    "text": "sparkling",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_sparkling",
+      "step": "waterType"
+    }
+  },
+  {
+    "id": "scenario_water_tap_01",
     "text": "tap water please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_tap",
+      "step": "waterType"
+    }
+  },
+  {
+    "id": "scenario_water_tap_01",
+    "text": "tap",
     "metadata": {
       "type": "scenario_menu",
       "intent": "water_tap",
@@ -649,7 +730,7 @@
   },
   {
     "id": "scenario_order_bruschetta_01",
-    "text": "i'll get the bruschetta ",
+    "text": "i'll get the bruschetta",
     "metadata": {
       "type": "scenario_menu",
       "intent": "order_bruschetta",
@@ -864,12 +945,93 @@
     }
   },
   {
+    "id": "scenario_is_that_all_yes_02",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
     "id": "scenario_is_that_all_no_01",
     "text": "no i want to add more",
     "metadata": {
       "type": "scenario_menu",
       "intent": "is_that_all_no",
       "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_no_02",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_no",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_01",
+    "text": "good",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "good",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_done_eating_01",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "done_eating_yes",
+      "step": "areYouDone"
+    }
+  },
+  {
+    "id": "scenario_not_done_eating_01",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "done_eating_no",
+      "step": "areYouDone"
+    }
+  },
+  {
+    "id": "scenario_ready_for_bill_01",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_yes",
+      "step": "readyForBill"
+    }
+  },
+  {
+    "id": "scenario_not_ready_for_bill_01",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_no",
+      "step": "readyForBill"
+    }
+  },
+  {
+    "id": "scenario_not_ready_for_bill_01",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_no",
+      "step": "readyForBill"
+    }
+  },
+  {
+    "id": "scenario_payment_method_01",
+    "text": "cash",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "payment_method",
+      "step": "paymentMethod"
     }
   }
 ]

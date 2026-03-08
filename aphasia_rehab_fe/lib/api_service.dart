@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class UtteranceClassification {
   final bool match;
-  final List<String> intents; // Changed to support multiple intents
+  final List<String> intents;
   final Map<String, dynamic>? metadata;
   final double? distance;
   final String? text;
@@ -18,10 +18,15 @@ class UtteranceClassification {
 
   factory UtteranceClassification.fromJson(Map<String, dynamic> json) {
     List<String> parsedIntents = [];
-    if (json['intents'] != null) {
-      parsedIntents = List<String>.from(json['intents']);
+
+    // Safely parse and sanitize the intents list to prevent whitespace mismatch bugs
+    if (json['intents'] != null && json['intents'] is List) {
+      parsedIntents = (json['intents'] as List)
+          .map((intent) => intent.toString().trim())
+          .toList();
+      print(parsedIntents);
     } else if (json['intent'] != null) {
-      parsedIntents = [json['intent'] as String];
+      parsedIntents = [json['intent'].toString().trim()];
     }
 
     return UtteranceClassification(
@@ -41,8 +46,9 @@ class ScenarioApiService {
 
   Future<UtteranceClassification?> classifyUtterance(
     String transcription,
-    String? currentStep,
-  ) async {
+    String? currentStep, {
+    bool globalSearch = false,
+  }) async {
     try {
       final response = await http.post(
         Uri.parse(_classifyUrl),
@@ -50,6 +56,7 @@ class ScenarioApiService {
         body: jsonEncode({
           "transcription": transcription,
           "current_step": currentStep,
+          "global_search": globalSearch,
         }),
       );
 

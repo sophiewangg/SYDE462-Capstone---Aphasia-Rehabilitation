@@ -10,6 +10,9 @@ import 'hint_manager.dart';
 
 // --- ENUMS ---
 enum ScenarioStep {
+  reservation,
+  reservationName,
+  numberPeople,
   drinksOffer,
   waterType,
   iceQuestion,
@@ -20,6 +23,11 @@ enum ScenarioStep {
   sideChoice,
   isThatAll,
   notReadyToOrder,
+  howIsEverything,
+  areYouDone,
+  readyForBill,
+  paymentMethod,
+  receipt,
 }
 
 class ScenarioPrompt {
@@ -41,6 +49,14 @@ class ScenarioSimManager extends ChangeNotifier {
   final ScenarioApiService _scenarioApiService = ScenarioApiService();
   final AudioPlayer _audioPlayer = AudioPlayer();
 
+  // Define which steps should allow the user to order anything from the menu
+  final List<ScenarioStep> _globalSearchSteps = [
+    ScenarioStep.drinksOffer,
+    ScenarioStep.readyToOrder,
+    ScenarioStep.appetizers,
+    ScenarioStep.entrees,
+  ];
+
   // --- State Variables: Transcription & Mic ---
   late final HintManager hintManager;
 
@@ -51,12 +67,16 @@ class ScenarioSimManager extends ChangeNotifier {
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
 
   // --- State Variables: Scenario Progression ---
-  ScenarioStep _currentStep = ScenarioStep.drinksOffer;
+  ScenarioStep _currentStep = ScenarioStep.reservation;
   String? _systemMessage;
   String? _promptPrefix;
   String? _promptOverride;
   final List<String> _orderItems = [];
-  bool _hasAnsweredSteakDoneness = false; // Added flag for dynamic routing
+
+  // Dynamic Routing Flags
+  bool _hasAnsweredSteakDoneness = false;
+  bool _wantsNoAppetizers = false;
+  bool _wantsNoEntrees = false;
 
   // --- State Variables: Scenario Status ---
   bool _isBobEateryModalOpen = false;
@@ -65,6 +85,18 @@ class ScenarioSimManager extends ChangeNotifier {
   bool get isScenarioComplete => _isScenarioComplete;
 
   final Map<ScenarioStep, ScenarioPrompt> _prompts = {
+    ScenarioStep.reservation: const ScenarioPrompt(
+      id: 'reservation',
+      text: "Welcome to Bob's Eatery. Do you have a reservation?",
+    ),
+    ScenarioStep.reservationName: const ScenarioPrompt(
+      id: 'reservation_name',
+      text: "Can I have the name that's on the reservation?",
+    ),
+    ScenarioStep.numberPeople: const ScenarioPrompt(
+      id: 'number_people',
+      text: "How many people are in your party?",
+    ),
     ScenarioStep.drinksOffer: const ScenarioPrompt(
       id: 'drinks_offer',
       text: "Here's the menu. Can I get you started with any drinks?",
@@ -83,7 +115,7 @@ class ScenarioSimManager extends ChangeNotifier {
     ),
     ScenarioStep.appetizers: const ScenarioPrompt(
       id: 'appetizers',
-      text: "Any appetizers to get you started?",
+      text: "Would you like to order any appetizers?",
     ),
     ScenarioStep.entrees: const ScenarioPrompt(
       id: 'entrees',
@@ -100,6 +132,26 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.isThatAll: const ScenarioPrompt(
       id: 'is_that_all',
       text: "Is that all for you?",
+    ),
+    ScenarioStep.howIsEverything: const ScenarioPrompt(
+      id: 'how_is_everything',
+      text: "how is everything?",
+    ),
+    ScenarioStep.areYouDone: const ScenarioPrompt(
+      id: 'are_you_done',
+      text: "Are you done with your food?",
+    ),
+    ScenarioStep.readyForBill: const ScenarioPrompt(
+      id: 'ready_for_bill',
+      text: "Are you ready for the bill?",
+    ),
+    ScenarioStep.paymentMethod: const ScenarioPrompt(
+      id: 'payment_method',
+      text: "How would you like to pay?",
+    ),
+    ScenarioStep.receipt: const ScenarioPrompt(
+      id: 'receipt',
+      text: "Would you like your receipt?",
     ),
   };
 
@@ -225,6 +277,9 @@ class ScenarioSimManager extends ChangeNotifier {
 
     final classification = await _scenarioApiService.classifyUtterance(
       transcript,
+      _currentMicrophoneState = MicrophoneState.idle;
+      notifyListeners();
+      return;
     );
 
     if (classification == null || !classification.match) {
@@ -235,13 +290,7 @@ class ScenarioSimManager extends ChangeNotifier {
       return;
     }
 
-    if (_currentStep == ScenarioStep.allergies) {
-      _isScenarioComplete = true;
-      notifyListeners();
-      return;
-    }
-
-    _advanceScenario(classification.intent);
+    _advanceScenario(classification.intents);
     _currentMicrophoneState = MicrophoneState.idle;
     notifyListeners();
   }
@@ -253,7 +302,11 @@ class ScenarioSimManager extends ChangeNotifier {
       _systemMessage = null;
     }
 
-    // 1. Process all detected food items, irrespective of the current step
+    if (intents.contains('no_appetizer')) _wantsNoAppetizers = true;
+    if (intents.contains('no_entrees')) _wantsNoEntrees = true;
+    if (intents.contains('steak_doneness')) _hasAnsweredSteakDoneness = true;
+
+    // new items are processed irrespective of step.. but it should matter that we're on the "ready to order" step
     bool orderedNewItems = false;
     for (String intent in intents) {
       if (intent.startsWith('order_') || intent.startsWith('side_')) {
@@ -266,6 +319,17 @@ class ScenarioSimManager extends ChangeNotifier {
 
     // 2. Step-based logic
     switch (_currentStep) {
+      case ScenarioStep.reservation:
+        if (intents.contains("reservation_yes")) {
+          _currentStep = ScenarioStep.reservationName;
+        } else if (intents.contains("reservation_no")) {
+          _currentStep = ScenarioStep.numberPeople;
+        }
+        break;
+      case ScenarioStep.reservationName:
+        _currentStep = ScenarioStep.numberPeople;
+      case ScenarioStep.numberPeople:
+        _currentStep = ScenarioStep.drinksOffer;
       case ScenarioStep.drinksOffer:
         if (intents.contains('beverage_water')) {
           _currentStep = ScenarioStep.waterType;
@@ -288,26 +352,31 @@ class ScenarioSimManager extends ChangeNotifier {
         if (intents.contains('ready_no')) {
           _promptOverride =
               "No problem, just say 'I'm ready to order' when you've decided.";
-        } else if (intents.contains('ready_yes') || orderedNewItems) {
+        } else if (intents.contains('ready_yes') ||
+            orderedNewItems ||
+            _wantsNoAppetizers ||
+            _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
         }
         break;
       case ScenarioStep.appetizers:
-      case ScenarioStep.entrees:
         if (intents.contains('ask_specials') || intents.contains('ask_soup')) {
-          _systemMessage = "Today's soup is creamy roasted garlic.";
+          _systemMessage =
+              "Today's soup is creamy roasted garlic."; //TODO: append to message
         } else if (intents.contains('ask_recommendations')) {
-          _systemMessage = "My personal favourite is the lobster pasta.";
-        } else if (orderedNewItems) {
+          _systemMessage =
+              "My personal favourite is the lobster pasta."; //TODO: append to message
+        } else if (orderedNewItems || _wantsNoAppetizers || _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
-        } else if (intents.contains('no_appetizer') ||
-            intents.contains('no_entrees')) {
+        }
+        break;
+      case ScenarioStep.entrees:
+        if (orderedNewItems || _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
         }
         break;
       case ScenarioStep.steakDoneness:
         if (intents.contains('steak_doneness')) {
-          _hasAnsweredSteakDoneness = true;
           _currentStep = _determineNextLogicalStep();
         }
         break;
@@ -323,32 +392,72 @@ class ScenarioSimManager extends ChangeNotifier {
           _currentStep = ScenarioStep.appetizers; // Loop back
         }
         break;
+      case ScenarioStep.howIsEverything:
+        _currentStep = ScenarioStep.areYouDone;
+        break;
+      case ScenarioStep.areYouDone:
+        if (intents.contains('done_eating_yes')) {
+          _currentStep = ScenarioStep.readyForBill;
+        } else if (intents.contains('done_eating_no')) {
+          _promptOverride =
+              "No problem, call me over when you're ready by saying 'I'm done'";
+        }
+        break;
+      case ScenarioStep.readyForBill:
+        if (intents.contains('ready_for_bill_yes')) {
+          _currentStep = ScenarioStep.paymentMethod;
+        } else if (intents.contains('ready_for_bill_no')) {
+          _promptOverride =
+              "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
+        }
+        break;
+      case ScenarioStep.paymentMethod:
+        _currentStep = ScenarioStep.receipt;
+        break;
+      case ScenarioStep.receipt:
+        _isScenarioComplete = true;
+        _systemMessage = "Thank you for dining with us! Have a wonderful day.";
+        break;
       case ScenarioStep.notReadyToOrder:
         break;
     }
     notifyListeners();
   }
 
+  // --- Dynamic Routing Helper ---
   ScenarioStep _determineNextLogicalStep() {
+    print("🛒 CURRENT ORDER ITEMS: $_orderItems");
+    // 1. Steak Doneness Check (Highest priority if steak is ordered)
     if (_orderItems.contains('order_steak') && !_hasAnsweredSteakDoneness) {
       return ScenarioStep.steakDoneness;
     }
 
-    // Check for combinations
     bool hasEntree = _orderItems.any(
       (item) => ['order_steak', 'order_chicken', 'order_pasta'].contains(item),
     );
     bool hasSide = _orderItems.any(
       (item) => ['side_salad', 'side_fries'].contains(item),
     );
+    bool hasAppetizer = _orderItems.any(
+      (item) => ['order_soup', 'order_bruschetta'].contains(item),
+    );
 
-    if (hasEntree && !hasSide) {
+    if (_orderItems.contains('order_steak') && !hasSide) {
       return ScenarioStep.sideChoice;
     }
 
-    if (!hasEntree && _currentStep != ScenarioStep.entrees) {
+    if (!hasAppetizer &&
+        !_wantsNoAppetizers &&
+        (_currentStep == ScenarioStep.readyToOrder ||
+            _currentStep == ScenarioStep.drinksOffer ||
+            _currentStep == ScenarioStep.iceQuestion)) {
+      return ScenarioStep.appetizers;
+    }
+
+    if (!hasEntree && !_wantsNoEntrees) {
       return ScenarioStep.entrees;
     }
+
     return ScenarioStep.isThatAll;
   }
 
@@ -358,8 +467,12 @@ class ScenarioSimManager extends ChangeNotifier {
     // Reset core progression
     _currentStep = ScenarioStep.drinksOffer;
     _isScenarioComplete = false;
-    _hasAnsweredSteakDoneness = false;
     _orderItems.clear();
+
+    // Reset Routing Flags
+    _hasAnsweredSteakDoneness = false;
+    _wantsNoAppetizers = false;
+    _wantsNoEntrees = false;
 
     // Reset text states
     _transcription = "";
