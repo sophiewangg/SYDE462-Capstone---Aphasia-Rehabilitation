@@ -1,5 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -14,16 +14,16 @@ class HintButton extends StatefulWidget {
 class _HintButtonState extends State<HintButton> {
   @override
   Widget build(BuildContext context) {
-    final scenarioSimManager = context.watch<ScenarioSimManager>();
+    final hintManager = context.watch<HintManager>();
     return Column(
       spacing: 5.0,
       children: [
         ElevatedButton(
           onPressed: () {
-            scenarioSimManager.toggleHintButton();
+            hintManager.toggleHintButton();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: scenarioSimManager.hintButtonPressed
+            backgroundColor: hintManager.hintButtonPressed
                 ? AppColors.grey100
                 : Colors.white,
             foregroundColor: AppColors.textPrimary,

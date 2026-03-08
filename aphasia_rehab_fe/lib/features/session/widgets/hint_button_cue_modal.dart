@@ -1,5 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -14,18 +14,16 @@ class HintButtonCueModal extends StatefulWidget {
 class _HintButtonCueModalState extends State<HintButtonCueModal> {
   @override
   Widget build(BuildContext context) {
-    final scenarioSimManager = context.watch<ScenarioSimManager>();
+    final hintManager = context.watch<HintManager>();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Stack(
-          clipBehavior: Clip
-              .none, // 1. Allows children to be drawn outside the Stack's box
+          clipBehavior: Clip.none,
           children: [
-            // Main Button
             ElevatedButton(
-              onPressed: scenarioSimManager.updateCueNumber,
+              onPressed: hintManager.updateCueNumber,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 fixedSize: const Size(72, 72),

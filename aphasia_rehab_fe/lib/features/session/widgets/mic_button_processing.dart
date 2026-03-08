@@ -2,7 +2,9 @@ import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:flutter/material.dart';
 
 class MicButtonProcessing extends StatefulWidget {
-  const MicButtonProcessing({super.key});
+  final bool fillWidth;
+
+  const MicButtonProcessing({super.key, this.fillWidth = false});
 
   @override
   State<MicButtonProcessing> createState() => _MicButtonProcessingState();
@@ -55,18 +57,24 @@ class _MicButtonProcessingState extends State<MicButtonProcessing>
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       spacing: 5.0,
       children: [
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFD6D9E8),
-            foregroundColor: AppColors.textPrimary,
-            shape: const StadiumBorder(),
-            fixedSize: const Size(170, 72),
-            padding: EdgeInsets.zero,
-            elevation: 2,
-          ),
+        SizedBox(
+          width: widget.fillWidth ? double.infinity : null,
+          height: 72,
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD6D9E8),
+              foregroundColor: AppColors.textPrimary,
+              shape: const StadiumBorder(),
+              minimumSize: widget.fillWidth
+                  ? const Size(double.infinity, 72)
+                  : const Size(170, 72),
+              padding: EdgeInsets.zero,
+              elevation: 2,
+            ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -98,7 +106,8 @@ class _MicButtonProcessingState extends State<MicButtonProcessing>
               );
             }),
           ),
-        ) ,
+          ),
+        ),
         Text("Processing...", style: TextStyle(color: Colors.white)),
       ],
     );

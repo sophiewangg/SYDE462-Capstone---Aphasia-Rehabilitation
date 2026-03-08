@@ -6,7 +6,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 
 class MicButtonSpeaking extends StatefulWidget {
-  const MicButtonSpeaking({super.key});
+  final bool fillWidth;
+
+  const MicButtonSpeaking({super.key, this.fillWidth = false});
 
   @override
   State<MicButtonSpeaking> createState() => _MicButtonSpeakingState();
@@ -67,20 +69,26 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
     final scenarioSimManager = context.watch<ScenarioSimManager>();
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       spacing: 5.0,
       children: [
-        ElevatedButton(
-          onPressed: () {
-            scenarioSimManager.handleMicToggle();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFFD6D9E8), // light purple-grey from screenshot
-            foregroundColor: AppColors.textPrimary,
-            shape: const StadiumBorder(),
-            fixedSize: const Size(170, 72),
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            elevation: 2,
-          ),
+        SizedBox(
+          width: widget.fillWidth ? double.infinity : null,
+          height: 72,
+          child: ElevatedButton(
+            onPressed: () {
+              scenarioSimManager.handleMicToggle();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFD6D9E8),
+              foregroundColor: AppColors.textPrimary,
+              shape: const StadiumBorder(),
+              minimumSize: widget.fillWidth
+                  ? const Size(double.infinity, 72)
+                  : const Size(170, 72),
+              padding: const EdgeInsets.symmetric(horizontal: 28),
+              elevation: 2,
+            ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -122,6 +130,7 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
                 width: 22,
               ),
             ],
+          ),
           ),
         ),
         Text("Listening...", style: TextStyle(color: Colors.white)),

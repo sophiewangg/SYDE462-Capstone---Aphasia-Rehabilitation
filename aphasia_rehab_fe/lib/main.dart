@@ -1,3 +1,4 @@
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,7 +10,10 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ScenarioSimManager()),
-        // Other managers...
+        ChangeNotifierProxyProvider<ScenarioSimManager, HintManager>(
+          create: (context) => context.read<ScenarioSimManager>().hintManager,
+          update: (_, scenario, __) => scenario.hintManager,
+        ),
       ],
       child: const MyApp(),
     ),
