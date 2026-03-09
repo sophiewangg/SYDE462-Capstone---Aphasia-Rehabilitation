@@ -1,15 +1,29 @@
 enum ScenarioStep {
-  drinksOffer,
-  waterType,
-  iceQuestion,
-  readyToOrder,
-  appetizers,
-  entrees,
-  steakDoneness,
-  sideChoice,
-  isThatAll,
-  allergies,
-  notReadyToOrder;
+  drinksOffer('drinksOffer'),
+  waterType('waterType'),
+  iceQuestion('iceQuestion'),
+  readyToOrder('readyToOrder'),
+  appetizers('appetizers'),
+  entrees('entrees'),
+  steakDoneness('steakDoneness'),
+  sideChoice('sideChoice'),
+  isThatAll('isThatAll'),
+  allergies('allergies'),
+  notReadyToOrder('notReadyToOrder');
+
+  // The internal string ID
+  final String id;
+
+  // Constructor
+  const ScenarioStep(this.id);
+
+  // Helper to find an enum by its string ID (useful for API responses)
+  static ScenarioStep fromId(String id) {
+    return ScenarioStep.values.firstWhere(
+      (step) => step.id == id,
+      orElse: () => ScenarioStep.drinksOffer,
+    );
+  }
 
   /// Returns the snake_case string required by the PostgreSQL database.
   String get dbValue {

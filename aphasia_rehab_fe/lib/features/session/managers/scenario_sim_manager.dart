@@ -78,6 +78,14 @@ class ScenarioSimManager extends ChangeNotifier {
     return base;
   }
 
+  // Define which steps should allow the user to order anything from the menu
+  final List<ScenarioStep> _globalSearchSteps = [
+    ScenarioStep.drinksOffer,
+    ScenarioStep.readyToOrder,
+    ScenarioStep.appetizers,
+    ScenarioStep.entrees,
+  ];
+
   ScenarioSimManager() {
     hintManager = HintManager(
       dashboardManager: dashboardManager,
@@ -190,7 +198,7 @@ class ScenarioSimManager extends ChangeNotifier {
 
     final classification = await _scenarioApiService.classifyUtterance(
       transcript,
-      _prompts[_currentStep]?.id,
+      _currentStep.id,
       globalSearch: _globalSearchSteps.contains(_currentStep),
     );
     _transcription = "";
@@ -212,7 +220,14 @@ class ScenarioSimManager extends ChangeNotifier {
       return;
     }
 
-    _advanceScenario(classification?.intents ?? [], config);
+    if (_currentStep == ScenarioStep.allergies) {
+      // Mark the scenario as complete and notify the UI
+      _isScenarioComplete = true;
+      notifyListeners();
+      return;
+    }
+
+    _advanceScenario(classification.intents, config);
   }
 
   Future<void> handleEndOfSession() async {
@@ -252,30 +267,31 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _advanceScenario(String? intent, ImageConfiguration config) async {
+  void _advanceScenario(List<String> intents, ImageConfiguration config) async {
+    if (intents.contains('no_appetizer')) _wantsNoAppetizers = true;
+    if (intents.contains('no_entrees')) _wantsNoEntrees = true;
+    if (intents.contains('steak_doneness')) _hasAnsweredSteakDoneness = true;
+
+    // new items are processed irrespective of step.. but it should matter that we're on the "ready to order" step
+    bool orderedNewItems = false;
+    for (String intent in intents) {
+      if (intent.startsWith('order_') || intent.startsWith('side_')) {
+        if (!_orderItems.contains(intent)) {
+          _orderItems.add(intent);
+          orderedNewItems = true;
+        }
+      }
+    }
     dashboardManager.incrementNumPromptsGiven();
     dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
     switch (_currentStep) {
-      case ScenarioStep.reservation:
-        if (intents.contains("reservation_yes")) {
-          _currentStep = ScenarioStep.reservationName;
-        } else if (intents.contains("reservation_no")) {
-          _currentStep = ScenarioStep.numberPeople;
-        }
-        break;
-      case ScenarioStep.reservationName:
-        _currentStep = ScenarioStep.numberPeople;
-        break;
-      case ScenarioStep.numberPeople:
-        _currentStep = ScenarioStep.drinksOffer;
-        break;
       case ScenarioStep.drinksOffer:
         if (intents.contains('beverage_water')) {
           _currentStep = ScenarioStep.waterType;
           await _handleScenarioStepChange(_currentStep, config);
-        } else if (intent == 'water_still' ||
-            intent == 'water_sparkling' ||
-            intent == 'beverage_other') {
+        } else if (intents.contains('water_still') ||
+            intents.contains('water_sparkling') ||
+            intents.contains('beverage_other')) {
           _currentStep = ScenarioStep.iceQuestion;
           await _handleScenarioStepChange(_currentStep, config);
         }
@@ -293,83 +309,89 @@ class ScenarioSimManager extends ChangeNotifier {
 
         break;
       case ScenarioStep.readyToOrder:
-        if (intent == 'ready_yes') {
+        if (intents.contains('ready_yes')) {
           _promptOverride = null;
           _currentStep = ScenarioStep.appetizers;
           await _handleScenarioStepChange(_currentStep, config);
-        } else if (intent == 'ready_no') {
+        } else if (intents.contains('ready_no')) {
           _promptOverride =
               "No problem, just say 'I'm ready to order' when you've decided.";
-        } else if (intents.contains('ready_yes') ||
-            orderedNewItems ||
-            _wantsNoAppetizers ||
-            _wantsNoEntrees) {
-          _currentStep = _determineNextLogicalStep();
         }
         break;
       case ScenarioStep.appetizers:
-        if (intent == 'ask_specials' || intent == 'ask_soup') {
+        if (intents.contains('ask_specials') || intents.contains('ask_soup')) {
           _promptOverride = "Today's soup is creamy roasted garlic.";
-        } else if (intent == 'ask_recommendations') {
+        } else if (intents.contains('ask_recommendations')) {
           _promptOverride = "My personal favourite is the lobster pasta.";
-        } else if (intent == 'order_steak') {
+        } else if (intents.contains('order_steak')) {
           _currentStep = ScenarioStep.steakDoneness;
           await _handleScenarioStepChange(_currentStep, config);
-        } else if (intent == 'order_chicken' || intent == 'order_pasta') {
-          _orderItems.add(intent!);
+        } else if (intents.contains('order_chicken') ||
+            intents.contains('order_pasta')) {
+          _orderItems.add(
+            intents.firstWhere(
+              (i) => i == 'order_chicken' || i == 'order_pasta',
+            ),
+          );
           _currentStep = ScenarioStep.isThatAll;
           await _handleScenarioStepChange(_currentStep, config);
-        } else if (intent == 'order_soup' || intent == 'order_bruschetta') {
+        } else if (intents.contains('order_soup') ||
+            intents.contains('order_bruschetta')) {
           //TODO: there was another app
-          _orderItems.add(intent!);
+          _orderItems.add(
+            intents.firstWhere(
+              (i) => i == 'order_soup' || i == 'order_bruschetta',
+            ),
+          );
           _currentStep = ScenarioStep.entrees;
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.entrees:
-        if (intent == 'order_steak') {
+        if (intents.contains('order_steak')) {
           _currentStep = ScenarioStep.steakDoneness;
           await _handleScenarioStepChange(_currentStep, config);
-        } else if (intent == 'order_chicken' || intent == 'order_pasta') {
-          _orderItems.add(intent!);
+        } else if (intents.contains('order_chicken') ||
+            intents.contains('order_pasta')) {
+          _orderItems.add(
+            intents.firstWhere(
+              (i) => i == 'order_chicken' || i == 'order_pasta',
+            ),
+          );
           _currentStep = ScenarioStep.isThatAll;
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.steakDoneness:
-        if (intent == 'steak_doneness') {
+        if (intents.contains('steak_doneness')) {
           _currentStep = ScenarioStep.sideChoice;
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.sideChoice:
-        if (intent == 'side_salad' || intent == 'side_fries') {
-          _orderItems.add(intent!);
+        if (intents.contains('side_salad') || intents.contains('side_fries')) {
+          _orderItems.add(
+            intents.firstWhere((i) => i == 'side_salad' || i == 'side_fries'),
+          );
           _currentStep = ScenarioStep.isThatAll;
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.isThatAll:
-        if (intent == 'is_that_all_yes') {
+        if (intents.contains('is_that_all_yes')) {
           _currentStep = ScenarioStep.allergies;
           await _handleScenarioStepChange(_currentStep, config);
-        } else if (intent == 'is_that_all_no') {
+        } else if (intents.contains('is_that_all_no')) {
           _currentStep = ScenarioStep.appetizers;
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
-      case ScenarioStep.paymentMethod:
-        _currentStep = ScenarioStep.receipt;
-        break;
-      case ScenarioStep.receipt:
-        _isScenarioComplete = true;
-        _systemMessage = "Thank you for dining with us! Have a wonderful day.";
-        break;
+      case ScenarioStep.allergies:
       case ScenarioStep.notReadyToOrder:
         break;
     }
     // Have this here to prevent glitch where prompt override is set to null and old prompt flashes before new one is loaded.
-    if (intent != 'ready_no') {
+    if (!intents.contains('ready_no')) {
       _promptOverride = null;
       _promptPrefix = null;
     }
@@ -418,7 +440,7 @@ class ScenarioSimManager extends ChangeNotifier {
     print("--- 🔄 RESETTING SCENARIO ---");
 
     // Reset core progression
-    _currentStep = ScenarioStep.reservation;
+    _currentStep = ScenarioStep.drinksOffer;
     _isScenarioComplete = false;
     _orderItems.clear();
 
