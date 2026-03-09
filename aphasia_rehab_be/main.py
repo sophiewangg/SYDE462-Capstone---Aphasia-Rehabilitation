@@ -2,18 +2,19 @@ import asyncio
 import json
 import logging
 import os
+import re # Added for utterance chunking
 from pathlib import Path
 import uuid
+from datetime import datetime
 
 from database import database, models
 from dotenv import load_dotenv
-from fastapi import Body, Depends, FastAPI, WebSocket, WebSocketDisconnect
-from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService)
-from services.vector_service import VectorService
-from sqlalchemy.orm import Session
-from fastapi import Query
+from fastapi import Body, Depends, FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.staticfiles import StaticFiles
-from datetime import datetime
+from sqlalchemy.orm import Session
+
+from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService)
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("uvicorn")
@@ -132,54 +133,69 @@ async def find_exercise(transcription: str = Body(..., embed=True)):
         "distances": results["distances"]
     }
 
-
 @app.post("/classify_utterance/")
 async def classify_utterance(
     transcription: str = Body(..., embed=True),
-    threshold: float = Query(0.40, description="Maximum allowed distance for a match"),
+    current_step: str = Body(None, embed=True), 
+    global_search: bool = Body(False, embed=True), # 👈 Added this parameter
+    threshold: float = Query(0.40),
 ):
     """
-    Use the vector store to find the closest matching utterance.
-    If the closest match is within the given distance threshold,
-    return its metadata (including the `intent` field).
+    Splits the transcription into chunks and runs vector similarity.
+    The frontend dictates whether to search globally via the global_search flag.
     """
-    results = vector_service.search_exercises(query_text=transcription, n_results=1)
+    
+    # 1. Frontend controls the filter scope
+    if current_step and not global_search:
+        step_filter = {"step": current_step}
+        logger.info(f"🔒 Strict filter applied for step: {current_step}")
+    else:
+        step_filter = None
+        logger.info(f"🌐 Global search executed (Step recorded as: {current_step})")
 
-    # Chroma returns lists-of-lists for distances / docs / metadatas.
-    # If the collection is empty (or query returns no candidates), these can be empty.
-    distances = results.get("distances") or []
-    metadatas = results.get("metadatas") or []
-    documents = results.get("documents") or []
+    # 2. Chunking the transcription
+    raw_chunks = re.split(r'\b(?:and|with|also|then)\b|,|\.|;', transcription.lower())
+    chunks = [chunk.strip() for chunk in raw_chunks if len(chunk.strip()) > 2]
+    if not chunks:
+        chunks = [transcription]
 
-    if not distances or not distances[0] or not metadatas or not metadatas[0] or not documents or not documents[0]:
-        return {
-            "match": False,
-            "reason": "no_results",
-        }
+    detected_intents = set()
+    best_distance = None
+    best_metadata = None
 
-    distance = distances[0][0]
-    metadata = metadatas[0][0]
-    document = documents[0][0]
+    # 3. Querying the Vector Database
+    for chunk in chunks:
+        results = vector_service.search_exercises(
+            query_text=chunk, 
+            n_results=1,
+            filter_metadata=step_filter  # Applies None or the strict dictionary
+        )
+        
+        distances = results.get("distances") or []
+        metadatas = results.get("metadatas") or []
 
-    logger.info(
-        f"Classify utterance: '{transcription}' -> distance={distance}, metadata={metadata}"
-    )
+        if distances and distances[0] and metadatas and metadatas[0]:
+            distance = distances[0][0]
+            metadata = metadatas[0][0]
 
-    if distance > threshold:
-        return {
-            "match": False,
-            "distance": distance,
-            "reason": "no_close_match",
-        }
+            if distance <= threshold:
+                intent = metadata.get("intent")
+                if intent:
+                    detected_intents.add(intent)
+                    
+                    if best_distance is None or distance < best_distance:
+                        best_distance = distance
+                        best_metadata = metadata
+
+    is_match = len(detected_intents) > 0
 
     return {
-        "match": True,
-        "distance": distance,
-        "metadata": metadata,
-        "intent": metadata.get("intent"),
-        "text": document,
+        "match": is_match,
+        "intents": list(detected_intents), 
+        "distance": best_distance,
+        "metadata": best_metadata,
+        "text": transcription
     }
-
 
 @app.get("/list_detections")
 async def list_detections(disfluency_type):

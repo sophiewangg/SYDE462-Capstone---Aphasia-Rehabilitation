@@ -1,810 +1,1037 @@
 [
   {
-    "id": "scenario_drink_water",
+    "id": "scenario_has_reservation_01",
+    "text": "yes i have a reservation",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_has_reservation_02",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_no_reservation_01",
+    "text": "no i don't have a reservation",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_no",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_no_reservation_02",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_no",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_number_people_01",
+    "text": "just me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_02",
+    "text": "one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_drink_water_01",
     "text": "just water for me please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_water"
+      "intent": "beverage_water",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_soda",
+    "id": "scenario_drink_water_02",
+    "text": "water",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_water",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_soda_01",
     "text": "i'll have a soda",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_soda",
+    "id": "scenario_drink_soda_02",
     "text": "i'll have a coke",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_soda",
+    "id": "scenario_drink_soda_03",
     "text": "i'll have a sprite",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_coffee",
-    "text": "can i get a coffee",
+    "id": "scenario_drink_soda_04",
+    "text": "soda",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_tea",
-    "text": "i'll have an iced tea",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_tea",
-    "text": "can i get a hot tea",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_lemonade",
-    "text": "i'd like a lemonade",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_juice",
-    "text": "lemon juice please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_juice",
-    "text": "beer for me",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_juice",
-    "text": "i'll have the white wine",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "i'll take a red wine",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "a glass of white wine please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "i'd like a beer",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "can i get an ipa",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_alcohol",
-    "text": "i'll have a bottle of wine",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_soda",
+    "id": "scenario_drink_soda_05",
     "text": "ginger ale please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_soda",
+    "id": "scenario_drink_soda_06",
     "text": "i'd like a root beer",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_drink_coffee",
-    "text": "i'd like an espresso",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_coffee",
-    "text": "can i get a cappuccino",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_coffee",
-    "text": "i'll have a latte",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_tea",
-    "text": "can i get a matcha latte",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_tea",
-    "text": "i'd like a chai tea",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "beverage_other"
-    }
-  },
-  {
-    "id": "scenario_drink_soda",
+    "id": "scenario_drink_soda_07",
     "text": "i'll take a club soda",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "beverage_other"
+      "intent": "beverage_other",
+      "step": "drinksOffer"
     }
   },
   {
-    "id": "scenario_water_still",
+    "id": "scenario_drink_coffee_01",
+    "text": "can i get a coffee",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee_02",
+    "text": "coffee",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee_03",
+    "text": "i'd like an espresso",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee_04",
+    "text": "can i get a cappuccino",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_coffee_05",
+    "text": "i'll have a latte",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_tea_01",
+    "text": "i'll have an iced tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_tea_02",
+    "text": "can i get a hot tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_tea_03",
+    "text": "tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_tea_04",
+    "text": "can i get a matcha latte",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_tea_05",
+    "text": "i'd like a chai tea",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_lemonade_01",
+    "text": "i'd like a lemonade",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_lemonade_02",
+    "text": "lemonade",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_lemonade_03",
+    "text": "lemon juice please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_01",
+    "text": "i'll take a red wine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_02",
+    "text": "a glass of white wine please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_03",
+    "text": "i'd like a beer",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_04",
+    "text": "can i get an ipa",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_05",
+    "text": "i'll have a bottle of wine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_06",
+    "text": "wine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_drink_alcohol_07",
+    "text": "wine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "beverage_other",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_water_still_01",
     "text": "still water please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "water_still"
+      "intent": "water_still",
+      "step": "waterType"
     }
   },
   {
-    "id": "scenario_water_sparkling",
+    "id": "scenario_water_still_02",
+    "text": "still",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_still",
+      "step": "waterType"
+    }
+  },
+  {
+    "id": "scenario_water_sparkling_01",
     "text": "sparkling water please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "water_sparkling"
+      "intent": "water_sparkling",
+      "step": "waterType"
     }
   },
   {
-    "id": "scenario_water_sparkling",
+    "id": "scenario_water_sparkling_02",
+    "text": "sparkling",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_sparkling",
+      "step": "waterType"
+    }
+  },
+  {
+    "id": "scenario_water_tap_01",
     "text": "tap water please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "water_tap"
+      "intent": "water_tap",
+      "step": "waterType"
     }
   },
   {
-    "id": "ice_question",
+    "id": "scenario_water_tap_01",
+    "text": "tap",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "water_tap",
+      "step": "waterType"
+    }
+  },
+  {
+    "id": "ice_question_01",
     "text": "yes i would like ice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_02",
     "text": "yes ice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_03",
     "text": "no ice for me please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_04",
     "text": "no ice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_05",
     "text": "lots of ice please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_06",
     "text": "easy on the ice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_07",
     "text": "just a little bit of ice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_08",
     "text": "extra ice would be great",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_09",
     "text": "ice is fine",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "yes_ice"
+      "intent": "yes_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_10",
     "text": "without ice please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_11",
     "text": "no ice needed",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_12",
     "text": "i'd prefer no ice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_13",
     "text": "actually no ice for me",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "ice_question",
+    "id": "ice_question_14",
     "text": "keep the ice out",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_ice"
+      "intent": "no_ice",
+      "step": "iceQuestion"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "ice_question_15",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice",
+      "step": "iceQuestion"
+    }
+  },
+  {
+    "id": "ice_question_16",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice",
+      "step": "iceQuestion"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_01",
     "text": "yes im ready to order",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_02",
     "text": "im ready to order",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_03",
     "text": "yes ready",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_01",
     "text": "no i need a bit more time",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_02",
     "text": "no can you give me a second",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_03",
     "text": "no i am not ready",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_04",
     "text": "i think we are all set to order",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_05",
     "text": "we are good to go",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_06",
     "text": "yeah i know what i want",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_07",
     "text": "we are all ready over here",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_yes",
+    "id": "scenario_ready_yes_08",
     "text": "im ready whenever you are",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_yes"
+      "intent": "ready_yes",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_04",
     "text": "just a couple more minutes please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_05",
     "text": "not quite yet",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_06",
     "text": "could you come back in a few",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_07",
     "text": "we still need to look at the menu",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ready_no",
+    "id": "scenario_ready_no_08",
     "text": "still deciding",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ready_no"
+      "intent": "ready_no",
+      "step": "readyToOrder"
     }
   },
   {
-    "id": "scenario_ask_specials",
+    "id": "scenario_ready_no_09",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_no_10",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ask_specials_01",
     "text": "what are todays specials",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ask_specials"
+      "intent": "ask_specials",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_ask_soup",
+    "id": "scenario_ask_soup_01",
     "text": "whats the soup of the day",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ask_soup"
+      "intent": "ask_soup",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_ask_recommendations",
+    "id": "scenario_ask_recommendations_01",
     "text": "what do you recommend",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "ask_recommendations"
+      "intent": "ask_recommendations",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_order_soup",
+    "id": "scenario_order_soup_01",
     "text": "i'd like the soup",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_soup"
+      "intent": "order_soup",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_order_soup",
+    "id": "scenario_order_soup_02",
     "text": "i'll have the soup of the day",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_soup"
+      "intent": "order_soup",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_order_soup",
+    "id": "scenario_order_soup_03",
     "text": "yeah i'll take that soup",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_soup"
+      "intent": "order_soup",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_order_bruschetta",
-    "text": "i'll get the bruschetta ",
+    "id": "scenario_order_bruschetta_01",
+    "text": "i'll get the bruschetta",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_bruschetta"
+      "intent": "order_bruschetta",
+      "step": "appetizers"
     }
   },
   {
-    "id": "scenario_order_steak",
+    "id": "no_appetizer_01",
+    "text": "no appetizers for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_appetizer",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "no_appetizer_02",
+    "text": "I don't want any appetizers",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_appetizer",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "scenario_order_steak_01",
     "text": "i'd like the ribeye",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_steak"
+      "intent": "order_steak",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_steak",
+    "id": "scenario_order_steak_02",
     "text": "i'd like the ribeye steak",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_steak"
+      "intent": "order_steak",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_steak",
+    "id": "scenario_order_steak_03",
     "text": "i'd like the steak",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_steak"
+      "intent": "order_steak",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_chicken",
+    "id": "scenario_order_chicken_01",
     "text": "i'll have the chicken",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_chicken"
+      "intent": "order_chicken",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_chicken",
+    "id": "scenario_order_chicken_02",
     "text": "i'll have the chicken katsu",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_chicken"
+      "intent": "order_chicken",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_chicken",
+    "id": "scenario_order_chicken_03",
     "text": "i'll have the katsu",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_chicken"
+      "intent": "order_chicken",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_pasta",
+    "id": "scenario_order_pasta_01",
     "text": "i'll get the pasta",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_pasta"
+      "intent": "order_pasta",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_pasta",
+    "id": "scenario_order_pasta_02",
     "text": "i'll get the seafood alfredo",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_pasta"
+      "intent": "order_pasta",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_order_pasta",
+    "id": "scenario_order_pasta_03",
     "text": "i'll get the alfredo",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "order_pasta"
+      "intent": "order_pasta",
+      "step": "entrees"
     }
   },
   {
-    "id": "scenario_steak_rare",
+    "id": "scenario_no_entree",
+    "text": "i don't want any entrees",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_entrees",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_no_entree",
+    "text": "no entrees for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_entrees",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_steak_rare_01",
     "text": "rare please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "steak_doneness"
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
     }
   },
   {
-    "id": "scenario_steak_medium",
+    "id": "scenario_steak_medium_01",
     "text": "medium please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "steak_doneness"
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
     }
   },
   {
-    "id": "scenario_steak_welldone",
+    "id": "scenario_steak_welldone_01",
     "text": "well done please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "steak_doneness"
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
     }
   },
   {
-    "id": "scenario_side_salad",
+    "id": "scenario_side_salad_01",
     "text": "salad please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "side_salad"
+      "intent": "side_salad",
+      "step": "sideChoice"
     }
   },
   {
-    "id": "scenario_side_fries",
+    "id": "scenario_side_salad_02",
+    "text": "i would like the salad",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_salad_03",
+    "text": "i want salad",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_fries_01",
     "text": "fries please",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "side_fries"
+      "intent": "side_fries",
+      "step": "sideChoice"
     }
   },
   {
-    "id": "scenario_is_that_all_yes",
+    "id": "scenario_side_fries_02",
+    "text": "i would like the fries",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_fries",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_fries_03",
+    "text": "i want fries",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_fries",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_01",
     "text": "yes thats all for me",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "is_that_all_yes"
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
     }
   },
   {
-    "id": "scenario_is_that_all_no",
+    "id": "scenario_is_that_all_yes_02",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_no_01",
     "text": "no i want to add more",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "is_that_all_no"
+      "intent": "is_that_all_no",
+      "step": "isThatAll"
     }
   },
   {
-    "id": "allergies",
-    "text": "no i don't have any allergies",
+    "id": "scenario_is_that_all_no_02",
+    "text": "no",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "is_that_all_no",
+      "step": "isThatAll"
     }
   },
   {
-    "id": "allergies",
-    "text": "nope im all good thank you",
+    "id": "scenario_how_is_everything_01",
+    "text": "good",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "good",
+      "step": "howIsEverything"
     }
   },
   {
-    "id": "allergies",
-    "text": "no allergies here",
+    "id": "scenario_done_eating_01",
+    "text": "yes",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "done_eating_yes",
+      "step": "areYouDone"
     }
   },
   {
-    "id": "allergies",
-    "text": "i can eat anything",
+    "id": "scenario_not_done_eating_01",
+    "text": "no",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "done_eating_no",
+      "step": "areYouDone"
     }
   },
   {
-    "id": "allergies",
-    "text": "none at all but thanks for asking",
+    "id": "scenario_ready_for_bill_01",
+    "text": "yes",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "ready_for_bill_yes",
+      "step": "readyForBill"
     }
   },
   {
-    "id": "allergies",
-    "text": "nothing to worry about on my end",
+    "id": "scenario_not_ready_for_bill_01",
+    "text": "no",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "ready_for_bill_no",
+      "step": "readyForBill"
     }
   },
   {
-    "id": "allergies",
-    "text": "no dietary restrictions for me",
+    "id": "scenario_not_ready_for_bill_01",
+    "text": "no",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "ready_for_bill_no",
+      "step": "readyForBill"
     }
   },
   {
-    "id": "allergies",
-    "text": "yes im highly allergic to peanuts",
+    "id": "scenario_payment_method_01",
+    "text": "cash",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "i actually have a gluten intolerance",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "im allergic to shellfish so nothing with shrimp or crab please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "just tree nuts for me",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "i have a severe dairy allergy",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "im lactose intolerant",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "yes i cant have any soy",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "are there any sesame seeds in the dishes i have a mild allergy",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "im deathly allergic to eggs",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "has_allergies"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "not an allergy but i am strictly vegetarian",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "dietary_restriction"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "no allergies but i prefer to avoid spicy foods",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "dietary_restriction"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "i have a slight sensitivity to raw onions",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "dietary_restriction"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "no im fine",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "other_person_allergy"
-    }
-  },
-  {
-    "id": "allergies",
-    "text": "nope we are all clear at this table",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "no_allergies"
+      "intent": "payment_method",
+      "step": "paymentMethod"
     }
   }
 ]
