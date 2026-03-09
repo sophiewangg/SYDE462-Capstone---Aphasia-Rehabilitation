@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../models/cue_model.dart';
 import '../../../services/cue_service.dart';
 import '../widgets/cue_modal.dart';
+import 'dashboard_manager.dart';
 
 /// Manages the hint flow: word-finding cues (with describe phase) and
 /// "I don't understand" prompt simplification.
 class HintManager extends ChangeNotifier {
   final CueService _cueService = CueService();
+  final DashboardManager dashboardManager;
 
   bool _isModalOpen = false;
   bool _modalIsWordFinding = false;
@@ -21,7 +23,7 @@ class HintManager extends ChangeNotifier {
   final cueFutureNotifier = ValueNotifier<Future<Cue?>?>(null);
 
   String Function() getCurrentPrompt;
-  void Function(String) onPromptSimplified;
+  Future<void> Function(String, dynamic) onPromptSimplified;
   Future<void> Function() requestStopRecording;
   void Function() onProcessingComplete;
   void Function()? onEnterDescribePhase;
@@ -31,6 +33,7 @@ class HintManager extends ChangeNotifier {
     required this.onPromptSimplified,
     required this.requestStopRecording,
     required this.onProcessingComplete,
+    required this.dashboardManager,
     this.onEnterDescribePhase,
   });
 
@@ -68,7 +71,10 @@ class HintManager extends ChangeNotifier {
     }
   }
 
-  void onTranscriptReceived(String transcript) async {
+  void onTranscriptReceived(
+    String transcript,
+    ImageConfiguration config,
+  ) async {
     if (_modalIsWordFinding && _cueDescriptionTranscript == null) {
       _cueDescriptionTranscript = transcript.trim();
       if (_cueDescriptionTranscript!.isEmpty) {
@@ -78,25 +84,27 @@ class HintManager extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      final cueFuture =
-          _cueService.getCues(_cueDescriptionTranscript!, getCurrentPrompt());
+      final cueFuture = _cueService.getCues(
+        _cueDescriptionTranscript!,
+        getCurrentPrompt(),
+      );
       cueFutureNotifier.value = cueFuture;
-      cueNumberNotifier.value = 2;
+      cueNumberNotifier.value = 1;
       final fetchedCue = await cueFuture;
       if (fetchedCue != null) _likelyWord = fetchedCue.likelyWord;
       cueResultStringNotifier.value = null;
       onProcessingComplete();
       notifyListeners();
     } else {
-      _processTranscript(transcript);
+      _processTranscript(transcript, config);
     }
   }
 
-  void _processTranscript(String transcript) {
+  void _processTranscript(String transcript, ImageConfiguration config) {
     if (_modalIsWordFinding) {
       _processWordFinding(transcript, _likelyWord ?? "");
     } else {
-      _processUnderstanding();
+      _processUnderstanding(config);
     }
   }
 
@@ -116,12 +124,15 @@ class HintManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _processUnderstanding() async {
+  void _processUnderstanding(ImageConfiguration config) async {
     cueCompleteNotifier.value = true;
     cueResultStringNotifier.value = "Return to exercise.";
     onProcessingComplete();
     final response = await _cueService.getSimplifiedPrompt(getCurrentPrompt());
-    onPromptSimplified(response?.simplifiedPrompt ?? getCurrentPrompt());
+    onPromptSimplified(
+      response?.simplifiedPrompt ?? getCurrentPrompt(),
+      config,
+    );
     notifyListeners();
   }
 
@@ -162,9 +173,16 @@ class HintManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeModal() {
+  void closeModal(String promptText) {
     cueFutureNotifier.value = null;
     _isModalOpen = false;
+
+    // Update metrics for dahsboard
+    dashboardManager.cueComplete(
+      cueNumberNotifier.value,
+      _likelyWord ?? promptText,
+    );
+
     notifyListeners();
   }
 

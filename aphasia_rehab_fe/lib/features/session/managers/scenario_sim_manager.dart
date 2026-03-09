@@ -1,6 +1,15 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
+import 'package:aphasia_rehab_fe/models/prompt_model.dart';
+import 'package:aphasia_rehab_fe/models/scenario_step.dart';
+import 'package:aphasia_rehab_fe/services/eleven_labs_service.dart';
+import 'package:aphasia_rehab_fe/services/prompt_service.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'dart:async';
 
 import '../../../api_service.dart';
@@ -8,58 +17,21 @@ import '../../../services/transcription_service.dart';
 import '../../../models/microphone_state.dart';
 import 'hint_manager.dart';
 
-// --- ENUMS ---
-enum ScenarioStep {
-  reservation,
-  reservationName,
-  numberPeople,
-  drinksOffer,
-  waterType,
-  iceQuestion,
-  readyToOrder,
-  appetizers,
-  entrees,
-  steakDoneness,
-  sideChoice,
-  isThatAll,
-  notReadyToOrder,
-  howIsEverything,
-  areYouDone,
-  readyForBill,
-  paymentMethod,
-  receipt,
-}
-
-class ScenarioPrompt {
-  final String id;
-  final String text;
-  final String? audioAsset;
-  final String? imageAsset;
-  const ScenarioPrompt({
-    required this.id,
-    required this.text,
-    this.audioAsset,
-    this.imageAsset,
-  });
-}
-
 class ScenarioSimManager extends ChangeNotifier {
+  bool isInitialized = false;
+
   // --- Services ---
   final TranscriptionService _transcriptionService = TranscriptionService();
   final ScenarioApiService _scenarioApiService = ScenarioApiService();
+  final PromptService _promptService = PromptService();
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _overridePlayer = AudioPlayer();
 
-  // Define which steps should allow the user to order anything from the menu
-  final List<ScenarioStep> _globalSearchSteps = [
-    ScenarioStep.drinksOffer,
-    ScenarioStep.readyToOrder,
-    ScenarioStep.appetizers,
-    ScenarioStep.entrees,
-  ];
+  final ElevenLabsService _elevenLabsService = ElevenLabsService();
 
   // --- State Variables: Transcription & Mic ---
   late final HintManager hintManager;
-
+  final DashboardManager dashboardManager = DashboardManager();
   StreamSubscription<TranscriptionResult>? _subscription;
   String _transcription = "";
   bool _hasPermission = false;
@@ -68,10 +40,10 @@ class ScenarioSimManager extends ChangeNotifier {
 
   // --- State Variables: Scenario Progression ---
   ScenarioStep _currentStep = ScenarioStep.reservation;
-  String? _systemMessage;
   String? _promptPrefix;
   String? _promptOverride;
   final List<String> _orderItems = [];
+  Prompt? _currentPrompt;
 
   // Dynamic Routing Flags
   bool _hasAnsweredSteakDoneness = false;
@@ -84,101 +56,44 @@ class ScenarioSimManager extends ChangeNotifier {
 
   bool get isScenarioComplete => _isScenarioComplete;
 
-  final Map<ScenarioStep, ScenarioPrompt> _prompts = {
-    ScenarioStep.reservation: const ScenarioPrompt(
-      id: 'reservation',
-      text: "Welcome to Bob's Eatery. Do you have a reservation?",
-    ),
-    ScenarioStep.reservationName: const ScenarioPrompt(
-      id: 'reservationName',
-      text: "Can I have the name that's on the reservation?",
-    ),
-    ScenarioStep.numberPeople: const ScenarioPrompt(
-      id: 'numberPeople',
-      text: "How many people are in your party?",
-    ),
-    ScenarioStep.drinksOffer: const ScenarioPrompt(
-      id: 'drinksOffer',
-      text: "Here's the menu. Can I get you started with any drinks?",
-    ),
-    ScenarioStep.waterType: const ScenarioPrompt(
-      id: 'waterType',
-      text: "Still or sparkling?",
-    ),
-    ScenarioStep.iceQuestion: const ScenarioPrompt(
-      id: 'iceQuestion',
-      text: "Would you like ice with it?",
-    ),
-    ScenarioStep.readyToOrder: const ScenarioPrompt(
-      id: 'readyToOrder',
-      text: "Are you ready to order?",
-    ),
-    ScenarioStep.appetizers: const ScenarioPrompt(
-      id: 'appetizers',
-      text: "Would you like to order any appetizers?",
-    ),
-    ScenarioStep.entrees: const ScenarioPrompt(
-      id: 'entrees',
-      text: 'Would you like to order any entrees?',
-    ),
-    ScenarioStep.steakDoneness: const ScenarioPrompt(
-      id: 'steakDoneness',
-      text: "How would you like your steak?",
-    ),
-    ScenarioStep.sideChoice: const ScenarioPrompt(
-      id: 'sideChoice',
-      text: "Would you like salad or fries as your side?",
-    ),
-    ScenarioStep.isThatAll: const ScenarioPrompt(
-      id: 'isThatAll',
-      text: "Is that all for you?",
-    ),
-    ScenarioStep.howIsEverything: const ScenarioPrompt(
-      id: 'howIsEverything',
-      text: "how is everything?",
-    ),
-    ScenarioStep.areYouDone: const ScenarioPrompt(
-      id: 'areYouDone',
-      text: "Are you done with your food?",
-    ),
-    ScenarioStep.readyForBill: const ScenarioPrompt(
-      id: 'readyForBill',
-      text: "Are you ready for the bill?",
-    ),
-    ScenarioStep.paymentMethod: const ScenarioPrompt(
-      id: 'paymentMethod',
-      text: "How would you like to pay?",
-    ),
-    ScenarioStep.receipt: const ScenarioPrompt(
-      id: 'receipt',
-      text: "Would you like your receipt?",
-    ),
-  };
-
   // --- State Variables: Character and Audio ---
-  String currentCharacter = "assets/characters/server_1.png";
-  String currentAudio = "audio_clips/server_speech_1.mp3";
+  String _currentCharacter = "";
+  String _currentAudio = "";
 
   // --- Getters ---
   String get transcription => _transcription;
   bool get isRecording => _isRecording;
   bool get hasPermission => _hasPermission;
   MicrophoneState get currentMicrophoneState => _currentMicrophoneState;
-  String? get systemMessage => _systemMessage;
   bool get isBobEateryModalOpen => _isBobEateryModalOpen;
+  Prompt? get currentPrompt => _currentPrompt;
+  String get currentCharacter => _currentCharacter;
+  String? get promptOverride => _promptOverride;
+  String? get promptPrefix => _promptPrefix;
 
-  String get currentPrompt {
-    final base = _prompts[_currentStep]?.text ?? "";
+  String get currentDialogue {
+    final base = _currentPrompt!.promptText;
     if (_promptOverride != null) return _promptOverride!;
     if (_promptPrefix != null) return "${_promptPrefix!}$base";
     return base;
   }
 
+  // Define which steps should allow the user to order anything from the menu
+  final List<ScenarioStep> _globalSearchSteps = [
+    ScenarioStep.drinksOffer,
+    ScenarioStep.readyToOrder,
+    ScenarioStep.appetizers,
+    ScenarioStep.entrees,
+  ];
+
   ScenarioSimManager() {
     hintManager = HintManager(
-      getCurrentPrompt: () => currentPrompt,
-      onPromptSimplified: (text) {
+      dashboardManager: dashboardManager,
+      getCurrentPrompt: () => currentPrompt!.promptText,
+      onPromptSimplified: (text, config) async {
         _promptOverride = text;
+        notifyListeners();
+        await _handlePromptOverride(config);
         notifyListeners();
       },
       requestStopRecording: () async {
@@ -198,17 +113,22 @@ class ScenarioSimManager extends ChangeNotifier {
       },
     );
     _initTranscriptionListener();
-    _playPrompt();
   }
 
   // --- Core Scenario Flow Logic ---
+  Future<void> init(ImageConfiguration config) async {
+    // 1. Fetch the data from FastAPI (as you already do)
+    _currentPrompt = await _promptService.fetchPrompt(_currentStep);
+    _currentCharacter = _currentPrompt!.imageSpeakingUrl;
+    _currentAudio = _currentPrompt!.audioUrl;
 
-  Future<void> _playPrompt() async {
-    final prompt = _prompts[_currentStep];
-    if (prompt?.audioAsset != null) {
-      await _audioPlayer.play(AssetSource(prompt!.audioAsset!));
-      await _audioPlayer.onPlayerComplete.first;
-    }
+    dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
+
+    // 2. Pre-cache the image immediately after getting the URL
+    await precacheCharacterImage(config);
+
+    playCharacterAudio(config);
+    isInitialized = true;
   }
 
   void _initTranscriptionListener() {
@@ -227,12 +147,24 @@ class ScenarioSimManager extends ChangeNotifier {
     return _hasPermission;
   }
 
-  void handleMicToggle() {
+  void handleMicToggle(ImageConfiguration config) {
     if (_isRecording) {
-      handleEndOfTurn();
+      if (hintManager.isModalOpen) {
+        processHint(config);
+        return;
+      }
+      handleEndOfTurn(config);
     } else {
       startRecording();
     }
+  }
+
+  void processHint(ImageConfiguration config) async {
+    await _transcriptionService.stopStreaming();
+    _isRecording = false;
+    _currentMicrophoneState = MicrophoneState.processing;
+    hintManager.onTranscriptReceived(_transcription, config);
+    notifyListeners();
   }
 
   void startRecording() {
@@ -243,68 +175,75 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> handleEndOfTurn() async {
-    // Update UI immediately so button switches right away
-    _isRecording = false;
-    _currentMicrophoneState = MicrophoneState.processing;
-    notifyListeners();
-    // Wait for 1 second to not cut off words currently being transcribed
-    await Future.delayed(const Duration(seconds: 1));
-
-    stopRecording();
-  }
-
-  Future<void> stopRecording() async {
-    print("--- 🛑 STOPPING & PROCESSING ---");
-
+  Future<void> handleEndOfTurn(ImageConfiguration config) async {
+    print("--- 🛑 END OF TURN ---");
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
     notifyListeners();
 
-    if (hintManager.isModalOpen) {
-      hintManager.onTranscriptReceived(_transcription);
-      _currentMicrophoneState = MicrophoneState.idle;
-      notifyListeners();
-      return;
-    }
-
     final transcript = _transcription.trim();
 
     if (transcript.isEmpty) {
       _promptPrefix = "I didn't quite hear that. Could you try again? ";
-      _currentMicrophoneState = MicrophoneState.idle;
       notifyListeners();
+      await _handlePromptOverride(config);
       return;
     }
 
     final classification = await _scenarioApiService.classifyUtterance(
       transcript,
-      _prompts[_currentStep]?.id,
+      _currentStep.id,
       globalSearch: _globalSearchSteps.contains(_currentStep),
     );
-
-    _currentMicrophoneState = MicrophoneState.idle;
+    _transcription = "";
 
     if (_currentStep != ScenarioStep.reservationName &&
         (classification == null || !classification.match)) {
-      _systemMessage =
+      _promptOverride =
           "I'm not sure I understood. Could you try saying that another way?";
       notifyListeners();
+      dashboardManager.incrementNumUnclearResponses();
+      await _handlePromptOverride(config);
       return;
     }
 
-    _advanceScenario(classification?.intents ?? []);
+    _advanceScenario(classification?.intents ?? [], config);
+  }
+
+  Future<void> handleEndOfSession() async {
+    print("--- 🛑 ENDING SESSION ---");
+    await _transcriptionService.stopStreaming();
+    _isRecording = false;
+    _currentMicrophoneState = MicrophoneState.idle;
+    _transcription = "";
     notifyListeners();
   }
 
-  void _advanceScenario(List<String> intents) {
-    if (!intents.contains('ready_no')) {
-      _promptOverride = null;
-      _promptPrefix = null;
-      _systemMessage = null;
-    }
+  Future<void> _handleScenarioStepChange(
+    ScenarioStep newStep,
+    ImageConfiguration config, // Pass the config you captured from context
+  ) async {
+    _promptOverride = null;
+    _promptPrefix = null;
+    Prompt nextPrompt = await _promptService.fetchPrompt(newStep);
+    _currentPrompt = nextPrompt;
+    _currentCharacter = nextPrompt.imageSpeakingUrl;
+    _currentAudio = nextPrompt.audioUrl;
+    dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
 
+    _isRecording = false;
+
+    await precacheCharacterImage(config);
+
+    playCharacterAudio(config);
+
+    _currentMicrophoneState = MicrophoneState.idle;
+
+    notifyListeners();
+  }
+
+  void _advanceScenario(List<String> intents, ImageConfiguration config) async {
     if (intents.contains('no_appetizer')) _wantsNoAppetizers = true;
     if (intents.contains('no_entrees')) _wantsNoEntrees = true;
     if (intents.contains('steak_doneness')) _hasAnsweredSteakDoneness = true;
@@ -325,108 +264,139 @@ class ScenarioSimManager extends ChangeNotifier {
       case ScenarioStep.reservation:
         if (intents.contains("reservation_yes")) {
           _currentStep = ScenarioStep.reservationName;
+          await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains("reservation_no")) {
           _currentStep = ScenarioStep.numberPeople;
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.reservationName:
         _currentStep = ScenarioStep.numberPeople;
+        await _handleScenarioStepChange(_currentStep, config);
         break;
       case ScenarioStep.numberPeople:
         _currentStep = ScenarioStep.drinksOffer;
+        await _handleScenarioStepChange(_currentStep, config);
         break;
       case ScenarioStep.drinksOffer:
         if (intents.contains('beverage_water')) {
           _currentStep = ScenarioStep.waterType;
+          await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('water_still') ||
             intents.contains('water_sparkling') ||
             intents.contains('beverage_other')) {
           _currentStep = ScenarioStep.iceQuestion;
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.waterType:
         if (intents.contains('water_still') ||
             intents.contains('water_sparkling')) {
           _currentStep = ScenarioStep.iceQuestion;
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.iceQuestion:
         _currentStep = ScenarioStep.readyToOrder;
+        await _handleScenarioStepChange(_currentStep, config);
+
         break;
       case ScenarioStep.readyToOrder:
         if (intents.contains('ready_no')) {
           _promptOverride =
               "No problem, just say 'I'm ready to order' when you've decided.";
+          notifyListeners();
+          await _handlePromptOverride(config);
         } else if (intents.contains('ready_yes') ||
             orderedNewItems ||
             _wantsNoAppetizers ||
             _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.appetizers:
         if (intents.contains('ask_specials') || intents.contains('ask_soup')) {
-          _systemMessage =
-              "Today's soup is creamy roasted garlic."; //TODO: append to message
+          _promptOverride = "Today's soup is creamy roasted garlic.";
+          notifyListeners();
+          await _handlePromptOverride(config);
         } else if (intents.contains('ask_recommendations')) {
-          _systemMessage =
+          _promptOverride =
               "My personal favourite is the lobster pasta."; //TODO: append to message
+          notifyListeners();
+          await _handlePromptOverride(config);
         } else if (orderedNewItems || _wantsNoAppetizers || _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.entrees:
         if (orderedNewItems || _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.steakDoneness:
         if (intents.contains('steak_doneness')) {
           _currentStep = _determineNextLogicalStep();
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.sideChoice:
         if (orderedNewItems) {
           _currentStep = _determineNextLogicalStep();
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.isThatAll:
         if (intents.contains('is_that_all_yes')) {
-          _isScenarioComplete = true; // Trigger ending sequence
+          _currentStep = ScenarioStep.howIsEverything;
+          await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('is_that_all_no')) {
           _currentStep = ScenarioStep.appetizers; // Loop back
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.howIsEverything:
         _currentStep = ScenarioStep.areYouDone;
+        await _handleScenarioStepChange(_currentStep, config);
         break;
       case ScenarioStep.areYouDone:
         if (intents.contains('done_eating_yes')) {
           _currentStep = ScenarioStep.readyForBill;
+          await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('done_eating_no')) {
           _promptOverride =
               "No problem, call me over when you're ready by saying 'I'm done'";
+          notifyListeners();
+          await _handlePromptOverride(config);
         }
         break;
       case ScenarioStep.readyForBill:
         if (intents.contains('ready_for_bill_yes')) {
           _currentStep = ScenarioStep.paymentMethod;
+          await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('ready_for_bill_no')) {
           _promptOverride =
               "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
+          notifyListeners();
+          await _handlePromptOverride(config);
         }
         break;
       case ScenarioStep.paymentMethod:
         _currentStep = ScenarioStep.receipt;
+        await _handleScenarioStepChange(_currentStep, config);
         break;
       case ScenarioStep.receipt:
         _isScenarioComplete = true;
-        _systemMessage = "Thank you for dining with us! Have a wonderful day.";
+        _promptOverride = "Thank you for dining with us! Have a wonderful day.";
+        _currentCharacter = _currentPrompt!.imageSpeakingUrl;
+        notifyListeners();
+        await _handlePromptOverride(config);
         break;
       case ScenarioStep.notReadyToOrder:
         break;
     }
-    notifyListeners();
   }
 
   // --- Dynamic Routing Helper ---
@@ -481,7 +451,6 @@ class ScenarioSimManager extends ChangeNotifier {
 
     // Reset text states
     _transcription = "";
-    _systemMessage = null;
     _promptPrefix = null;
     _promptOverride = null;
 
@@ -499,15 +468,109 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   // --- Character and Audio ---
-  void playCharacterAudio() async {
-    await _audioPlayer.play(AssetSource(currentAudio));
-    await _audioPlayer.onPlayerComplete.first;
+  Future<void> precacheCharacterImage(ImageConfiguration config) async {
+    if (_currentCharacter.isNotEmpty) {
+      // This is the manual version of precacheImage
+      final provider = NetworkImage(_currentCharacter);
+
+      // Resolve the image using the config we passed in.
+      // This triggers the download and caching.
+      final ImageStream stream = provider.resolve(config);
+
+      // Optional: If you MUST wait for it to finish loading before moving on
+      final Completer<void> completer = Completer<void>();
+      final listener = ImageStreamListener(
+        (ImageInfo info, bool sync) => completer.complete(),
+        onError: (dynamic exc, StackTrace? stack) =>
+            completer.completeError(exc),
+      );
+
+      stream.addListener(listener);
+      await completer.future;
+      stream.removeListener(listener);
+    }
+    notifyListeners();
+  }
+
+  Future<void> _handlePromptOverride(ImageConfiguration config) async {
+    _currentCharacter = _currentPrompt!.imageSpeakingUrl;
+    await precacheCharacterImage(config);
+    await clearAudioCache();
+    notifyListeners();
+    await playElevenLabsAudio(currentDialogue, 'override-prompt');
+    _currentMicrophoneState = MicrophoneState.idle;
+    _currentCharacter = currentPrompt!.imageListeningUrl;
+    await precacheCharacterImage(config);
+    notifyListeners();
+  }
+
+  Future<void> playCharacterAudio(ImageConfiguration config) async {
+    if (_currentAudio.isNotEmpty) {
+      try {
+        await _audioPlayer.setAudioSource(
+          AudioSource.uri(Uri.parse(_currentAudio)),
+          preload: true,
+        );
+      } catch (e) {
+        print("Error loading audio: $e");
+      }
+    }
+    await _audioPlayer.play();
+
+    // Important: After it finishes, you usually want to seek back to the start
+    // so the user can play it again if they want.
+    await _audioPlayer.seek(Duration.zero);
+    await _audioPlayer.pause();
+
+    _currentCharacter = currentPrompt!.imageListeningUrl;
+    await precacheCharacterImage(config);
+    notifyListeners();
+  }
+
+  Future<void> playElevenLabsAudio(String text, String promptId) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/audio_$promptId.mp3';
+    final file = File(filePath);
+
+    if (await file.exists()) {
+      // 1. Play from Cache
+      print("Playing from local cache: $filePath");
+      await _overridePlayer.setFilePath(filePath);
+    } else {
+      // 2. Fetch from ElevenLabs API
+      print("Fetching from ElevenLabs API...");
+      Uint8List audioBytes = await _elevenLabsService.fetchAudio(text);
+
+      // 3. Save to Cache
+      await file.writeAsBytes(audioBytes);
+
+      await _overridePlayer.setFilePath(filePath);
+    }
+
+    await _overridePlayer.play();
+  }
+
+  Future<void> clearAudioCache() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+
+      // 1. List all files in the documents directory
+      final List<FileSystemEntity> files = directory.listSync();
+
+      // 2. Filter for only your audio cache files
+      for (var file in files) {
+        if (file is File && file.path.contains('audio_')) {
+          await file.delete();
+          print("Deleted cached audio: ${file.path}");
+        }
+      }
+      print("Audio cache cleared successfully.");
+    } catch (e) {
+      print("Error clearing cache: $e");
+    }
   }
 
   // --- Utilities ---
-  void handleUserTurnCompleted() {
-    handleEndOfTurn();
-  }
 
   void toggleBobEateryModal() {
     _isBobEateryModalOpen = !_isBobEateryModalOpen;
@@ -519,6 +582,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _subscription?.cancel();
     hintManager.dispose();
     _audioPlayer.dispose();
+    _overridePlayer.dispose();
     super.dispose();
   }
 }

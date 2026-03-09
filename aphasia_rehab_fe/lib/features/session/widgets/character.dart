@@ -13,7 +13,7 @@ class _CharacterState extends State<Character> {
   @override
   Widget build(BuildContext context) {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
-    return Image.asset(
+    return Image.network(
       scenarioSimManager.currentCharacter,
       height: 750, // Set a specific height
       fit: BoxFit.contain, // Ensures the whole image fits without cropping

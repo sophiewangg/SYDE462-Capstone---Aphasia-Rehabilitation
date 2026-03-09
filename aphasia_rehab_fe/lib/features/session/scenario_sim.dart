@@ -67,17 +67,8 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
           Menu(modalHeight: modalHeight),
+
           // App dialogue that slides with the Bob's Eatery modal
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            left: 0,
-            right: 0,
-            bottom: scenarioSimManager.isBobEateryModalOpen
-                ? modalHeight + 16
-                : dialogueBaseBottom,
-            child: SpeechBubble(),
-          ),
           Positioned(
             top: 75,
             left: 20,
@@ -106,7 +97,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
             right: 20,
             child: ElevatedButton(
               onPressed: () {
-                scenarioSimManager.stopRecording();
+                scenarioSimManager.handleEndOfSession();
 
                 Navigator.push(
                   context,
@@ -119,15 +110,24 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
 
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+            left: 0,
+            right: 0,
+            bottom: scenarioSimManager.isBobEateryModalOpen
+                ? modalHeight + 16
+                : dialogueBaseBottom,
+            child: SpeechBubble(),
+          ),
+          
           Positioned(
             bottom: 30,
             right: 20,
             child: Column(
               spacing: 10.0,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MicAndHintButton(),
-              ],
+              children: [MicAndHintButton()],
             ),
           ),
         ],
