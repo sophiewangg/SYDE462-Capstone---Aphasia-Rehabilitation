@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/models/prompt_model.dart';
 import 'package:aphasia_rehab_fe/models/scenario_step.dart';
 import 'package:http/http.dart' as http;
@@ -27,7 +26,7 @@ class PromptService {
           imageSpeakingUrl: "",
           imageListeningUrl: "",
           imageConfusedUrl: "",
-          stringPracticedId: "",
+          skillPracticedId: "",
           promptText: "",
         );
       }
@@ -40,7 +39,7 @@ class PromptService {
         imageSpeakingUrl: "",
         imageListeningUrl: "",
         imageConfusedUrl: "",
-        stringPracticedId: "",
+        skillPracticedId: "",
         promptText: "",
       );
     }

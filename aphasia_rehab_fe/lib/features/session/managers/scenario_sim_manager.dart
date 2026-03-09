@@ -1,7 +1,13 @@
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
 import 'package:aphasia_rehab_fe/models/prompt_model.dart';
 import 'package:aphasia_rehab_fe/models/scenario_step.dart';
+import 'package:aphasia_rehab_fe/services/eleven_labs_service.dart';
 import 'package:aphasia_rehab_fe/services/prompt_service.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:just_audio/just_audio.dart';
 import 'dart:async';
@@ -11,66 +17,21 @@ import '../../../services/transcription_service.dart';
 import '../../../models/microphone_state.dart';
 import 'hint_manager.dart';
 
-// --- ENUMS ---
-enum ScenarioStep {
-  reservation,
-  reservationName,
-  numberPeople,
-  drinksOffer,
-  waterType,
-  iceQuestion,
-  readyToOrder,
-  appetizers,
-  entrees,
-  steakDoneness,
-  sideChoice,
-  isThatAll,
-  notReadyToOrder,
-  howIsEverything,
-  areYouDone,
-  readyForBill,
-  paymentMethod,
-  receipt,
-}
-
-class ScenarioPrompt {
-  final String id;
-  final String text;
-  final String? audioAsset;
-  final String? imageAsset;
-  const ScenarioPrompt({
-    required this.id,
-    required this.text,
-    this.audioAsset,
-    this.imageAsset,
-  });
-}
-
 class ScenarioSimManager extends ChangeNotifier {
   bool isInitialized = false;
-  final String _dontUnderstandFilename = "dont_understand.mp3";
-  final String _didntHearFilename = "didnt_hear.mp3";
 
-  String _dontUnderstandUrl = "";
-  String _didntHearUrl = "";
   // --- Services ---
   final TranscriptionService _transcriptionService = TranscriptionService();
   final ScenarioApiService _scenarioApiService = ScenarioApiService();
   final PromptService _promptService = PromptService();
-  final CueService _cueService = CueService();
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _overridePlayer = AudioPlayer();
 
-  // Define which steps should allow the user to order anything from the menu
-  final List<ScenarioStep> _globalSearchSteps = [
-    ScenarioStep.drinksOffer,
-    ScenarioStep.readyToOrder,
-    ScenarioStep.appetizers,
-    ScenarioStep.entrees,
-  ];
+  final ElevenLabsService _elevenLabsService = ElevenLabsService();
 
   // --- State Variables: Transcription & Mic ---
   late final HintManager hintManager;
-
+  final DashboardManager dashboardManager = DashboardManager();
   StreamSubscription<TranscriptionResult>? _subscription;
   String _transcription = "";
   bool _hasPermission = false;
@@ -107,6 +68,8 @@ class ScenarioSimManager extends ChangeNotifier {
   bool get isBobEateryModalOpen => _isBobEateryModalOpen;
   Prompt? get currentPrompt => _currentPrompt;
   String get currentCharacter => _currentCharacter;
+  String? get promptOverride => _promptOverride;
+  String? get promptPrefix => _promptPrefix;
 
   String get currentDialogue {
     final base = _currentPrompt!.promptText;
@@ -117,7 +80,8 @@ class ScenarioSimManager extends ChangeNotifier {
 
   ScenarioSimManager() {
     hintManager = HintManager(
-      getCurrentPrompt: () => currentPrompt,
+      dashboardManager: dashboardManager,
+      getCurrentPrompt: () => currentPrompt!.promptText,
       onPromptSimplified: (text) {
         _promptOverride = text;
         notifyListeners();
@@ -148,10 +112,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _currentCharacter = _currentPrompt!.imageSpeakingUrl;
     _currentAudio = _currentPrompt!.audioUrl;
 
-    _dontUnderstandUrl = await _promptService.getSignedUrl(
-      _dontUnderstandFilename,
-    );
-    _didntHearUrl = await _promptService.getSignedUrl(_didntHearFilename);
+    dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
 
     // 2. Pre-cache the image immediately after getting the URL
     await precacheCharacterImage(config);
@@ -178,14 +139,22 @@ class ScenarioSimManager extends ChangeNotifier {
 
   void handleMicToggle(ImageConfiguration config) {
     if (_isRecording) {
-      if (_isModalOpen) {
-        handleEndOfCue();
-      } else {
-        handleEndOfTurn(config);
+      if (hintManager.isModalOpen) {
+        processHint();
+        return;
       }
+      handleEndOfTurn(config);
     } else {
       startRecording();
     }
+  }
+
+  void processHint() async {
+    await _transcriptionService.stopStreaming();
+    _isRecording = false;
+    _currentMicrophoneState = MicrophoneState.processing;
+    hintManager.onTranscriptReceived(_transcription);
+    notifyListeners();
   }
 
   void startRecording() {
@@ -202,15 +171,19 @@ class ScenarioSimManager extends ChangeNotifier {
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
     notifyListeners();
+
     final transcript = _transcription.trim();
 
     if (transcript.isEmpty) {
       _promptPrefix = "I didn't quite hear that. Could you try again? ";
-      _currentAudio = _didntHearUrl;
       _currentCharacter = _currentPrompt!.imageSpeakingUrl;
       await precacheCharacterImage(config);
-      playCharacterAudio(config);
+      await clearAudioCache();
+      notifyListeners();
+      playElevenLabsAudio(currentDialogue, 'override-prompt');
       _currentMicrophoneState = MicrophoneState.idle;
+      _currentCharacter = currentPrompt!.imageListeningUrl;
+      await precacheCharacterImage(config);
       notifyListeners();
       return;
     }
@@ -226,11 +199,15 @@ class ScenarioSimManager extends ChangeNotifier {
         (classification == null || !classification.match)) {
       _promptOverride =
           "I'm not sure I understood. Could you try saying that another way?";
-      _currentAudio = _dontUnderstandUrl;
+      dashboardManager.incrementNumUnclearResponses();
       _currentCharacter = _currentPrompt!.imageConfusedUrl;
       await precacheCharacterImage(config);
-      playCharacterAudio(config);
+      notifyListeners();
+      await clearAudioCache();
+      await playElevenLabsAudio(currentDialogue, 'override-prompt');
       _currentMicrophoneState = MicrophoneState.idle;
+      _currentCharacter = currentPrompt!.imageListeningUrl;
+      await precacheCharacterImage(config);
       notifyListeners();
       return;
     }
@@ -253,7 +230,7 @@ class ScenarioSimManager extends ChangeNotifier {
     hintManager.onTranscriptReceived(_transcription);
     _isRecording = false;
     _transcription = "";
-    }
+  }
 
   Future<void> _handleScenarioStepChange(
     ScenarioStep newStep,
@@ -276,6 +253,8 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   void _advanceScenario(String? intent, ImageConfiguration config) async {
+    dashboardManager.incrementNumPromptsGiven();
+    dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
     switch (_currentStep) {
       case ScenarioStep.reservation:
         if (intents.contains("reservation_yes")) {
@@ -394,6 +373,7 @@ class ScenarioSimManager extends ChangeNotifier {
       _promptOverride = null;
       _promptPrefix = null;
     }
+    await clearAudioCache();
     notifyListeners();
   }
 
@@ -513,6 +493,49 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> playElevenLabsAudio(String text, String promptId) async {
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/audio_$promptId.mp3';
+    final file = File(filePath);
+
+    if (await file.exists()) {
+      // 1. Play from Cache
+      print("Playing from local cache: $filePath");
+      await _overridePlayer.setFilePath(filePath);
+    } else {
+      // 2. Fetch from ElevenLabs API
+      print("Fetching from ElevenLabs API...");
+      Uint8List audioBytes = await _elevenLabsService.fetchAudio(text);
+
+      // 3. Save to Cache
+      await file.writeAsBytes(audioBytes);
+
+      await _overridePlayer.setFilePath(filePath);
+    }
+
+    await _overridePlayer.play();
+  }
+
+  Future<void> clearAudioCache() async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+
+      // 1. List all files in the documents directory
+      final List<FileSystemEntity> files = directory.listSync();
+
+      // 2. Filter for only your audio cache files
+      for (var file in files) {
+        if (file is File && file.path.contains('audio_')) {
+          await file.delete();
+          print("Deleted cached audio: ${file.path}");
+        }
+      }
+      print("Audio cache cleared successfully.");
+    } catch (e) {
+      print("Error clearing cache: $e");
+    }
+  }
+
   // --- Utilities ---
 
   void toggleBobEateryModal() {
@@ -525,6 +548,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _subscription?.cancel();
     hintManager.dispose();
     _audioPlayer.dispose();
+    _overridePlayer.dispose();
     super.dispose();
   }
 }

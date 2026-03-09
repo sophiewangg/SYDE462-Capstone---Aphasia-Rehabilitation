@@ -17,8 +17,16 @@ class _PlayAudioButtonState extends State<PlayAudioButton> {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
     return ElevatedButton(
       onPressed: () {
-        final config = createLocalImageConfiguration(context);
-        scenarioSimManager.playCharacterAudio(config);
+        if (scenarioSimManager.promptOverride == null &&
+            scenarioSimManager.promptPrefix == null) {
+          final config = createLocalImageConfiguration(context);
+          scenarioSimManager.playCharacterAudio(config);
+        } else {
+          scenarioSimManager.playElevenLabsAudio(
+            scenarioSimManager.currentDialogue,
+            'override-prompt',
+          );
+        }
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.grey100,

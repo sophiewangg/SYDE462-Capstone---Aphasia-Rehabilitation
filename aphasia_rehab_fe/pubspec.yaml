@@ -37,11 +37,13 @@ dependencies:
   google_fonts: ^6.1.0
   audioplayers: ^5.2.1
   just_audio: ^0.9.42 # The core player
+  flutter_dotenv: ^5.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   provider: ^6.1.5+1
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
@@ -87,6 +89,7 @@ flutter:
     - assets/images/confident.png
     - assets/images/okay.png
     - assets/images/frustrated.png
+    - .env
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

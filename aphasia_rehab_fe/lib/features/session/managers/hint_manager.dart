@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import '../../../models/cue_model.dart';
 import '../../../services/cue_service.dart';
 import '../widgets/cue_modal.dart';
+import 'dashboard_manager.dart';
 
 /// Manages the hint flow: word-finding cues (with describe phase) and
 /// "I don't understand" prompt simplification.
 class HintManager extends ChangeNotifier {
   final CueService _cueService = CueService();
+  final DashboardManager dashboardManager;
 
   bool _isModalOpen = false;
   bool _modalIsWordFinding = false;
@@ -31,6 +33,7 @@ class HintManager extends ChangeNotifier {
     required this.onPromptSimplified,
     required this.requestStopRecording,
     required this.onProcessingComplete,
+    required this.dashboardManager,
     this.onEnterDescribePhase,
   });
 
@@ -78,10 +81,12 @@ class HintManager extends ChangeNotifier {
         notifyListeners();
         return;
       }
-      final cueFuture =
-          _cueService.getCues(_cueDescriptionTranscript!, getCurrentPrompt());
+      final cueFuture = _cueService.getCues(
+        _cueDescriptionTranscript!,
+        getCurrentPrompt(),
+      );
       cueFutureNotifier.value = cueFuture;
-      cueNumberNotifier.value = 2;
+      cueNumberNotifier.value = 1;
       final fetchedCue = await cueFuture;
       if (fetchedCue != null) _likelyWord = fetchedCue.likelyWord;
       cueResultStringNotifier.value = null;
@@ -162,9 +167,16 @@ class HintManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void closeModal() {
+  void closeModal(String promptText) {
     cueFutureNotifier.value = null;
     _isModalOpen = false;
+
+    // Update metrics for dahsboard
+    dashboardManager.cueComplete(
+      cueNumberNotifier.value,
+      _likelyWord ?? promptText,
+    );
+
     notifyListeners();
   }
 

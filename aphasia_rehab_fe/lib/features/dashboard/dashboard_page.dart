@@ -5,6 +5,7 @@ import 'package:aphasia_rehab_fe/features/dashboard/widgets/hints_used.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/progress.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/session_feeling.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/skills_practiced.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final DashboardManager dashboardManager = context.watch<DashboardManager>();
+
     return Scaffold(
       body: SafeArea(
         child: FutureBuilder<List<List<String>>>(
@@ -60,11 +63,18 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Progress(),
+                  Progress(
+                    dashboardManager.numHintsUsed,
+                    soundRepFiles.length + interjectionFiles.length,
+                    dashboardManager.numUnclearResponses /
+                        dashboardManager.numPromptsGiven,
+                  ),
                   const SizedBox(height: 24),
-                  SkillsPracticed(),
+                  SkillsPracticed(
+                    dashboardManager.skillsPracticed,
+                  ),
                   const SizedBox(height: 24),
-                  HintsUsed(),
+                  HintsUsed(dashboardManager.hintsGiven),
                   const SizedBox(height: 24),
 
                   // 4. Pass the specific lists to the correct widgets

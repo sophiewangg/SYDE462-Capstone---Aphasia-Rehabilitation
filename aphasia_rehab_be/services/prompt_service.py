@@ -3,10 +3,11 @@ import json
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from database.models import Prompt, ScenarioStep 
+from database.models import Prompt, ScenarioStep, SkillPracticed 
 from google.cloud import storage
 from datetime import timedelta
 from dotenv import load_dotenv
+from uuid import UUID
 
 class PromptService:
 
@@ -38,8 +39,6 @@ class PromptService:
         result.image_listening_url = self.generate_signed_url('speakeasy_characters', result.image_listening_url)
         result.image_confused_url = self.generate_signed_url('speakeasy_characters', result.image_confused_url)
         result.audio_url = self.generate_signed_url('speakeasy_voice_audios', result.audio_url)
-        print(result.audio_url)
-
 
         return result
 
@@ -55,3 +54,24 @@ class PromptService:
         )
 
         return url
+
+    def get_skill_name(self, skillId: str):
+        try:
+            # Convert string to UUID object
+            uuid_obj = UUID(skillId)
+        except ValueError:
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid UUID format"
+            )
+
+        statement = select(SkillPracticed).where(SkillPracticed.id == uuid_obj)
+        result = self.db.execute(statement).scalar_one_or_none()
+
+        if result is None:
+            raise HTTPException(
+                status_code=404, 
+                detail="Skill not found for the given skill ID"
+            )
+        
+        return result.skill_name

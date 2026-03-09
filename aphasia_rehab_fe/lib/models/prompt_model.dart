@@ -7,7 +7,7 @@ class Prompt {
   final String imageSpeakingUrl;
   final String imageListeningUrl;
   final String imageConfusedUrl;
-  final String stringPracticedId;
+  final String skillPracticedId;
   final String promptText;
 
   Prompt({
@@ -17,7 +17,7 @@ class Prompt {
     required this.imageSpeakingUrl,
     required this.imageListeningUrl,
     required this.imageConfusedUrl,
-    required this.stringPracticedId,
+    required this.skillPracticedId,
     required this.promptText,
   });
 
@@ -30,7 +30,7 @@ class Prompt {
       imageSpeakingUrl: json['image_speaking_url'],
       imageListeningUrl: json['image_listening_url'],
       imageConfusedUrl: json['image_confused_url'],
-      stringPracticedId: json['skill_practiced_id'],
+      skillPracticedId: json['skill_practiced_id'],
       promptText: json['prompt_text'], // Note: JSON uses snake_case from Python
     );
   }

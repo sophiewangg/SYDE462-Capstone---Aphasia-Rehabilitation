@@ -110,17 +110,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
 
-          Positioned(
-            bottom: 30,
-            right: 20,
-            child: Column(
-              spacing: 10.0,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                MicAndHintButton(),
-              ],
-            ),
-          ),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -130,6 +119,16 @@ class _ScenarioSimState extends State<ScenarioSim> {
                 ? modalHeight + 16
                 : dialogueBaseBottom,
             child: SpeechBubble(),
+          ),
+          
+          Positioned(
+            bottom: 30,
+            right: 20,
+            child: Column(
+              spacing: 10.0,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [MicAndHintButton()],
+            ),
           ),
         ],
       ),

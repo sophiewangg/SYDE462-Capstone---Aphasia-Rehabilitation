@@ -1,14 +1,19 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class HintAudioButton extends StatelessWidget {
-  const HintAudioButton({super.key});
+  final String text;
+  final String promptId;
+  const HintAudioButton(this.text, this.promptId, {super.key});
   @override
   Widget build(BuildContext context) {
+    final DashboardManager dashboardManager = context.watch<DashboardManager>();
     return ElevatedButton(
       onPressed: () {
-        // TODO: play hint audio
+        dashboardManager.playElevenLabsAudio(text, promptId);
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
