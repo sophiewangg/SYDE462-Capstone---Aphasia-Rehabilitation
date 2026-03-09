@@ -90,27 +90,27 @@ class ScenarioSimManager extends ChangeNotifier {
       text: "Welcome to Bob's Eatery. Do you have a reservation?",
     ),
     ScenarioStep.reservationName: const ScenarioPrompt(
-      id: 'reservation_name',
+      id: 'reservationName',
       text: "Can I have the name that's on the reservation?",
     ),
     ScenarioStep.numberPeople: const ScenarioPrompt(
-      id: 'number_people',
+      id: 'numberPeople',
       text: "How many people are in your party?",
     ),
     ScenarioStep.drinksOffer: const ScenarioPrompt(
-      id: 'drinks_offer',
+      id: 'drinksOffer',
       text: "Here's the menu. Can I get you started with any drinks?",
     ),
     ScenarioStep.waterType: const ScenarioPrompt(
-      id: 'water_type',
+      id: 'waterType',
       text: "Still or sparkling?",
     ),
     ScenarioStep.iceQuestion: const ScenarioPrompt(
-      id: 'ice_question',
+      id: 'iceQuestion',
       text: "Would you like ice with it?",
     ),
     ScenarioStep.readyToOrder: const ScenarioPrompt(
-      id: 'ready_to_order',
+      id: 'readyToOrder',
       text: "Are you ready to order?",
     ),
     ScenarioStep.appetizers: const ScenarioPrompt(
@@ -122,31 +122,31 @@ class ScenarioSimManager extends ChangeNotifier {
       text: 'Would you like to order any entrees?',
     ),
     ScenarioStep.steakDoneness: const ScenarioPrompt(
-      id: 'steak_doneness',
+      id: 'steakDoneness',
       text: "How would you like your steak?",
     ),
     ScenarioStep.sideChoice: const ScenarioPrompt(
-      id: 'side_choice',
+      id: 'sideChoice',
       text: "Would you like salad or fries as your side?",
     ),
     ScenarioStep.isThatAll: const ScenarioPrompt(
-      id: 'is_that_all',
+      id: 'isThatAll',
       text: "Is that all for you?",
     ),
     ScenarioStep.howIsEverything: const ScenarioPrompt(
-      id: 'how_is_everything',
+      id: 'howIsEverything',
       text: "how is everything?",
     ),
     ScenarioStep.areYouDone: const ScenarioPrompt(
-      id: 'are_you_done',
+      id: 'areYouDone',
       text: "Are you done with your food?",
     ),
     ScenarioStep.readyForBill: const ScenarioPrompt(
-      id: 'ready_for_bill',
+      id: 'readyForBill',
       text: "Are you ready for the bill?",
     ),
     ScenarioStep.paymentMethod: const ScenarioPrompt(
-      id: 'payment_method',
+      id: 'paymentMethod',
       text: "How would you like to pay?",
     ),
     ScenarioStep.receipt: const ScenarioPrompt(
