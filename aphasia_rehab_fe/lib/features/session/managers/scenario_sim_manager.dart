@@ -286,14 +286,15 @@ class ScenarioSimManager extends ChangeNotifier {
 
     _currentMicrophoneState = MicrophoneState.idle;
 
-    if (classification == null || !classification.match) {
+    if (_currentStep != ScenarioStep.reservationName &&
+        (classification == null || !classification.match)) {
       _systemMessage =
           "I'm not sure I understood. Could you try saying that another way?";
       notifyListeners();
       return;
     }
 
-    _advanceScenario(classification.intents);
+    _advanceScenario(classification?.intents ?? []);
     notifyListeners();
   }
 
