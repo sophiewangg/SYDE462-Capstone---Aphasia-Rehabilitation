@@ -256,6 +256,7 @@ class ScenarioSimManager extends ChangeNotifier {
 
   Future<void> stopRecording() async {
     print("--- 🛑 STOPPING & PROCESSING ---");
+
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
@@ -263,6 +264,8 @@ class ScenarioSimManager extends ChangeNotifier {
 
     if (hintManager.isModalOpen) {
       hintManager.onTranscriptReceived(_transcription);
+      _currentMicrophoneState = MicrophoneState.idle;
+      notifyListeners();
       return;
     }
 
@@ -277,21 +280,20 @@ class ScenarioSimManager extends ChangeNotifier {
 
     final classification = await _scenarioApiService.classifyUtterance(
       transcript,
-      _currentMicrophoneState = MicrophoneState.idle;
-      notifyListeners();
-      return;
+      _prompts[_currentStep]?.id,
+      globalSearch: _globalSearchSteps.contains(_currentStep),
     );
+
+    _currentMicrophoneState = MicrophoneState.idle;
 
     if (classification == null || !classification.match) {
       _systemMessage =
           "I'm not sure I understood. Could you try saying that another way?";
-      _currentMicrophoneState = MicrophoneState.idle;
       notifyListeners();
       return;
     }
 
     _advanceScenario(classification.intents);
-    _currentMicrophoneState = MicrophoneState.idle;
     notifyListeners();
   }
 
@@ -328,8 +330,10 @@ class ScenarioSimManager extends ChangeNotifier {
         break;
       case ScenarioStep.reservationName:
         _currentStep = ScenarioStep.numberPeople;
+        break;
       case ScenarioStep.numberPeople:
         _currentStep = ScenarioStep.drinksOffer;
+        break;
       case ScenarioStep.drinksOffer:
         if (intents.contains('beverage_water')) {
           _currentStep = ScenarioStep.waterType;
@@ -465,7 +469,7 @@ class ScenarioSimManager extends ChangeNotifier {
     print("--- 🔄 RESETTING SCENARIO ---");
 
     // Reset core progression
-    _currentStep = ScenarioStep.drinksOffer;
+    _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
     _orderItems.clear();
 
