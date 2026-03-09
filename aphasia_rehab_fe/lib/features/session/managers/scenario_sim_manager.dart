@@ -39,7 +39,7 @@ class ScenarioSimManager extends ChangeNotifier {
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
 
   // --- State Variables: Scenario Progression ---
-  ScenarioStep _currentStep = ScenarioStep.drinksOffer;
+  ScenarioStep _currentStep = ScenarioStep.reservation;
   String? _promptPrefix;
   String? _promptOverride;
   final List<String> _orderItems = [];
@@ -90,8 +90,10 @@ class ScenarioSimManager extends ChangeNotifier {
     hintManager = HintManager(
       dashboardManager: dashboardManager,
       getCurrentPrompt: () => currentPrompt!.promptText,
-      onPromptSimplified: (text) {
+      onPromptSimplified: (text, config) async {
         _promptOverride = text;
+        notifyListeners();
+        await _handlePromptOverride(config);
         notifyListeners();
       },
       requestStopRecording: () async {
@@ -148,7 +150,7 @@ class ScenarioSimManager extends ChangeNotifier {
   void handleMicToggle(ImageConfiguration config) {
     if (_isRecording) {
       if (hintManager.isModalOpen) {
-        processHint();
+        processHint(config);
         return;
       }
       handleEndOfTurn(config);
@@ -157,11 +159,11 @@ class ScenarioSimManager extends ChangeNotifier {
     }
   }
 
-  void processHint() async {
+  void processHint(ImageConfiguration config) async {
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
-    hintManager.onTranscriptReceived(_transcription);
+    hintManager.onTranscriptReceived(_transcription, config);
     notifyListeners();
   }
 
@@ -184,15 +186,8 @@ class ScenarioSimManager extends ChangeNotifier {
 
     if (transcript.isEmpty) {
       _promptPrefix = "I didn't quite hear that. Could you try again? ";
-      _currentCharacter = _currentPrompt!.imageSpeakingUrl;
-      await precacheCharacterImage(config);
-      await clearAudioCache();
       notifyListeners();
-      playElevenLabsAudio(currentDialogue, 'override-prompt');
-      _currentMicrophoneState = MicrophoneState.idle;
-      _currentCharacter = currentPrompt!.imageListeningUrl;
-      await precacheCharacterImage(config);
-      notifyListeners();
+      await _handlePromptOverride(config);
       return;
     }
 
@@ -207,23 +202,9 @@ class ScenarioSimManager extends ChangeNotifier {
         (classification == null || !classification.match)) {
       _promptOverride =
           "I'm not sure I understood. Could you try saying that another way?";
+      notifyListeners();
       dashboardManager.incrementNumUnclearResponses();
-      _currentCharacter = _currentPrompt!.imageConfusedUrl;
-      await precacheCharacterImage(config);
-      notifyListeners();
-      await clearAudioCache();
-      await playElevenLabsAudio(currentDialogue, 'override-prompt');
-      _currentMicrophoneState = MicrophoneState.idle;
-      _currentCharacter = currentPrompt!.imageListeningUrl;
-      await precacheCharacterImage(config);
-      notifyListeners();
-      return;
-    }
-
-    if (_currentStep == ScenarioStep.allergies) {
-      // Mark the scenario as complete and notify the UI
-      _isScenarioComplete = true;
-      notifyListeners();
+      await _handlePromptOverride(config);
       return;
     }
 
@@ -239,22 +220,17 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> handleEndOfCue() async {
-    print("--- 🛑 PROCESSING CUE ---");
-    await _transcriptionService.stopStreaming();
-    hintManager.onTranscriptReceived(_transcription);
-    _isRecording = false;
-    _transcription = "";
-  }
-
   Future<void> _handleScenarioStepChange(
     ScenarioStep newStep,
     ImageConfiguration config, // Pass the config you captured from context
   ) async {
+    _promptOverride = null;
+    _promptPrefix = null;
     Prompt nextPrompt = await _promptService.fetchPrompt(newStep);
     _currentPrompt = nextPrompt;
     _currentCharacter = nextPrompt.imageSpeakingUrl;
     _currentAudio = nextPrompt.audioUrl;
+    dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
 
     _isRecording = false;
 
@@ -282,9 +258,26 @@ class ScenarioSimManager extends ChangeNotifier {
         }
       }
     }
-    dashboardManager.incrementNumPromptsGiven();
-    dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
+
+    // 2. Step-based logic
     switch (_currentStep) {
+      case ScenarioStep.reservation:
+        if (intents.contains("reservation_yes")) {
+          _currentStep = ScenarioStep.reservationName;
+          await _handleScenarioStepChange(_currentStep, config);
+        } else if (intents.contains("reservation_no")) {
+          _currentStep = ScenarioStep.numberPeople;
+          await _handleScenarioStepChange(_currentStep, config);
+        }
+        break;
+      case ScenarioStep.reservationName:
+        _currentStep = ScenarioStep.numberPeople;
+        await _handleScenarioStepChange(_currentStep, config);
+        break;
+      case ScenarioStep.numberPeople:
+        _currentStep = ScenarioStep.drinksOffer;
+        await _handleScenarioStepChange(_currentStep, config);
+        break;
       case ScenarioStep.drinksOffer:
         if (intents.contains('beverage_water')) {
           _currentStep = ScenarioStep.waterType;
@@ -309,94 +302,101 @@ class ScenarioSimManager extends ChangeNotifier {
 
         break;
       case ScenarioStep.readyToOrder:
-        if (intents.contains('ready_yes')) {
-          _promptOverride = null;
-          _currentStep = ScenarioStep.appetizers;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('ready_no')) {
+        if (intents.contains('ready_no')) {
           _promptOverride =
               "No problem, just say 'I'm ready to order' when you've decided.";
+          notifyListeners();
+          await _handlePromptOverride(config);
+        } else if (intents.contains('ready_yes') ||
+            orderedNewItems ||
+            _wantsNoAppetizers ||
+            _wantsNoEntrees) {
+          _currentStep = _determineNextLogicalStep();
+          await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.appetizers:
         if (intents.contains('ask_specials') || intents.contains('ask_soup')) {
           _promptOverride = "Today's soup is creamy roasted garlic.";
+          notifyListeners();
+          await _handlePromptOverride(config);
         } else if (intents.contains('ask_recommendations')) {
-          _promptOverride = "My personal favourite is the lobster pasta.";
-        } else if (intents.contains('order_steak')) {
-          _currentStep = ScenarioStep.steakDoneness;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('order_chicken') ||
-            intents.contains('order_pasta')) {
-          _orderItems.add(
-            intents.firstWhere(
-              (i) => i == 'order_chicken' || i == 'order_pasta',
-            ),
-          );
-          _currentStep = ScenarioStep.isThatAll;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('order_soup') ||
-            intents.contains('order_bruschetta')) {
-          //TODO: there was another app
-          _orderItems.add(
-            intents.firstWhere(
-              (i) => i == 'order_soup' || i == 'order_bruschetta',
-            ),
-          );
-          _currentStep = ScenarioStep.entrees;
+          _promptOverride =
+              "My personal favourite is the lobster pasta."; //TODO: append to message
+          notifyListeners();
+          await _handlePromptOverride(config);
+        } else if (orderedNewItems || _wantsNoAppetizers || _wantsNoEntrees) {
+          _currentStep = _determineNextLogicalStep();
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.entrees:
-        if (intents.contains('order_steak')) {
-          _currentStep = ScenarioStep.steakDoneness;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('order_chicken') ||
-            intents.contains('order_pasta')) {
-          _orderItems.add(
-            intents.firstWhere(
-              (i) => i == 'order_chicken' || i == 'order_pasta',
-            ),
-          );
-          _currentStep = ScenarioStep.isThatAll;
+        if (orderedNewItems || _wantsNoEntrees) {
+          _currentStep = _determineNextLogicalStep();
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.steakDoneness:
         if (intents.contains('steak_doneness')) {
-          _currentStep = ScenarioStep.sideChoice;
+          _currentStep = _determineNextLogicalStep();
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.sideChoice:
-        if (intents.contains('side_salad') || intents.contains('side_fries')) {
-          _orderItems.add(
-            intents.firstWhere((i) => i == 'side_salad' || i == 'side_fries'),
-          );
-          _currentStep = ScenarioStep.isThatAll;
+        if (orderedNewItems) {
+          _currentStep = _determineNextLogicalStep();
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
       case ScenarioStep.isThatAll:
         if (intents.contains('is_that_all_yes')) {
-          _currentStep = ScenarioStep.allergies;
+          _currentStep = ScenarioStep.howIsEverything;
           await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('is_that_all_no')) {
-          _currentStep = ScenarioStep.appetizers;
+          _currentStep = ScenarioStep.appetizers; // Loop back
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
-      case ScenarioStep.allergies:
+      case ScenarioStep.howIsEverything:
+        _currentStep = ScenarioStep.areYouDone;
+        await _handleScenarioStepChange(_currentStep, config);
+        break;
+      case ScenarioStep.areYouDone:
+        if (intents.contains('done_eating_yes')) {
+          _currentStep = ScenarioStep.readyForBill;
+          await _handleScenarioStepChange(_currentStep, config);
+        } else if (intents.contains('done_eating_no')) {
+          _promptOverride =
+              "No problem, call me over when you're ready by saying 'I'm done'";
+          notifyListeners();
+          await _handlePromptOverride(config);
+        }
+        break;
+      case ScenarioStep.readyForBill:
+        if (intents.contains('ready_for_bill_yes')) {
+          _currentStep = ScenarioStep.paymentMethod;
+          await _handleScenarioStepChange(_currentStep, config);
+        } else if (intents.contains('ready_for_bill_no')) {
+          _promptOverride =
+              "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
+          notifyListeners();
+          await _handlePromptOverride(config);
+        }
+        break;
+      case ScenarioStep.paymentMethod:
+        _currentStep = ScenarioStep.receipt;
+        await _handleScenarioStepChange(_currentStep, config);
+        break;
+      case ScenarioStep.receipt:
+        _isScenarioComplete = true;
+        _promptOverride = "Thank you for dining with us! Have a wonderful day.";
+        _currentCharacter = _currentPrompt!.imageSpeakingUrl;
+        notifyListeners();
+        await _handlePromptOverride(config);
+        break;
       case ScenarioStep.notReadyToOrder:
         break;
     }
-    // Have this here to prevent glitch where prompt override is set to null and old prompt flashes before new one is loaded.
-    if (!intents.contains('ready_no')) {
-      _promptOverride = null;
-      _promptPrefix = null;
-    }
-    await clearAudioCache();
-    notifyListeners();
   }
 
   // --- Dynamic Routing Helper ---
@@ -440,7 +440,7 @@ class ScenarioSimManager extends ChangeNotifier {
     print("--- 🔄 RESETTING SCENARIO ---");
 
     // Reset core progression
-    _currentStep = ScenarioStep.drinksOffer;
+    _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
     _orderItems.clear();
 
@@ -492,7 +492,19 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void playCharacterAudio(ImageConfiguration config) async {
+  Future<void> _handlePromptOverride(ImageConfiguration config) async {
+    _currentCharacter = _currentPrompt!.imageSpeakingUrl;
+    await precacheCharacterImage(config);
+    await clearAudioCache();
+    notifyListeners();
+    await playElevenLabsAudio(currentDialogue, 'override-prompt');
+    _currentMicrophoneState = MicrophoneState.idle;
+    _currentCharacter = currentPrompt!.imageListeningUrl;
+    await precacheCharacterImage(config);
+    notifyListeners();
+  }
+
+  Future<void> playCharacterAudio(ImageConfiguration config) async {
     if (_currentAudio.isNotEmpty) {
       try {
         await _audioPlayer.setAudioSource(

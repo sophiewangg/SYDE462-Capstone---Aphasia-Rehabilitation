@@ -1,6 +1,11 @@
 -- Ensure the UUID extension is active for generating IDs
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Delete existing tables
+DROP TABLE IF EXISTS prompts CASCADE;
+DROP TABLE IF EXISTS skills_practiced CASCADE;
+DROP TABLE IF EXISTS scenario_steps CASCADE;
+
 -- SCENARIO STEPS TABLE ---
 
 CREATE TABLE IF NOT EXISTS scenario_steps (
@@ -8,10 +13,11 @@ CREATE TABLE IF NOT EXISTS scenario_steps (
 	description TEXT NOT NULL
 );
 
-TRUNCATE TABLE scenario_steps;
-
 INSERT INTO scenario_steps (description) 
 VALUES 
+    ('reservation'),
+    ('reservation_name'),
+    ('number_people'),
     ('drinks_offer'),
     ('water_type'),
     ('ice_question'),
@@ -21,7 +27,11 @@ VALUES
     ('steak_doneness'),
     ('side_choice'),
     ('is_that_all'),
-    ('allergies');
+    ('how_is_everything'),
+    ('are_you_done'),
+    ('ready_for_bill'),
+    ('payment_method'),
+    ('receipt');
 
 -- SKILLS PRACTICED TABLE ---
 
@@ -30,13 +40,12 @@ CREATE TABLE IF NOT EXISTS skills_practiced (
 	skill_name TEXT NOT NULL
 );
 
-TRUNCATE TABLE skills_practiced;
-
 INSERT INTO skills_practiced (skill_name) 
 VALUES 
+    ('Getting seated'),
     ('Small talk'),
     ('Ordering'),
-    ('Notifying of allergies');
+    ('Paying');
 
 -- PROMPTS TABLE ---
 
@@ -52,8 +61,6 @@ CREATE TABLE IF NOT EXISTS prompts (
     prompt_text TEXT NOT NULL
 );
 
-TRUNCATE TABLE prompts;
-
 INSERT INTO prompts (
     scenario_step_id, 
     audio_url, 
@@ -65,9 +72,36 @@ INSERT INTO prompts (
 ) 
 VALUES 
     (
+        (SELECT id FROM scenario_steps WHERE description = 'reservation' LIMIT 1),
+        'reservation.mp3',
+        'intro_hello.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Getting seated' LIMIT 1),
+        'Welcome to Bob''s Eatery. Do you have a reservation?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'reservation_name' LIMIT 1),
+        'reservation_name.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Getting seated' LIMIT 1),
+        'Can I have the name that''s on the reservation?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'number_people' LIMIT 1),
+        'number_people.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Getting seated' LIMIT 1),
+        'How many people are in your party?'
+    ),
+    (
         (SELECT id FROM scenario_steps WHERE description = 'drinks_offer' LIMIT 1),
         'drinks_offer.mp3',
-        'intro_hello.png',
+        'intro_talk.png',
         'intro_listen.png',
         'intro_confused.png',
         (SELECT id FROM skills_practiced WHERE skill_name = 'Ordering' LIMIT 1),
@@ -146,11 +180,47 @@ VALUES
         'Is that all for you?'
     ),
     (
-        (SELECT id FROM scenario_steps WHERE description = 'allergies' LIMIT 1),
-        'allergies.mp3',
-        'order_talk.png',
-        'order_listen.png',
-        'order_confused.png',
-        (SELECT id FROM skills_practiced WHERE skill_name = 'Notifying of allergies' LIMIT 1),
-        'Do you have any allergies?'
+        (SELECT id FROM scenario_steps WHERE description = 'how_is_everything' LIMIT 1),
+        'how_is_everything.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'How is everything?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'are_you_done' LIMIT 1),
+        'are_you_done.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Are you done with your food?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'ready_for_bill' LIMIT 1),
+        'ready_for_bill.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Paying' LIMIT 1),
+        'Are you ready for the bill?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'payment_method' LIMIT 1),
+        'payment_method.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Paying' LIMIT 1),
+        'How would you like to pay?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'receipt' LIMIT 1),
+        'receipt.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Paying' LIMIT 1),
+        'Would you like your receipt?'
     );

@@ -23,7 +23,7 @@ class HintManager extends ChangeNotifier {
   final cueFutureNotifier = ValueNotifier<Future<Cue?>?>(null);
 
   String Function() getCurrentPrompt;
-  void Function(String) onPromptSimplified;
+  Future<void> Function(String, dynamic) onPromptSimplified;
   Future<void> Function() requestStopRecording;
   void Function() onProcessingComplete;
   void Function()? onEnterDescribePhase;
@@ -71,7 +71,10 @@ class HintManager extends ChangeNotifier {
     }
   }
 
-  void onTranscriptReceived(String transcript) async {
+  void onTranscriptReceived(
+    String transcript,
+    ImageConfiguration config,
+  ) async {
     if (_modalIsWordFinding && _cueDescriptionTranscript == null) {
       _cueDescriptionTranscript = transcript.trim();
       if (_cueDescriptionTranscript!.isEmpty) {
@@ -93,15 +96,15 @@ class HintManager extends ChangeNotifier {
       onProcessingComplete();
       notifyListeners();
     } else {
-      _processTranscript(transcript);
+      _processTranscript(transcript, config);
     }
   }
 
-  void _processTranscript(String transcript) {
+  void _processTranscript(String transcript, ImageConfiguration config) {
     if (_modalIsWordFinding) {
       _processWordFinding(transcript, _likelyWord ?? "");
     } else {
-      _processUnderstanding();
+      _processUnderstanding(config);
     }
   }
 
@@ -121,12 +124,15 @@ class HintManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _processUnderstanding() async {
+  void _processUnderstanding(ImageConfiguration config) async {
     cueCompleteNotifier.value = true;
     cueResultStringNotifier.value = "Return to exercise.";
     onProcessingComplete();
     final response = await _cueService.getSimplifiedPrompt(getCurrentPrompt());
-    onPromptSimplified(response?.simplifiedPrompt ?? getCurrentPrompt());
+    onPromptSimplified(
+      response?.simplifiedPrompt ?? getCurrentPrompt(),
+      config,
+    );
     notifyListeners();
   }
 
