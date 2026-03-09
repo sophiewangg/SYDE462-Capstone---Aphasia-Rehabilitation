@@ -21,14 +21,16 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final SessionDashboardService _dashboardService = SessionDashboardService();
 
-  late Future<List<List<String>>> _combinedFuture;
+  late Future<List<dynamic>> _combinedFuture;
 
   @override
   void initState() {
     super.initState();
+    final dashboardManager = context.read<DashboardManager>();
     _combinedFuture = Future.wait([
       _dashboardService.fetchSavedDetections("sound_rep"),
       _dashboardService.fetchSavedDetections("interjection"),
+      _fetchAllSkillNames(dashboardManager),
     ]);
   }
 
@@ -37,13 +39,26 @@ class _DashboardPageState extends State<DashboardPage> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
+  Future<Map<String, int>> _fetchAllSkillNames(DashboardManager manager) async {
+    final Map<String, int> skillMap = {};
+
+    final skillEntries = manager.skillsPracticed.entries;
+
+    for (var entry in skillEntries) {
+      String skillName = await manager.getSkillName(entry.key);
+      skillMap[skillName] = entry.value;
+    }
+
+    return skillMap;
+  }
+
   @override
   Widget build(BuildContext context) {
     final DashboardManager dashboardManager = context.watch<DashboardManager>();
 
     return Scaffold(
       body: SafeArea(
-        child: FutureBuilder<List<List<String>>>(
+        child: FutureBuilder<List<dynamic>>(
           future: _combinedFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -56,6 +71,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
             final soundRepFiles = snapshot.data?[0] ?? [];
             final interjectionFiles = snapshot.data?[1] ?? [];
+            final skillNameMap = snapshot.data?[2] ?? {};
 
             return SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
@@ -70,9 +86,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         dashboardManager.numPromptsGiven,
                   ),
                   const SizedBox(height: 24),
-                  SkillsPracticed(
-                    dashboardManager.skillsPracticed,
-                  ),
+                  SkillsPracticed(skillNameMap),
                   const SizedBox(height: 24),
                   HintsUsed(dashboardManager.hintsGiven),
                   const SizedBox(height: 24),

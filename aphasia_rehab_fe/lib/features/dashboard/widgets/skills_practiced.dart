@@ -5,13 +5,12 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class SkillsPracticed extends StatelessWidget {
-  final Map<String, int> skillsPracticed;
+  final Map<String, int> skillNameMap;
 
-  SkillsPracticed(this.skillsPracticed, {super.key});
+  SkillsPracticed(this.skillNameMap, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final DashboardManager dashboardManager = context.watch<DashboardManager>();
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Column(
@@ -30,7 +29,7 @@ class SkillsPracticed extends StatelessWidget {
             child: Column(
               spacing: 8.0,
               children: [
-                for (var skill in skillsPracticed.entries)
+                for (var skill in skillNameMap.entries)
                   Row(
                     spacing: 12.0,
                     children: [
@@ -43,26 +42,12 @@ class SkillsPracticed extends StatelessWidget {
                             ? AppColors.checkmarkSuccess
                             : AppColors.textSecondary,
                       ),
-                      Expanded(
-                        child: FutureBuilder<String>(
-                          future: dashboardManager.getSkillName(skill.key),
-                          builder: (context, snapshot) {
-                            // While waiting, show the ID or a placeholder
-                            if (!snapshot.hasData) {
-                              return Text(
-                                skill.key,
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(color: Colors.grey),
-                              );
-                            }
-                            // Once the name arrives, show it
-                            return Text(
-                              snapshot.data!,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            );
-                          },
-                        ),
+
+                      Text(
+                        skill.key,
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
+
                       if (skill.value != 0)
                         _buildHintsUsed(context, skill.value),
                     ],

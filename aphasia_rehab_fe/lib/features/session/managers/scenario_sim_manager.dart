@@ -208,7 +208,7 @@ class ScenarioSimManager extends ChangeNotifier {
       return;
     }
 
-    _advanceScenario(classification.intents, config);
+    _advanceScenario(classification?.intents ?? [], config);
   }
 
   Future<void> handleEndOfSession() async {
