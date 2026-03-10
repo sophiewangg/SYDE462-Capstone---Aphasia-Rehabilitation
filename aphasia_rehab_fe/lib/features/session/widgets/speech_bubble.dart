@@ -42,7 +42,7 @@ class _SpeechBubbleState extends State<SpeechBubble> {
                     SizedBox(width: 40, height: 40, child: PlayAudioButton()),
                     Expanded(
                       child: Text(
-                        scenarioSimManager.currentPrompt,
+                        scenarioSimManager.currentDialogue,
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ),
@@ -58,23 +58,6 @@ class _SpeechBubbleState extends State<SpeechBubble> {
               child: Image.asset(
                 'assets/images/speech_bubble_tip_image.png',
                 width: 150,
-              ),
-            ),
-            SizedBox(
-              height: 46,
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                child: (scenarioSimManager.systemMessage == null)
-                    ? const SizedBox.shrink()
-                    : Text(
-                        scenarioSimManager.systemMessage!,
-                        key: const ValueKey("system_message"),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontStyle: FontStyle.italic,
-                        ),
-                        softWrap: true,
-                      ),
               ),
             ),
           ],

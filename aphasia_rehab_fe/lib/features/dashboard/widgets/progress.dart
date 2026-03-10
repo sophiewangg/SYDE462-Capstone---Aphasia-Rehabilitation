@@ -4,7 +4,15 @@ import 'package:aphasia_rehab_fe/features/dashboard/widgets/share_button.dart';
 import 'package:flutter/material.dart';
 
 class Progress extends StatelessWidget {
-  const Progress({super.key});
+  final int numHintsUsed;
+  final int numDisfluencies;
+  final double unclearPercentage;
+  Progress(
+    this.numHintsUsed,
+    this.numDisfluencies,
+    this.unclearPercentage, {
+    super.key,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -59,6 +67,16 @@ class Progress extends StatelessWidget {
   }
 
   Widget _buildProgressMetrics(BuildContext context) {
+    String getClarityScore() {
+      if (unclearPercentage >= 0.6) {
+        return "Developing";
+      } else if (unclearPercentage >= 0.2) {
+        return "Good";
+      } else {
+        return "Strong";
+      }
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 15.0,
@@ -71,17 +89,27 @@ class Progress extends StatelessWidget {
         ),
         Column(
           spacing: 10.0,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               spacing: 10.0,
               children: [
-                ProgressMetric(title: "Clarity", value: "Strong", width: 145.0),
-                ProgressMetric(title: "Hints", value: "2 used", width: 145.0),
+                ProgressMetric(
+                  title: "Hints",
+                  value: "$numHintsUsed used",
+                  width: 145.0,
+                ),
+                ProgressMetric(
+                  title: "Disfluencies",
+                  value: "$numDisfluencies flagged",
+                  width: 145.0,
+                ),
               ],
             ),
+
             ProgressMetric(
-              title: "Stuttering",
-              value: "30% of the time",
+              title: "Clarity",
+              value: "${getClarityScore()} response relevancy",
               width: 300.0,
             ),
           ],

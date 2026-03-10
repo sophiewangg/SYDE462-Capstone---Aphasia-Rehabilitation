@@ -19,7 +19,9 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
   static const int _barCount = 6;
   static const double _maxBarHeight = 36.0;
   static const double _minBarHeight = 6.0;
-  static const Color _barColor = Color(0xFF4A4E7A); // dark purple to match pause icon
+  static const Color _barColor = Color(
+    0xFF4A4E7A,
+  ); // dark purple to match pause icon
 
   late final List<AnimationController> _controllers;
   late final List<Animation<double>> _animations;
@@ -41,9 +43,10 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
       // Each bar animates between a random min and max within our bounds
       final low = _minBarHeight + _random.nextDouble() * 8;
       final high = _maxBarHeight - _random.nextDouble() * 8;
-      return Tween<double>(begin: low, end: high).animate(
-        CurvedAnimation(parent: ctrl, curve: Curves.easeInOut),
-      );
+      return Tween<double>(
+        begin: low,
+        end: high,
+      ).animate(CurvedAnimation(parent: ctrl, curve: Curves.easeInOut));
     }).toList();
 
     // Stagger start times so bars don't all move in sync
@@ -77,7 +80,8 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
           height: 72,
           child: ElevatedButton(
             onPressed: () {
-              scenarioSimManager.handleMicToggle();
+              final config = createLocalImageConfiguration(context);
+              scenarioSimManager.handleMicToggle(config);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFD6D9E8),
@@ -89,48 +93,53 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
               padding: const EdgeInsets.symmetric(horizontal: 28),
               elevation: 2,
             ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Audio wave bars on the LEFT
-              SizedBox(
-                height: _maxBarHeight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: List.generate(_barCount, (i) {
-                    return Padding(
-                      padding: EdgeInsets.only(right: i < _barCount - 1 ? 4.0 : 0),
-                      child: AnimatedBuilder(
-                        animation: _animations[i],
-                        builder: (context, _) {
-                          return Container(
-                            width: 3,
-                            height: _animations[i].value,
-                            decoration: BoxDecoration(
-                              color: _barColor,
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  }),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Audio wave bars on the LEFT
+                SizedBox(
+                  height: _maxBarHeight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: List.generate(_barCount, (i) {
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          right: i < _barCount - 1 ? 4.0 : 0,
+                        ),
+                        child: AnimatedBuilder(
+                          animation: _animations[i],
+                          builder: (context, _) {
+                            return Container(
+                              width: 3,
+                              height: _animations[i].value,
+                              decoration: BoxDecoration(
+                                color: _barColor,
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }),
+                  ),
                 ),
-              ),
 
-              const SizedBox(width: 30),
+                const SizedBox(width: 30),
 
-              // Pause icon on the RIGHT
-              SvgPicture.asset(
-                'assets/icons/pause_icon.svg',
-                colorFilter: const ColorFilter.mode(_barColor, BlendMode.srcIn),
-                width: 22,
-              ),
-            ],
-          ),
+                // Pause icon on the RIGHT
+                SvgPicture.asset(
+                  'assets/icons/pause_icon.svg',
+                  colorFilter: const ColorFilter.mode(
+                    _barColor,
+                    BlendMode.srcIn,
+                  ),
+                  width: 22,
+                ),
+              ],
+            ),
           ),
         ),
         Text("Listening...", style: TextStyle(color: Colors.white)),

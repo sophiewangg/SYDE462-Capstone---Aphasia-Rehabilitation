@@ -1,7 +1,9 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/scenario_sim.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 class StartButton extends StatefulWidget {
   const StartButton({super.key});
@@ -17,13 +19,19 @@ class _StartButtonState extends State<StartButton> {
       width:
           double.infinity, // This forces the button to fill all available width
       child: ElevatedButton.icon(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final manager = Provider.of<ScenarioSimManager>(
             context,
-            MaterialPageRoute(
-              builder: (context) => const ScenarioSim(),
-            ),
+            listen: false,
           );
+          final config = createLocalImageConfiguration(context);
+          await manager.init(config);
+          if (context.mounted) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ScenarioSim()),
+            );
+          }
         },
         icon: SvgPicture.asset(
           'assets/icons/start_icon.svg',
@@ -40,11 +48,11 @@ class _StartButtonState extends State<StartButton> {
           backgroundColor: AppColors.yellowPrimary,
           foregroundColor: AppColors.textPrimary,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
     );
   }
+
+  void showLoadingDialog(BuildContext context) {}
 }

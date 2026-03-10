@@ -47,3 +47,28 @@ class TherapyExercise(Base):
     target_word = Column(String, nullable=False)
     phonemic_cue = Column(String)
     semantic_cue = Column(Text)
+ 
+class ScenarioStep(Base):
+    __tablename__ = "scenario_steps"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    description = Column(String(255), nullable=False)
+
+class SkillPracticed(Base):
+    __tablename__ = "skills_practiced"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    skill_name = Column(String(100), nullable=False)
+
+class Prompt(Base):
+    __tablename__ = "prompts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    scenario_step_id = Column(UUID(as_uuid=True), ForeignKey("scenario_steps.id"), unique=True, nullable=False)
+    audio_url = Column(Text, nullable=False)
+    image_speaking_url = Column(Text, nullable=False)
+    image_listening_url = Column(Text, nullable=False)
+    image_confused_url = Column(Text, nullable=False)
+    skill_practiced_id = Column(UUID(as_uuid=True), ForeignKey("skills_practiced.id"), unique=False, nullable=False)
+    prompt_text = Column(Text, nullable=False)
+

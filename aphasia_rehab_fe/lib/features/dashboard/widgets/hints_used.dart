@@ -3,16 +3,11 @@ import 'package:aphasia_rehab_fe/features/dashboard/widgets/hint_audio_button.da
 import 'package:flutter/material.dart';
 
 class HintsUsed extends StatelessWidget {
-  const HintsUsed({super.key});
+  final List<String> hintsGiven;
+  HintsUsed(this.hintsGiven, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final List<String> hints = [
-      "Spoon",
-      "Steak",
-      "How would you like your steak?",
-    ];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 8.0,
@@ -26,13 +21,18 @@ class HintsUsed extends StatelessWidget {
         Wrap(
           spacing: 12.0,
           runSpacing: 12.0,
-          children: hints.map((hint) => _buildHintBox(context, hint)).toList(),
+          children: hintsGiven.asMap().entries.map((entry) {
+            int index = entry.key;
+            String hint = entry.value;
+
+            return _buildHintBox(context, hint, index); // Pass index here
+          }).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildHintBox(BuildContext context, String text) {
+  Widget _buildHintBox(BuildContext context, String text, int index) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
@@ -48,7 +48,7 @@ class HintsUsed extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min, // Keeps the box tight around content
           children: [
-            HintAudioButton(),
+            HintAudioButton(text, index.toString()),
             const SizedBox(width: 8),
             // Flexible with FlexFit.loose is the secret to keeping the UI look
             Flexible(

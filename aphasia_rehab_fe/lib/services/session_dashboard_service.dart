@@ -30,6 +30,25 @@ class SessionDashboardService {
     }
   }
 
+  Future<String> getSkillName(String skillId) async {
+    try {
+      final response = await http.get(
+        Uri.parse("$baseUrl/get_skill_name?skill_id=$skillId"),
+      );
+
+      if (response.statusCode == 200) {
+        final json = jsonDecode(response.body);
+        return json['skill_name'] ?? "Unknown Skill";
+      } else {
+        print("Error fetching skill name: ${response.statusCode}");
+        return "Unknown Skill";
+      }
+    } catch (e) {
+      print("Error fetching skill name: $e");
+      return "Unknown Skill";
+    }
+  }
+
   // Helper to get the full playable URL for a specific file
   String getAudioUrl(String filename, disfluency_type) {
     return "$baseUrl/detections/$disfluency_type/$filename";

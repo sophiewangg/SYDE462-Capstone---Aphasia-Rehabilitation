@@ -1,5 +1,6 @@
 import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button_cue_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +41,7 @@ class _CueModalState extends State<CueModal> {
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 300), () {
+        hintManager.closeModal(hintManager.getCurrentPrompt());
         hintManager.updateCueNumber(reset: true);
         hintManager.resetCueComplete();
         hintManager.resetCueResultString();
@@ -190,6 +192,8 @@ class _CueModalState extends State<CueModal> {
   }
 
   Widget _buildCloseButton(BuildContext context, HintManager hintManager) {
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
+
     return Align(
       alignment: Alignment.centerRight,
       child: TextButton.icon(
@@ -199,7 +203,7 @@ class _CueModalState extends State<CueModal> {
           hintManager.updateCueNumber(reset: true);
           hintManager.resetCueComplete();
           hintManager.resetCueResultString();
-          hintManager.closeModal();
+          hintManager.closeModal(scenarioSimManager.currentPrompt!.promptText);
         },
         icon: const Icon(Icons.close),
         label: const Text('Cancel'),
