@@ -42,8 +42,9 @@ class UtteranceClassification {
 }
 
 class ScenarioApiService {
-  final String _classifyUrl = "http://localhost:8000/classify_utterance/";
-
+  // final String _classifyUrl = "http://localhost:8000/classify_utterance/";
+  final String _classifyUrl =
+      "https://clotilde-squaretoed-fredrick.ngrok-free.dev/classify_utterance/";
   Future<UtteranceClassification?> classifyUtterance(
     String transcription,
     String? currentStep, {

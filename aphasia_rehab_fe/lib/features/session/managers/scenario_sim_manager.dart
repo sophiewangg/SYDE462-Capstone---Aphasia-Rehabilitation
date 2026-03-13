@@ -533,21 +533,24 @@ class ScenarioSimManager extends ChangeNotifier {
     final file = File(filePath);
 
     if (await file.exists()) {
-      // 1. Play from Cache
-      print("Playing from local cache: $filePath");
       await _overridePlayer.setFilePath(filePath);
     } else {
-      // 2. Fetch from ElevenLabs API
-      print("Fetching from ElevenLabs API...");
       Uint8List audioBytes = await _elevenLabsService.fetchAudio(text);
-
-      // 3. Save to Cache
       await file.writeAsBytes(audioBytes);
-
       await _overridePlayer.setFilePath(filePath);
     }
 
+    // Start playing
     await _overridePlayer.play();
+
+    // 1. Wait for the audio to actually finish
+    // We listen to the processingState stream and wait for the 'completed' event
+    await _overridePlayer.processingStateStream.firstWhere(
+      (state) => state == ProcessingState.completed,
+    );
+
+    // 2. Optional: Reset the player position so it's ready for next time
+    await _overridePlayer.stop();
   }
 
   Future<void> clearAudioCache() async {

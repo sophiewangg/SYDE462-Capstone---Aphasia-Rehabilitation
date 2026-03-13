@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class SessionDashboardService {
-  final String baseUrl = "http://127.0.0.1:8000";
+  // final String baseUrl = "http://127.0.0.1:8000";
+  String baseUrl = "https://clotilde-squaretoed-fredrick.ngrok-free.dev";
 
   void clearDetections() async {
     try {
