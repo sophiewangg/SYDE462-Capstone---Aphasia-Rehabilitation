@@ -4,7 +4,8 @@ import 'package:aphasia_rehab_fe/models/simplified_prompt_model.dart';
 import 'package:http/http.dart' as http;
 
 class CueService {
-  final String backendUrl = "http://localhost:8000/";
+  // final String backendUrl = "http://localhost:8000/";
+  String backendUrl = "https://clotilde-squaretoed-fredrick.ngrok-free.dev/";
 
   Future<Cue?> getCues(String transcription, String goal) async {
     try {
@@ -22,6 +23,9 @@ class CueService {
         return null;
       }
     } catch (e) {
+      print(
+        "Detailed Error: $e",
+      ); // This will show if it's a SocketException, Timeout, etc.
       print("Failed to generate cues.");
       return null;
     }
