@@ -68,11 +68,12 @@ class OrderCorrectionResult {
 }
 
 class ScenarioApiService {
-  final String _classifyUrl = "http://localhost:8000/classify_utterance/";
+  final String _llmFallbackUrl =
+      "https://clotilde-squaretoed-fredrick.ngrok-free.dev/llm_fallback/";
+  final String _classifyUrl =
+      "https://clotilde-squaretoed-fredrick.ngrok-free.dev/classify_utterance/";
   final String _verifyCorrectionUrl =
-      "http://localhost:8000/verify_order_correction/";
-  final String _llmFallbackUrl = "http://localhost:8000/llm_fallback/";
-
+      "https://clotilde-squaretoed-fredrick.ngrok-free.dev/verify_order_correction/";
   Future<UtteranceClassification?> classifyUtterance(
     String transcription,
     String? currentStep, {
