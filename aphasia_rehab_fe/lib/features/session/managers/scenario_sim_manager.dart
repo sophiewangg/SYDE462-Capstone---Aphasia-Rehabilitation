@@ -552,6 +552,14 @@ class ScenarioSimManager extends ChangeNotifier {
     _promptPrefix = null;
     _promptOverride = null;
 
+    // Reset Character/Audio/Food states
+    _currentCharacter = "";
+    _currentAudio = "";
+
+    // --- State Variables: Food ---
+    _appetizerUrl = null;
+    _entreeUrl = null;
+
     hintManager.reset();
     dashboardManager.resetDashboard();
 
