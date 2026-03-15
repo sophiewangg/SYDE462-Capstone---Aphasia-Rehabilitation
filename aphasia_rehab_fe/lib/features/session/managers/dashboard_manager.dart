@@ -1,3 +1,4 @@
+import 'package:aphasia_rehab_fe/models/improved_response_model.dart';
 import 'package:aphasia_rehab_fe/services/eleven_labs_service.dart';
 import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,10 @@ class DashboardManager extends ChangeNotifier {
   // Skills Practiced
   final Map<String, int> _skillsPracticed = {};
 
+  // Words Used
+  int _numWordsUsed = 0;
+  final List<String> _pendingTaskIds = [];
+
   // getters
   int get numHintsUsed => _numHintsUsed;
   int get numHintsSuccess => _numHintsSuccess;
@@ -31,9 +36,10 @@ class DashboardManager extends ChangeNotifier {
   int get numPromptsGiven => _numPromptsGiven;
   int get numUnclearResponses => _numUnclearResponses;
   Map<String, int> get skillsPracticed => _skillsPracticed;
+  int get numWordsUsed => _numWordsUsed;
+  List<String> get pendingTaskIds => _pendingTaskIds;
 
   void cueComplete(int numCues, String hintGiven) {
-    print(hintGiven);
     _numHintsUsed += 1;
     if (numCues <= 2) {
       _numHintsSuccess += 1;
@@ -51,6 +57,11 @@ class DashboardManager extends ChangeNotifier {
     _numPromptsGiven += 1;
   }
 
+  void incrementNumWordsUsed(int numWords) {
+    _numWordsUsed += numWords;
+    notifyListeners();
+  }
+
   void addSkillPracticed(String skill_id) {
     if (!_skillsPracticed.containsKey(skill_id)) {
       _skillsPracticed[skill_id] = 0;
@@ -58,8 +69,62 @@ class DashboardManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  void incrementHintUsed(String skill_id) {
+    _skillsPracticed[skill_id] = (_skillsPracticed[skill_id])! + 1;
+  }
+
   Future<String> getSkillName(String skillId) async {
     return await _dashboardService.getSkillName(skillId);
+  }
+
+  Future<void> improveResponse(String prompt, String transcription) async {
+    try {
+      String? taskId = await _dashboardService.startImprovementTask(
+        prompt,
+        transcription,
+      );
+
+      if (taskId != null) {
+        _pendingTaskIds.add(taskId);
+        print("Added Task ID to queue: $taskId");
+
+        notifyListeners();
+      }
+    } catch (e) {
+      print("Error triggering background task: $e");
+    }
+  }
+
+  Future<List<ImprovedResponse>> fetchImprovedResults() async {
+    List<ImprovedResponse> finalResults = [];
+
+    for (String id in _pendingTaskIds) {
+      bool isDone = false;
+      while (!isDone) {
+        final statusData = await _dashboardService.checkTaskStatus(id);
+        print(statusData);
+
+        if (statusData['status'] == 'SUCCESS') {
+          final newImprovement = ImprovedResponse(
+            improvedResponse1: statusData['result']['improved_response_1']
+                .toString(),
+            improvedResponse2: statusData['result']['improved_response_2']
+                .toString(),
+            prompt: statusData['result']['prompt'].toString(),
+            response: statusData['result']['response'].toString(),
+            taskId: statusData['task_id'],
+          );
+          finalResults.add(newImprovement);
+          isDone = true;
+        } else if (statusData['status'] == 'FAILURE') {
+          isDone = true;
+        } else {
+          // Wait a bit before checking this specific task again
+          await Future.delayed(const Duration(milliseconds: 500));
+        }
+      }
+    }
+    return finalResults;
   }
 
   Future<void> playElevenLabsAudio(String text, String promptId) async {
@@ -83,5 +148,27 @@ class DashboardManager extends ChangeNotifier {
     }
 
     await _audioPlayer.play();
+  }
+
+  Future<int?> clearDetection(String filename, String disfluencyType) async {
+    return await _dashboardService.clearDetection(filename, disfluencyType);
+  }
+
+  void resetDashboard() {
+    // Hints Used
+    _numHintsUsed = 0;
+    _numHintsSuccess = 0;
+    _hintsGiven.clear();
+
+    // Response Clarity
+    _numPromptsGiven = 1;
+    _numUnclearResponses = 0;
+
+    // Skills Practiced
+    _skillsPracticed.clear();
+
+    // Words Used
+    _numWordsUsed = 0;
+    _pendingTaskIds.clear();
   }
 }

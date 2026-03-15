@@ -41,7 +41,8 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.lexendTextTheme(
           const TextTheme(
             titleLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            titleMedium: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            titleSmall: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             bodyMedium: TextStyle(fontSize: 16),
             bodyLarge: TextStyle(fontSize: 18),
             bodySmall: TextStyle(fontSize: 14),

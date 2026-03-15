@@ -49,6 +49,17 @@ class DisfluencyDetectionService:
                 except Exception as e:
                     print(f'Failed to delete {file_path}. Reason: {e}')
 
+    def clear_detection(self, filename, disfluency_type):
+        detections_dir = os.path.join(self.detections_dir, disfluency_type)
+        file_path = os.path.join(detections_dir, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path) # Delete files and symlinks
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path) # Delete subdirectories
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
+
     def detect_disfluencies(self, raw_filename):
         from worker import process_recording_pipeline
         

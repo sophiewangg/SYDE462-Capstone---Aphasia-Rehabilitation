@@ -160,6 +160,7 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   void processHint(ImageConfiguration config) async {
+    dashboardManager.incrementHintUsed(_currentPrompt!.skillPracticedId);
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
@@ -183,6 +184,15 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
 
     final transcript = _transcription.trim();
+
+    final wordsUsed = transcript.split(RegExp(r'\s+')).length;
+    dashboardManager.incrementNumWordsUsed(wordsUsed);
+    if (wordsUsed == 1) {
+      dashboardManager.improveResponse(
+        _currentPrompt!.promptText,
+        transcription,
+      );
+    }
 
     if (transcript.isEmpty) {
       _promptPrefix = "I didn't quite hear that. Could you try again? ";
@@ -231,6 +241,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _currentCharacter = nextPrompt.imageSpeakingUrl;
     _currentAudio = nextPrompt.audioUrl;
     dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
+    dashboardManager.incrementNumPromptsGiven();
 
     _isRecording = false;
 
@@ -455,6 +466,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _promptOverride = null;
 
     hintManager.reset();
+    dashboardManager.resetDashboard();
 
     // Make sure audio is stopped
     _audioPlayer.stop();

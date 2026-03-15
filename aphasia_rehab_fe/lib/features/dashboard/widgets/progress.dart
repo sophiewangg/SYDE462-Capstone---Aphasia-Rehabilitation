@@ -5,14 +5,9 @@ import 'package:flutter/material.dart';
 
 class Progress extends StatelessWidget {
   final int numHintsUsed;
-  final int numDisfluencies;
-  final double unclearPercentage;
-  Progress(
-    this.numHintsUsed,
-    this.numDisfluencies,
-    this.unclearPercentage, {
-    super.key,
-  });
+  final double avgWords;
+  final double clearPercentage;
+  Progress(this.numHintsUsed, this.avgWords, this.clearPercentage, {super.key});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,25 +63,19 @@ class Progress extends StatelessWidget {
 
   Widget _buildProgressMetrics(BuildContext context) {
     String getClarityScore() {
-      if (unclearPercentage >= 0.6) {
-        return "Developing";
-      } else if (unclearPercentage >= 0.2) {
-        return "Good";
-      } else {
-        return "Strong";
-      }
+      return switch (clearPercentage) {
+        >= 0.95 => "Expert",
+        >= 0.90 => "Strong",
+        >= 0.70 => "Good",
+        >= 0.5 => "Developing",
+        _ => "Beginner", // The 'default' case
+      };
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       spacing: 15.0,
       children: [
-        Text(
-          "Your progress",
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w100),
-        ),
         Column(
           spacing: 10.0,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -95,22 +84,25 @@ class Progress extends StatelessWidget {
               spacing: 10.0,
               children: [
                 ProgressMetric(
+                  title: "Clarity",
+                  value: getClarityScore(),
+                  width: 145.0,
+                  hasTooltip: true,
+                  clearPercentage: clearPercentage,
+                ),
+                ProgressMetric(
                   title: "Hints",
                   value: "$numHintsUsed used",
                   width: 145.0,
-                ),
-                ProgressMetric(
-                  title: "Disfluencies",
-                  value: "$numDisfluencies flagged",
-                  width: 145.0,
+                  hasTooltip: false,
                 ),
               ],
             ),
-
             ProgressMetric(
-              title: "Clarity",
-              value: "${getClarityScore()} response relevancy",
+              title: "Average words per response",
+              value: "${avgWords.round()} words",
               width: 300.0,
+              hasTooltip: false,
             ),
           ],
         ),
