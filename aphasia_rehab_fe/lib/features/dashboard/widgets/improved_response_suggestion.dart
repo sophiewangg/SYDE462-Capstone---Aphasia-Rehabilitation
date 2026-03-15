@@ -1,4 +1,5 @@
 import 'package:aphasia_rehab_fe/colors.dart';
+import 'package:aphasia_rehab_fe/features/dashboard/widgets/hint_audio_button.dart';
 import 'package:aphasia_rehab_fe/models/improved_response_model.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +35,10 @@ class _ImprovedResponseSuggestionState
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
                   children: [
-                    _buildSpeakerIcon(AppColors.textPrimary),
+                    HintAudioButton(
+                      widget.improvedResponse.prompt,
+                      '${widget.improvedResponse.taskId}/prompt',
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -81,6 +85,7 @@ class _ImprovedResponseSuggestionState
                     const SizedBox(height: 8),
                     _buildResponseBox(
                       text: widget.improvedResponse.response,
+                      id: '${widget.improvedResponse.taskId}/response',
                       backgroundColor:
                           AppColors.cueModalInProgress, // Light orange
                       iconColor: Colors.black,
@@ -101,6 +106,7 @@ class _ImprovedResponseSuggestionState
                     const SizedBox(height: 8),
                     _buildResponseBox(
                       text: widget.improvedResponse.improvedResponse1,
+                      id: '${widget.improvedResponse.improvedResponse1}/improvedResponse1',
                       backgroundColor:
                           AppColors.cueModalComplete, // Light green
                       iconColor: Colors.black,
@@ -108,6 +114,7 @@ class _ImprovedResponseSuggestionState
                     const SizedBox(height: 8),
                     _buildResponseBox(
                       text: widget.improvedResponse.improvedResponse2,
+                      id: '${widget.improvedResponse.improvedResponse1}/improvedResponse2',
                       backgroundColor:
                           AppColors.cueModalComplete, // Light green
                       iconColor: Colors.black,
@@ -121,24 +128,10 @@ class _ImprovedResponseSuggestionState
     );
   }
 
-  // Helper to build the speaker icon inside a circle
-  Widget _buildSpeakerIcon(Color iconColor) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Icon(Icons.volume_up_outlined, color: iconColor, size: 24),
-    );
-  }
-
   // Helper to build the individual response rows
   Widget _buildResponseBox({
     required String text,
+    required String id,
     required Color backgroundColor,
     required Color iconColor,
   }) {
@@ -150,7 +143,7 @@ class _ImprovedResponseSuggestionState
       ),
       child: Row(
         children: [
-          _buildSpeakerIcon(iconColor),
+          HintAudioButton(text, id),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

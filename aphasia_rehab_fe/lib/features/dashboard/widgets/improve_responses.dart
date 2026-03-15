@@ -1,4 +1,4 @@
-import 'package:aphasia_rehab_fe/features/dashboard/widgets/improved_response.dart';
+import 'package:aphasia_rehab_fe/features/dashboard/widgets/improved_response_suggestion.dart';
 import 'package:aphasia_rehab_fe/models/improved_response_model.dart';
 import 'package:flutter/material.dart';
 

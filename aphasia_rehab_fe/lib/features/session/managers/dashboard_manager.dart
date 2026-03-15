@@ -112,6 +112,7 @@ class DashboardManager extends ChangeNotifier {
                 .toString(),
             prompt: statusData['result']['prompt'].toString(),
             response: statusData['result']['response'].toString(),
+            taskId: statusData['task_id'],
           );
           finalResults.add(newImprovement);
           isDone = true;
