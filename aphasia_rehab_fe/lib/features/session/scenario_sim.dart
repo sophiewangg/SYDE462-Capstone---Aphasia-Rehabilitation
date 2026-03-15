@@ -38,7 +38,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
     final screenHeight = MediaQuery.of(context).size.height;
     final modalHeight = screenHeight * 2 / 3;
     // Place the dialogue roughly where the menu button column starts
-    final dialogueBaseBottom = screenHeight * 0.33;
+    final dialogueBaseBottom = screenHeight * 0.39;
     final scenarioSimManager = context.watch<ScenarioSimManager>();
 
     return Scaffold(

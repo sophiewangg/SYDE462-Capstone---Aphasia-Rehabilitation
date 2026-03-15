@@ -25,9 +25,9 @@ class _CueModalState extends State<CueModal> {
       case 0:
         return "Meaning: ${fetchedCue.semantic}";
       case 1:
-        return "Rhymes with: ${fetchedCue.rhyming}";
+        return "Try a word that rhymes with: ${fetchedCue.rhyming}";
       case 2:
-        return "Starts with: ${fetchedCue.firstSound.toUpperCase()}";
+        return "Try a word that starts with: ${fetchedCue.firstSound.toUpperCase()}";
       default:
         return "Try the word: ${fetchedCue.likelyWord.toUpperCase()}";
     }
@@ -37,7 +37,7 @@ class _CueModalState extends State<CueModal> {
     if (_autoCloseScheduled) return;
     _autoCloseScheduled = true;
 
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 1000), () {
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 300), () {
@@ -53,39 +53,45 @@ class _CueModalState extends State<CueModal> {
     final resultText = hintManager.cueResultStringNotifier.value ?? "Done.";
     return _buildBaseContainer(
       hintManager: hintManager,
-      child: Column(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildCloseButton(context, hintManager),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           _buildMessageBox(resultText),
-          const SizedBox(height: 40),
+          const SizedBox(height: 12),
           MicAndHintButtonCueModal(showHintButton: false),
-        ],
-      ),
+          ],
+        ),
+      )      
     );
   }
 
   Widget _buildDescribePhase(BuildContext context, HintManager hintManager) {
-    return _buildBaseContainer(
-      hintManager: hintManager,
+  return _buildBaseContainer(
+    hintManager: hintManager,
+    child: Padding(
+      padding: const EdgeInsets.only(bottom: 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildCloseButton(context, hintManager),
-          const SizedBox(height: 24),
-          _buildMessageBox("Describe the word you're looking for."),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
+          _buildMessageBox("Try describing the word"),
+          const SizedBox(height: 12),
           if (hintManager.cueResultStringNotifier.value != null)
             _buildMessageBox(hintManager.cueResultStringNotifier.value!),
-          const SizedBox(height: 40),
+            const SizedBox(height: 12),
           MicAndHintButtonCueModal(showHintButton: false),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -134,24 +140,24 @@ class _CueModalState extends State<CueModal> {
 
         return _buildBaseContainer(
           hintManager: hintManager,
-          child: Column(
+          child: Padding(padding: EdgeInsets.only(bottom: 12),
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCloseButton(context, hintManager),
-              const SizedBox(height: 10),
               if (hintManager.cueResultStringNotifier.value != null)
-                _buildMessageBox(hintManager.cueResultStringNotifier.value!)
-              else
-                const SizedBox(height: 25),
-              const SizedBox(height: 10),
+                _buildMessageBox(hintManager.cueResultStringNotifier.value!),
+              const SizedBox(height: 12),
               _buildMessageBox(
                 _getHintText(hintManager.cueNumberNotifier.value, fetchedCue),
               ),
-              const SizedBox(height: 40),
-              MicAndHintButtonCueModal(showHintButton: true),
-            ],
-          ),
+              const SizedBox(height: 24),
+              MicAndHintButtonCueModal(showHintButton: false),
+              ],
+            ),
+          )
+          
         );
       },
     );
@@ -163,12 +169,12 @@ class _CueModalState extends State<CueModal> {
   }) {
     return Container(
       width: double.infinity,
-      height: 350,
-      padding: const EdgeInsets.all(20),
+      // height: 300,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: hintManager.cueCompleteNotifier.value
             ? AppColors.cueModalComplete
-            : AppColors.cueModalInProgress,
+            : AppColors.yellowTertiary,
         borderRadius: BorderRadius.circular(32.0),
       ),
       child: child,

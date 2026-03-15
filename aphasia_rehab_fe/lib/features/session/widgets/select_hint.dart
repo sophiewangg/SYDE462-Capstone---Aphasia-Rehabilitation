@@ -22,14 +22,20 @@ class _SelectHintState extends State<SelectHint> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(color: AppColors.boxBorder, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 12,
+            offset: Offset(0, 0),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildHintOption(
             imagePath: 'assets/images/help_finding_word_image.png',
-            label: "I can't find a word",
+            label: "I can't think of a word",
             onTap: () => hintManager.startHintFlow(
               isWordFinding: true,
               context: context,
@@ -61,7 +67,7 @@ class _SelectHintState extends State<SelectHint> {
         splashColor: AppColors.grey100,
         highlightColor: AppColors.grey100.withValues(alpha: 0.5),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           child: Row(
             children: [
               ClipRRect(

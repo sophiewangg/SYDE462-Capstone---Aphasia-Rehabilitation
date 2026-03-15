@@ -7,6 +7,8 @@ class AppColors {
   /// Secondary yellow color
   static const Color yellowSecondary = Color(0xFFAA7203);
 
+  static const Color yellowTertiary = Color(0xFFFDEED1);
+
   /// Background color
   static const Color background = Color(0xFFFCF0DD);
 
@@ -32,7 +34,7 @@ class AppColors {
   static const Color cueModalInProgress = Color.fromARGB(255, 239, 199, 135);
 
   /// Cue modal in complete background
-  static const Color cueModalComplete = Color.fromARGB(210, 166, 227, 142);
+  static const Color cueModalComplete = Color.fromARGB(255, 166, 227, 142);
 
   /// Dashboard page background colour
   static const Color dashboardBackground = Color(0xFFF2EFEA);

@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 
 class MicButtonIdle extends StatefulWidget {
   final bool fillWidth;
+  final Color textColor;
 
-  const MicButtonIdle({super.key, this.fillWidth = false});
+  const MicButtonIdle({super.key, this.fillWidth = false, this.textColor = Colors.white});
 
   @override
   State<MicButtonIdle> createState() => _MicButtonIdleState();
@@ -50,7 +51,7 @@ class _MicButtonIdleState extends State<MicButtonIdle> {
             ),
           ),
         ),
-        Text("Tap to speak", style: TextStyle(color: Colors.white)),
+        Text("Tap to speak", style: TextStyle(color: widget.textColor)),
       ],
     );
   }
