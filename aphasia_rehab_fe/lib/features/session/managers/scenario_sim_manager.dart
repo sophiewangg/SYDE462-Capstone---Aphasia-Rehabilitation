@@ -60,6 +60,10 @@ class ScenarioSimManager extends ChangeNotifier {
   String _currentCharacter = "";
   String _currentAudio = "";
 
+  // --- State Variables: Food ---
+  String? _appetizerUrl = null;
+  String? _entreeUrl = null;
+
   // --- Getters ---
   String get transcription => _transcription;
   bool get isRecording => _isRecording;
@@ -70,6 +74,20 @@ class ScenarioSimManager extends ChangeNotifier {
   String get currentCharacter => _currentCharacter;
   String? get promptOverride => _promptOverride;
   String? get promptPrefix => _promptPrefix;
+  ScenarioStep get currentStep => _currentStep;
+  String? get appetizerUrl => _appetizerUrl;
+  String? get entreeUrl => _entreeUrl;
+  List<ScenarioStep> get showAppetizer => [
+    ScenarioStep.hereChicken,
+    ScenarioStep.herePasta,
+    ScenarioStep.hereSteak,
+    ScenarioStep.howIsEverything,
+    ScenarioStep.areYouDone,
+  ];
+  List<ScenarioStep> get showEntree => [
+    ScenarioStep.howIsEverything,
+    ScenarioStep.areYouDone,
+  ];
 
   String get currentDialogue {
     final base = _currentPrompt!.promptText;
@@ -84,6 +102,14 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.readyToOrder,
     ScenarioStep.appetizers,
     ScenarioStep.entrees,
+  ];
+
+  final List<ScenarioStep> _hereFood = [
+    ScenarioStep.hereBruschetta,
+    ScenarioStep.hereSoup,
+    ScenarioStep.hereChicken,
+    ScenarioStep.herePasta,
+    ScenarioStep.hereSteak,
   ];
 
   ScenarioSimManager() {
@@ -209,6 +235,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _transcription = "";
 
     if (_currentStep != ScenarioStep.reservationName &&
+        !_hereFood.contains(_currentStep) &&
         (classification == null || !classification.match)) {
       _promptOverride =
           "I'm not sure I understood. Could you try saying that another way?";
@@ -361,13 +388,73 @@ class ScenarioSimManager extends ChangeNotifier {
         break;
       case ScenarioStep.isThatAll:
         if (intents.contains('is_that_all_yes')) {
-          _currentStep = ScenarioStep.howIsEverything;
+          if (_orderItems.contains('order_bruschetta')) {
+            _appetizerUrl = await _promptService.getSignedUrl(
+              'bruschetta.png',
+              'speakeasy_food_images',
+            );
+            _currentStep = ScenarioStep.hereBruschetta;
+          } else if (_orderItems.contains('order_soup')) {
+            _appetizerUrl = await _promptService.getSignedUrl(
+              'soup.png',
+              'speakeasy_food_images',
+            );
+            _currentStep = ScenarioStep.hereSoup;
+          }
+
+          if (_orderItems.contains('order_pasta')) {
+            _entreeUrl = await _promptService.getSignedUrl(
+              'pasta.png',
+              'speakeasy_food_images',
+            );
+            if (_currentStep != ScenarioStep.hereBruschetta &&
+                _currentStep != ScenarioStep.hereSoup) {
+              _currentStep = ScenarioStep.herePasta;
+            }
+          } else if (_orderItems.contains('order_chicken')) {
+            _entreeUrl = await _promptService.getSignedUrl(
+              'chicken.png',
+              'speakeasy_food_images',
+            );
+            if (_currentStep != ScenarioStep.hereBruschetta &&
+                _currentStep != ScenarioStep.hereSoup) {
+              _currentStep = ScenarioStep.hereChicken;
+            }
+          } else if (_orderItems.contains('order_steak')) {
+            _entreeUrl = await _promptService.getSignedUrl(
+              'steak.png',
+              'speakeasy_food_images',
+            );
+            if (_currentStep != ScenarioStep.hereBruschetta &&
+                _currentStep != ScenarioStep.hereSoup) {
+              _currentStep = ScenarioStep.hereSteak;
+            }
+          }
+          // _currentStep = ScenarioStep.howIsEverything;
           await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('is_that_all_no')) {
           _currentStep = ScenarioStep.appetizers; // Loop back
           await _handleScenarioStepChange(_currentStep, config);
         }
         break;
+      case ScenarioStep.hereBruschetta || ScenarioStep.hereSoup:
+        if (_orderItems.contains('order_pasta')) {
+          _currentStep = ScenarioStep.herePasta;
+        } else if (_orderItems.contains('order_chicken')) {
+          _currentStep = ScenarioStep.hereChicken;
+        } else if (_orderItems.contains('order_steak')) {
+          _currentStep = ScenarioStep.hereSteak;
+        } else {
+          _currentStep = ScenarioStep.howIsEverything;
+        }
+        await precacheFood(_appetizerUrl!, config);
+        await _handleScenarioStepChange(_currentStep, config);
+      case ScenarioStep.herePasta ||
+          ScenarioStep.hereChicken ||
+          ScenarioStep.hereSteak:
+        await precacheFood(entreeUrl!, config);
+        _currentStep = ScenarioStep.howIsEverything;
+        await _handleScenarioStepChange(_currentStep, config);
       case ScenarioStep.howIsEverything:
         _currentStep = ScenarioStep.areYouDone;
         await _handleScenarioStepChange(_currentStep, config);
@@ -501,6 +588,21 @@ class ScenarioSimManager extends ChangeNotifier {
       await completer.future;
       stream.removeListener(listener);
     }
+    notifyListeners();
+  }
+
+  Future<void> precacheFood(String url, ImageConfiguration config) async {
+    final provider = NetworkImage(url);
+    final ImageStream stream = provider.resolve(config);
+    final Completer<void> completer = Completer<void>();
+    final listener = ImageStreamListener(
+      (ImageInfo info, bool sync) => completer.complete(),
+      onError: (dynamic exc, StackTrace? stack) => completer.completeError(exc),
+    );
+
+    stream.addListener(listener);
+    await completer.future;
+    stream.removeListener(listener);
     notifyListeners();
   }
 

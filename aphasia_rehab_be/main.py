@@ -229,9 +229,13 @@ def next_prompt(scenario_step_description: str, db: Session = Depends(database.g
     return res
 
 @app.get("/generate_signed_url")
-def generate_signed_url(url: str, db: Session = Depends(database.get_db)):
+def generate_signed_url(
+    url: str, 
+    bucket: str, 
+    db: Session = Depends(database.get_db)
+):
     prompt_service = PromptService(db)
-    return prompt_service.generate_signed_url('speakeasy_voice_audios', url)
+    return prompt_service.generate_signed_url(bucket, url)
 
 @app.get("/get_skill_name")
 def get_skill_name(skill_id: str, db: Session = Depends(database.get_db)):

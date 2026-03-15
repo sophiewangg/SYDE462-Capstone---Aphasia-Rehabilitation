@@ -42,7 +42,7 @@ class PromptService:
 
         return result
 
-    def generate_signed_url(self,bucket_name, blob_name):
+    def generate_signed_url(self, bucket_name, blob_name):
         """Generates a v4 signed URL for downloading a blob."""
         bucket = self.storage_client.bucket(bucket_name)
         blob = bucket.blob(blob_name)

@@ -27,6 +27,11 @@ VALUES
     ('steak_doneness'),
     ('side_choice'),
     ('is_that_all'),
+    ('here_bruschetta'),
+    ('here_soup'),
+    ('here_pasta'),
+    ('here_chicken'),
+    ('here_steak'),
     ('how_is_everything'),
     ('are_you_done'),
     ('ready_for_bill'),
@@ -178,6 +183,51 @@ VALUES
         'order_confused.png',
         (SELECT id FROM skills_practiced WHERE skill_name = 'Ordering' LIMIT 1),
         'Is that all for you?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'here_bruschetta' LIMIT 1),
+        'here_bruschetta.mp3',
+        'here_bruschetta.png',
+        'here_bruschetta.png',
+        'here_bruschetta.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Here''s your bruschetta to get you started! I''ll be back shortly with your entree.'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'here_soup' LIMIT 1),
+        'here_soup.mp3',
+        'here_soup.png',
+        'here_soup.png',
+        'here_soup.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Here''s the soup of the day to get you started! I''ll be back shortly with your entree.'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'here_pasta' LIMIT 1),
+        'here_pasta.mp3',
+        'here_pasta.png',
+        'here_pasta.png',
+        'here_pasta.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Alright and here''s the seafood alfredo. Let me know if you need anything else.'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'here_chicken' LIMIT 1),
+        'here_chicken.mp3',
+        'here_chicken.png',
+        'here_chicken.png',
+        'here_chicken.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Alright and here''s the chicken katsu. Let me know if you need anything else.'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'here_steak' LIMIT 1),
+        'here_steak.mp3',
+        'here_steak.png',
+        'here_steak.png',
+        'here_steak.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Alright and here''s the steak. Let me know if you need anything else.'
     ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'how_is_everything' LIMIT 1),

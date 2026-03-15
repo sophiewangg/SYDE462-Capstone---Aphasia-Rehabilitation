@@ -45,10 +45,10 @@ class PromptService {
     }
   }
 
-  Future<String> getSignedUrl(String url) async {
+  Future<String> getSignedUrl(String url, String bucket) async {
     try {
       final response = await http.get(
-        Uri.parse("$baseUrl/generate_signed_url?url=$url"),
+        Uri.parse("$baseUrl/generate_signed_url?url=$url&bucket=$bucket"),
       );
 
       if (response.statusCode == 200) {
