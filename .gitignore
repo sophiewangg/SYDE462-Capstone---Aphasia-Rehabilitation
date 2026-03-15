@@ -18,6 +18,8 @@ __pycache__/
 .python-version
 chroma_db/
 *.sqlite3ß
+aphasia_rehab_be/google_service_account.json
+start_backend.sh
 # Ignore large ML model files if they are over 100MB
 *.joblib
 *.pkl
