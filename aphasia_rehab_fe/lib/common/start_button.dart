@@ -42,7 +42,7 @@ class _StartButtonState extends State<StartButton> {
           width: 16,
         ),
 
-        label: Text('Start', style: Theme.of(context).textTheme.titleMedium),
+        label: Text('Start', style: Theme.of(context).textTheme.titleSmall),
 
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.yellowPrimary,

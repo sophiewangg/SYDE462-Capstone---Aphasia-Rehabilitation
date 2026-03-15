@@ -3,7 +3,10 @@ from celery import Celery, group
 from pydub import AudioSegment
 import wave
 import os
-from services import DisfluencyDetectionService
+from services import DisfluencyDetectionService, DashboardService
+from dotenv import load_dotenv
+
+load_dotenv() # Loads API key from your .env file
 
 # Configure Celery to use Redis as the broker and backend
 celery_app = Celery(
@@ -14,6 +17,15 @@ celery_app = Celery(
 
 # 1. Ensure you have the instance created at the top level
 service = DisfluencyDetectionService()
+dashboard_service = DashboardService(api_key=os.getenv("GPT_API_KEY"))
+
+@celery_app.task(name="worker.improve_response")
+def improve_response(prompt: str, response: str):
+    # This must RETURN the result so it gets saved in Redis
+    result = dashboard_service.get_improved_response(prompt, response)
+    print("HERE 123")
+    print(result)
+    return result
 
 @celery_app.task(name="worker.process_recording_pipeline")
 def process_recording_pipeline(raw_filepath: str):
