@@ -47,7 +47,7 @@ class _HintButtonCueModalState extends State<HintButtonCueModal> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: AppColors.yellowPrimary,
+                  color: AppColors.yellowTertiary,
                   shape: BoxShape.circle,
                   border: Border.all(
                     color: Colors.white,

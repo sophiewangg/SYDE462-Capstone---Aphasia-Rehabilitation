@@ -9,10 +9,12 @@ import 'package:provider/provider.dart';
 
 class MicAndHintButtonCueModal extends StatefulWidget {
   final bool showHintButton;
+  final Color textColor;
 
   const MicAndHintButtonCueModal({
     super.key,
     this.showHintButton = true,
+    this.textColor = Colors.black
   });
 
   @override
@@ -24,11 +26,11 @@ class _MicAndHintButtonCueModalState extends State<MicAndHintButtonCueModal> {
   Widget _buildMicButton(ScenarioSimManager manager) {
     switch (manager.currentMicrophoneState) {
       case MicrophoneState.idle:
-        return MicButtonIdle(fillWidth: true);
+        return MicButtonIdle(fillWidth: true, textColor: Colors.black,);
       case MicrophoneState.userSpeaking:
-        return MicButtonSpeaking(fillWidth: true);
+        return MicButtonSpeaking(fillWidth: true, textColor: Colors.black,);
       case MicrophoneState.processing:
-        return MicButtonProcessing(fillWidth: true);
+        return MicButtonProcessing(fillWidth: true, textColor: Colors.black,);
     }
   }
 

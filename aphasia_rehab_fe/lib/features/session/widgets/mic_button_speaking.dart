@@ -7,8 +7,11 @@ import 'package:provider/provider.dart';
 
 class MicButtonSpeaking extends StatefulWidget {
   final bool fillWidth;
+  final Color textColor;
 
-  const MicButtonSpeaking({super.key, this.fillWidth = false});
+  const MicButtonSpeaking({super.key,
+                          this.fillWidth = false,
+                          this.textColor = Colors.white});
 
   @override
   State<MicButtonSpeaking> createState() => _MicButtonSpeakingState();
@@ -20,8 +23,8 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
   static const double _maxBarHeight = 36.0;
   static const double _minBarHeight = 6.0;
   static const Color _barColor = Color(
-    0xFF4A4E7A,
-  ); // dark purple to match pause icon
+    0xFFC00D0D,
+  ); 
 
   late final List<AnimationController> _controllers;
   late final List<Animation<double>> _animations;
@@ -84,7 +87,7 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
               scenarioSimManager.handleMicToggle(config);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD6D9E8),
+              backgroundColor: const Color(0xFFFFDADA),
               foregroundColor: AppColors.textPrimary,
               shape: const StadiumBorder(),
               minimumSize: widget.fillWidth
@@ -129,20 +132,20 @@ class _MicButtonSpeakingState extends State<MicButtonSpeaking>
 
                 const SizedBox(width: 30),
 
-                // Pause icon on the RIGHT
+                // stop icon on the RIGHT
                 SvgPicture.asset(
                   'assets/icons/pause_icon.svg',
                   colorFilter: const ColorFilter.mode(
                     _barColor,
                     BlendMode.srcIn,
                   ),
-                  width: 22,
+                  width: 30,
                 ),
               ],
             ),
           ),
         ),
-        Text("Listening...", style: TextStyle(color: Colors.white)),
+        Text("Listening...", style: TextStyle(color: widget.textColor)),
       ],
     );
   }

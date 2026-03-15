@@ -50,7 +50,7 @@ class _MicAndHintButtonState extends State<MicAndHintButton> {
                 padding: const EdgeInsets.all(12),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
-              child: const Icon(Icons.restaurant),
+              child: const Icon(Icons.restaurant, size: 24,),
             ),
             Text("Menu", style: TextStyle(color: Colors.white)),
           ],

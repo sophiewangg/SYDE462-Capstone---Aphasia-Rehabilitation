@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class MicButtonProcessing extends StatefulWidget {
   final bool fillWidth;
+  final Color textColor;
 
-  const MicButtonProcessing({super.key, this.fillWidth = false});
+  const MicButtonProcessing({super.key, this.fillWidth = false, this.textColor = Colors.white});
 
   @override
   State<MicButtonProcessing> createState() => _MicButtonProcessingState();
@@ -108,7 +109,7 @@ class _MicButtonProcessingState extends State<MicButtonProcessing>
           ),
           ),
         ),
-        Text("Processing...", style: TextStyle(color: Colors.white)),
+        Text("Processing...", style: TextStyle(color: widget.textColor)),
       ],
     );
   }
