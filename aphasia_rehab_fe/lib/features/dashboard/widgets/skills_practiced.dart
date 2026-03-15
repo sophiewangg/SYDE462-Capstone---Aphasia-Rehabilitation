@@ -1,8 +1,6 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 
 class SkillsPracticed extends StatelessWidget {
   final Map<String, int> skillNameMap;
