@@ -139,8 +139,10 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SizedBox(height: 24),
                   ],
-                  if (_improvedResults.isNotEmpty)
+                  if (_improvedResults.isNotEmpty) ...[
                     ImproveResponses(improvedResponses: _improvedResults),
+                    const SizedBox(height: 24),
+                  ],
                   const SessionFeeling(),
                   const SizedBox(height: 32),
                   _buildActionButtons(),
