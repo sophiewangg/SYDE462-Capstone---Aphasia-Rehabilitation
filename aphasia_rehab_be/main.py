@@ -12,8 +12,10 @@ from dotenv import load_dotenv
 from fastapi import Body, Depends, FastAPI, WebSocket, WebSocketDisconnect, Query
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from celery.result import AsyncResult
+from worker import celery_app
 
-from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService, PromptService)
+from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService, PromptService, DashboardService)
 
 
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +32,7 @@ transcription_service = TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_K
 cue_service = CueService(api_key=os.getenv("GPT_API_KEY")) # type: ignore
 vector_service = VectorService()
 disfluency_detection_service = DisfluencyDetectionService()
+dashoboard_service = DashboardService(api_key=os.getenv("GPT_API_KEY"))
 
 def get_user_service(db: Session = Depends(database.get_db)):
     return UserService(db)
@@ -214,6 +217,10 @@ def clear_detections():
     disfluency_detection_service.clear_detections("sound_rep")
     disfluency_detection_service.clear_detections("interjection")
 
+@app.post("/clear_detection")
+def clear_detections(filename: str, disfluency_type: str):
+    disfluency_detection_service.clear_detection(filename, disfluency_type)
+
 @app.get("/next_prompt")
 def next_prompt(scenario_step_description: str, db: Session = Depends(database.get_db)):
     prompt_service = PromptService(db)
@@ -231,3 +238,26 @@ def get_skill_name(skill_id: str, db: Session = Depends(database.get_db)):
     prompt_service = PromptService(db)
     result =  prompt_service.get_skill_name(skill_id)
     return {"skill_name": result}
+
+@app.post("/improve_response")
+def get_skill_name(prompt: str, response: str):
+    result = dashoboard_service.improve_response(prompt, response)
+    return result
+
+@app.get("/task_status/{task_id}")
+async def get_task_status(task_id: str):
+    # Connect to the task in Redis
+    task_result = AsyncResult(task_id, app=celery_app)
+    
+    response = {
+        "task_id": task_id,
+        "status": task_result.status, # e.g., 'PENDING', 'SUCCESS', 'FAILURE'
+        "result": None
+    }
+
+    if task_result.ready():
+        print(task_result.result)
+        # task_result.result will contain whatever your worker returned
+        response["result"] = task_result.result
+
+    return response

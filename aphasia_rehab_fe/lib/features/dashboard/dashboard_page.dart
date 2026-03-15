@@ -2,11 +2,13 @@ import 'package:aphasia_rehab_fe/common/primary_button.dart';
 import 'package:aphasia_rehab_fe/common/secondary_button.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/ai_analytic.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/hints_used.dart';
+import 'package:aphasia_rehab_fe/features/dashboard/widgets/improve_responses.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/progress.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/session_feeling.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/skills_practiced.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/models/improved_response_model.dart';
 import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,17 +23,59 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final SessionDashboardService _dashboardService = SessionDashboardService();
 
+  // Local state for the disfluencies list
+  List<Map<String, String>> _localDisfluencies = [];
+  List<ImprovedResponse> _improvedResults = [];
+
   late Future<List<dynamic>> _combinedFuture;
 
   @override
   void initState() {
     super.initState();
+    _initializeDashboardData();
+  }
+
+  Future<void> _initializeDashboardData() async {
     final dashboardManager = context.read<DashboardManager>();
-    _combinedFuture = Future.wait([
-      _dashboardService.fetchSavedDetections("sound_rep"),
-      _dashboardService.fetchSavedDetections("interjection"),
-      _fetchAllSkillNames(dashboardManager),
-    ]);
+
+    setState(() {
+      _combinedFuture = Future.wait([
+        _dashboardService.fetchSavedDetections("sound_rep"),
+        _dashboardService.fetchSavedDetections("interjection"),
+        _fetchAllSkillNames(dashboardManager),
+      ]);
+    });
+
+    final results = await _combinedFuture;
+
+    // Process and store list in state once data arrives
+    final soundReps = (results[0] as List? ?? []).map(
+      (f) => {'filename': f.toString(), 'disfluencyType': 'sound_rep'},
+    );
+    final interjections = (results[1] as List? ?? []).map(
+      (f) => {'filename': f.toString(), 'disfluencyType': 'interjection'},
+    );
+
+    if (mounted) {
+      setState(() {
+        _localDisfluencies = [...soundReps, ...interjections];
+      });
+      dashboardManager.fetchImprovedResults().then((results) {
+        setState(() {
+          _improvedResults = results;
+        });
+      });
+    }
+  }
+
+  void removeDisfluencyLocally(String filename, String disfluencyType) {
+    setState(() {
+      _localDisfluencies.removeWhere(
+        (item) =>
+            item['filename'] == filename &&
+            item['disfluencyType'] == disfluencyType,
+      );
+    });
   }
 
   void onPressedDone() {
@@ -41,20 +85,16 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<Map<String, int>> _fetchAllSkillNames(DashboardManager manager) async {
     final Map<String, int> skillMap = {};
-
-    final skillEntries = manager.skillsPracticed.entries;
-
-    for (var entry in skillEntries) {
+    for (var entry in manager.skillsPracticed.entries) {
       String skillName = await manager.getSkillName(entry.key);
       skillMap[skillName] = entry.value;
     }
-
     return skillMap;
   }
 
   @override
   Widget build(BuildContext context) {
-    final DashboardManager dashboardManager = context.watch<DashboardManager>();
+    final dashboardManager = context.watch<DashboardManager>();
 
     return Scaffold(
       body: SafeArea(
@@ -69,8 +109,6 @@ class _DashboardPageState extends State<DashboardPage> {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
 
-            final soundRepFiles = snapshot.data?[0] ?? [];
-            final interjectionFiles = snapshot.data?[1] ?? [];
             final skillNameMap = snapshot.data?[2] ?? {};
 
             return SingleChildScrollView(
@@ -81,55 +119,54 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   Progress(
                     dashboardManager.numHintsUsed,
-                    soundRepFiles.length + interjectionFiles.length,
-                    dashboardManager.numUnclearResponses /
-                        dashboardManager.numPromptsGiven,
+                    (dashboardManager.numWordsUsed /
+                        dashboardManager.numPromptsGiven),
+                    1 -
+                        (dashboardManager.numUnclearResponses /
+                            dashboardManager.numPromptsGiven),
                   ),
                   const SizedBox(height: 24),
                   SkillsPracticed(skillNameMap),
                   const SizedBox(height: 24),
-                  HintsUsed(dashboardManager.hintsGiven),
-                  const SizedBox(height: 24),
-
-                  // 4. Pass the specific lists to the correct widgets
-                  if (soundRepFiles.isNotEmpty) ...[
-                    AiAnalytic(
-                      files: soundRepFiles,
-                      disfluencyType: "sound_rep",
-                    ),
-                    const SizedBox(height: 24), // Keeps spacing consistent
+                  if (dashboardManager.hintsGiven.isNotEmpty) ...[
+                    HintsUsed(dashboardManager.hintsGiven),
+                    const SizedBox(height: 24),
                   ],
-                  if (interjectionFiles.isNotEmpty) ...[
+                  if (_localDisfluencies.isNotEmpty) ...[
                     AiAnalytic(
-                      files: interjectionFiles,
-                      disfluencyType: "interjection",
+                      files: _localDisfluencies,
+                      onDeleteSuccess: removeDisfluencyLocally,
                     ),
-                    const SizedBox(height: 24), // Keeps spacing consistent
+                    const SizedBox(height: 24),
                   ],
-                  SessionFeeling(),
+                  if (_improvedResults.isNotEmpty) ...[
+                    ImproveResponses(improvedResponses: _improvedResults),
+                    const SizedBox(height: 24),
+                  ],
+                  const SessionFeeling(),
                   const SizedBox(height: 32),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: SecondaryButton(text: "Retry", onPressed: () {}),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: PrimaryButton(
-                          text: "Done",
-                          onPressed: onPressedDone,
-                        ),
-                      ),
-                    ],
-                  ),
+                  _buildActionButtons(),
                 ],
               ),
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      children: [
+        Expanded(
+          child: SecondaryButton(text: "Retry", onPressed: () {}),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          flex: 2,
+          child: PrimaryButton(text: "Done", onPressed: onPressedDone),
+        ),
+      ],
     );
   }
 }

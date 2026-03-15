@@ -26,7 +26,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
 
         child: Text(
           widget.text,
-          style: Theme.of(context).textTheme.titleMedium,
+          style: Theme.of(context).textTheme.titleSmall,
         ),
       ),
     );

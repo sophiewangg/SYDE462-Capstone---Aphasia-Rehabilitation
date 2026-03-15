@@ -34,7 +34,7 @@ class _SecondaryButtonState extends State<SecondaryButton> {
 
         child: Text(
           widget.text,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
             color: AppColors.yellowSecondary,
           ),
         ),

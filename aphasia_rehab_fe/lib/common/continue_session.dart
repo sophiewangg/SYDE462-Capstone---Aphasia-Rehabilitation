@@ -19,7 +19,7 @@ class _ContinueSessionState extends State<ContinueSession> {
             padding: const EdgeInsets.symmetric(vertical: 15),
             child: Text(
               "Continue where you left off",
-              style: Theme.of(context).textTheme.titleMedium,
+              style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
           Container(
@@ -56,7 +56,7 @@ class _ContinueSessionState extends State<ContinueSession> {
                         children: [
                           Text(
                             "Ordering at a restaurant",
-                            style: Theme.of(context).textTheme.titleMedium,
+                            style: Theme.of(context).textTheme.titleSmall,
                           ),
                           Text(
                             "3 mins left",
