@@ -1,5 +1,6 @@
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/dashboard_page.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/food.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/menu.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
@@ -38,7 +39,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
     final screenHeight = MediaQuery.of(context).size.height;
     final modalHeight = screenHeight * 2 / 3;
     // Place the dialogue roughly where the menu button column starts
-    final dialogueBaseBottom = screenHeight * 0.39;
+    final dialogueBaseBottom = screenHeight * 0.34;
     final scenarioSimManager = context.watch<ScenarioSimManager>();
 
     return Scaffold(
@@ -110,6 +111,26 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
 
+          if (scenarioSimManager.appetizerUrl != null &&
+              scenarioSimManager.showAppetizer.contains(
+                scenarioSimManager.currentStep,
+              ))
+            Positioned(
+              bottom: screenHeight * 0.18,
+              right: 200,
+              child: Food(foodUrl: scenarioSimManager.appetizerUrl!),
+            ),
+
+          if (scenarioSimManager.entreeUrl != null &&
+              scenarioSimManager.showEntree.contains(
+                scenarioSimManager.currentStep,
+              ))
+            Positioned(
+              bottom: screenHeight * 0.18,
+              right: 20,
+              child: Food(foodUrl: scenarioSimManager.entreeUrl!),
+            ),
+
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
@@ -120,7 +141,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
                 : dialogueBaseBottom,
             child: SpeechBubble(),
           ),
-          
+
           Positioned(
             bottom: 30,
             right: 20,

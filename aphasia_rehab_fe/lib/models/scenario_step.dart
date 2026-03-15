@@ -11,6 +11,11 @@ enum ScenarioStep {
   steakDoneness('steakDoneness'),
   sideChoice('sideChoice'),
   isThatAll('isThatAll'),
+  hereBruschetta('hereBruschetta'),
+  hereSoup('hereSoup'),
+  herePasta('herePasta'),
+  hereChicken('hereChicken'),
+  hereSteak('hereSteak'),
   notReadyToOrder('notReadyToOrder'),
   howIsEverything('howIsEverything'),
   areYouDone('areYouDone'),
@@ -59,6 +64,16 @@ enum ScenarioStep {
         return 'side_choice';
       case ScenarioStep.isThatAll:
         return 'is_that_all';
+      case ScenarioStep.hereBruschetta:
+        return 'here_bruschetta';
+      case ScenarioStep.hereSoup:
+        return 'here_soup';
+      case ScenarioStep.herePasta:
+        return 'here_pasta';
+      case ScenarioStep.hereChicken:
+        return 'here_chicken';
+      case ScenarioStep.hereSteak:
+        return 'here_steak';
       case ScenarioStep.notReadyToOrder:
         return 'not_ready_to_order';
       case ScenarioStep.howIsEverything:
