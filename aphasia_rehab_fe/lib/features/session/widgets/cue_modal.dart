@@ -37,15 +37,31 @@ class _CueModalState extends State<CueModal> {
     if (_autoCloseScheduled) return;
     _autoCloseScheduled = true;
 
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    // Capture dependencies while the context is still safely mounted.
+    final scenarioSimManager = context.read<ScenarioSimManager>();
+    final config = createLocalImageConfiguration(context);
+
+    Future.delayed(const Duration(milliseconds: 1000), () async {
       if (!context.mounted) return;
       Navigator.pop(context);
-      Future.delayed(const Duration(milliseconds: 300), () {
-        hintManager.closeModal(hintManager.getCurrentPrompt());
-        hintManager.updateCueNumber(reset: true);
-        hintManager.resetCueComplete();
-        hintManager.resetCueResultString();
-      });
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      hintManager.closeModal(hintManager.getCurrentPrompt());
+      hintManager.updateCueNumber(reset: true);
+      hintManager.resetCueComplete();
+      hintManager.resetCueResultString();
+
+      // After the hint flow completes and the modal closes,
+      // re-ask the current dialogue by replaying the audio.
+      if (scenarioSimManager.promptOverride == null &&
+          scenarioSimManager.promptPrefix == null) {
+        await scenarioSimManager.playCharacterAudio(config);
+      } else {
+        await scenarioSimManager.playElevenLabsAudio(
+          scenarioSimManager.currentDialogue,
+          'override-prompt',
+        );
+      }
     });
   }
 
