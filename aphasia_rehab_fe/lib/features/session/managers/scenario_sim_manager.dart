@@ -53,8 +53,10 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- State Variables: Scenario Status ---
   bool _isBobEateryModalOpen = false;
   bool _isScenarioComplete = false;
+  bool _showReceiptSheet = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
+  bool get showReceiptSheet => _showReceiptSheet;
 
   // --- State Variables: Character and Audio ---
   String _currentCharacter = "";
@@ -75,6 +77,7 @@ class ScenarioSimManager extends ChangeNotifier {
   String? get promptOverride => _promptOverride;
   String? get promptPrefix => _promptPrefix;
   ScenarioStep get currentStep => _currentStep;
+  List<String> get orderItems => List.unmodifiable(_orderItems);
   String? get appetizerUrl => _appetizerUrl;
   String? get entreeUrl => _entreeUrl;
   List<ScenarioStep> get showAppetizer => [
@@ -472,8 +475,10 @@ class ScenarioSimManager extends ChangeNotifier {
         break;
       case ScenarioStep.readyForBill:
         if (intents.contains('ready_for_bill_yes')) {
+          _showReceiptSheet = true;
           _currentStep = ScenarioStep.paymentMethod;
           await _handleScenarioStepChange(_currentStep, config);
+          notifyListeners();
         } else if (intents.contains('ready_for_bill_no')) {
           _promptOverride =
               "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
@@ -482,8 +487,10 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
       case ScenarioStep.paymentMethod:
+        _showReceiptSheet = false;
         _currentStep = ScenarioStep.receipt;
         await _handleScenarioStepChange(_currentStep, config);
+        notifyListeners();
         break;
       case ScenarioStep.receipt:
         _isScenarioComplete = true;
@@ -540,6 +547,7 @@ class ScenarioSimManager extends ChangeNotifier {
     // Reset core progression
     _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
+    _showReceiptSheet = false;
     _orderItems.clear();
 
     // Reset Routing Flags
