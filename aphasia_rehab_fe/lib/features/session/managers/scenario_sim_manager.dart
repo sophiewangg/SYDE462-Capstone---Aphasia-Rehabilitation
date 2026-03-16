@@ -619,7 +619,7 @@ class ScenarioSimManager extends ChangeNotifier {
     await precacheCharacterImage(config);
     await clearAudioCache();
     notifyListeners();
-    await playElevenLabsAudio(currentDialogue, 'override-prompt');
+    // await playElevenLabsAudio(currentDialogue, 'override-prompt');
     _currentMicrophoneState = MicrophoneState.idle;
     _currentCharacter = currentPrompt!.imageListeningUrl;
     await precacheCharacterImage(config);
