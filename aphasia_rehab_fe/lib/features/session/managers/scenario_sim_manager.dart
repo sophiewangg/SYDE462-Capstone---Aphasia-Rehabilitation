@@ -474,8 +474,10 @@ class ScenarioSimManager extends ChangeNotifier {
         break;
       case ScenarioStep.readyForBill:
         if (intents.contains('ready_for_bill_yes')) {
+          _showReceiptSheet = true;
           _currentStep = ScenarioStep.paymentMethod;
           await _handleScenarioStepChange(_currentStep, config);
+          notifyListeners();
         } else if (intents.contains('ready_for_bill_no')) {
           _promptOverride =
               "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
@@ -484,12 +486,12 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
       case ScenarioStep.paymentMethod:
+        _showReceiptSheet = false;
         _currentStep = ScenarioStep.receipt;
-        _showReceiptSheet = true;
         await _handleScenarioStepChange(_currentStep, config);
+        notifyListeners();
         break;
       case ScenarioStep.receipt:
-        _showReceiptSheet = false; // Triggers receipt sheet to animate closed (same as menu)
         _isScenarioComplete = true;
         _promptOverride = "Thank you for dining with us! Have a wonderful day.";
         _currentCharacter = _currentPrompt!.imageSpeakingUrl;
