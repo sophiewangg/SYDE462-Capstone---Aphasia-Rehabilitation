@@ -77,6 +77,7 @@ class ScenarioSimManager extends ChangeNotifier {
   String? get promptOverride => _promptOverride;
   String? get promptPrefix => _promptPrefix;
   ScenarioStep get currentStep => _currentStep;
+  List<String> get orderItems => List.unmodifiable(_orderItems);
   String? get appetizerUrl => _appetizerUrl;
   String? get entreeUrl => _entreeUrl;
   List<ScenarioStep> get showAppetizer => [

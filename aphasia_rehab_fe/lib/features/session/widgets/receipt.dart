@@ -1,4 +1,5 @@
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/models/menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,29 @@ class Receipt extends StatelessWidget {
   Widget build(BuildContext context) {
     final scenarioSimManager = context.watch<ScenarioSimManager>();
     final isVisible = scenarioSimManager.showReceiptSheet;
+    final orderItems = scenarioSimManager.orderItems;
+
+    // Aggregate order: itemId -> count, then build lines from bobsEateryMenu
+    final Map<String, int> counts = {};
+    for (final id in orderItems) {
+      counts[id] = (counts[id] ?? 0) + 1;
+    }
+
+    double subtotal = 0;
+    final lineWidgets = <Widget>[];
+    for (final e in counts.entries) {
+      final entry = bobsEateryMenu[e.key];
+      if (entry == null) continue;
+      final qty = e.value;
+      final lineTotal = entry.price * qty;
+      subtotal += lineTotal;
+      final label = qty > 1 ? '$qty ${entry.name}' : entry.name;
+      lineWidgets.add(_receiptRow(context, label, _formatPrice(lineTotal)));
+    }
+
+    const taxRate = 0.08;
+    final tax = subtotal * taxRate;
+    final total = subtotal + tax;
 
     return AnimatedPositioned(
       duration: const Duration(milliseconds: 300),
@@ -66,16 +90,18 @@ class Receipt extends StatelessWidget {
                         const SizedBox(height: 16),
                         const Divider(height: 1),
                         const SizedBox(height: 8),
-                        _receiptRow('1 Soda', r'$4.00'),
-                        _receiptRow('2 Ribeye Steak', r'$34.00'),
-                        _receiptRow('1 Seafood Alfredo', r'$22.00'),
-                        _receiptRow('1 Bruschetta', r'$6.00'),
+                        ...lineWidgets,
+                        if (lineWidgets.isEmpty)
+                          Text(
+                            'No items',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
                         const SizedBox(height: 8),
                         const Divider(height: 1),
                         const SizedBox(height: 8),
-                        _receiptRow('SUBTOTAL', r'$66.00', bold: true),
-                        _receiptRow('TAX', r'$5.28', bold: true),
-                        _receiptRow('TOTAL', r'$71.28', bold: true),
+                        _receiptRow(context, 'SUBTOTAL', _formatPrice(subtotal), bold: true),
+                        _receiptRow(context, 'TAX', _formatPrice(tax), bold: true),
+                        _receiptRow(context, 'TOTAL', _formatPrice(total), bold: true),
                         const SizedBox(height: 8),
                       ],
                     ),
@@ -104,7 +130,11 @@ class Receipt extends StatelessWidget {
     );
   }
 
-  Widget _receiptRow(String left, String right, {bool bold = false}) {
+  static String _formatPrice(double value) =>
+      '\$${value.toStringAsFixed(2)}';
+
+  Widget _receiptRow(BuildContext context, String left, String right,
+      {bool bold = false}) {
     final style = TextStyle(
       fontWeight: bold ? FontWeight.bold : FontWeight.normal,
       fontSize: bold ? 14 : 13,
