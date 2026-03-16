@@ -70,8 +70,8 @@ class TranscriptionService:
                 # Threshold for model confidence turn has ended
                 end_of_turn_confidence_threshold=0.7,
                 # How long to wait for silence if confidence is above threshold
-                min_end_of_turn_silence_when_confident=800,
-                max_turn_silence=3600,  # Max silence allowed before forcing end of turn
+                min_end_of_turn_silence_when_confident=500,
+                max_turn_silence=1800,  # Max silence allowed before forcing end of turn
                 # disable turn formatting as this adds latency and is unessesary for LLM interpretation
                 format_turns=False
             )
