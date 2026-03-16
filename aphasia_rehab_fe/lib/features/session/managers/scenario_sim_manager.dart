@@ -53,8 +53,10 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- State Variables: Scenario Status ---
   bool _isBobEateryModalOpen = false;
   bool _isScenarioComplete = false;
+  bool _showReceiptSheet = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
+  bool get showReceiptSheet => _showReceiptSheet;
 
   // --- State Variables: Character and Audio ---
   String _currentCharacter = "";
@@ -483,9 +485,11 @@ class ScenarioSimManager extends ChangeNotifier {
         break;
       case ScenarioStep.paymentMethod:
         _currentStep = ScenarioStep.receipt;
+        _showReceiptSheet = true;
         await _handleScenarioStepChange(_currentStep, config);
         break;
       case ScenarioStep.receipt:
+        _showReceiptSheet = false; // Triggers receipt sheet to animate closed (same as menu)
         _isScenarioComplete = true;
         _promptOverride = "Thank you for dining with us! Have a wonderful day.";
         _currentCharacter = _currentPrompt!.imageSpeakingUrl;
@@ -540,6 +544,7 @@ class ScenarioSimManager extends ChangeNotifier {
     // Reset core progression
     _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
+    _showReceiptSheet = false;
     _orderItems.clear();
 
     // Reset Routing Flags
