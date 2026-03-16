@@ -3,6 +3,7 @@ import 'package:aphasia_rehab_fe/features/dashboard/dashboard_page.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/food.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/menu.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/receipt.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
 import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:flutter/material.dart';
@@ -38,13 +39,23 @@ class _ScenarioSimState extends State<ScenarioSim> {
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
     final modalHeight = screenHeight * 2 / 3;
-    // Place the dialogue roughly where the menu button column starts
+    final receiptHeight = screenHeight * 2 / 3;
     final dialogueBaseBottom = screenHeight * 0.34;
     final scenarioSimManager = context.watch<ScenarioSimManager>();
+
+    // Dialogue sits above menu or receipt when either is open, else at base position.
+    final dialogueBottom = scenarioSimManager.isBobEateryModalOpen
+        ? modalHeight + 16
+        : scenarioSimManager.showReceiptSheet
+            ? receiptHeight + 16
+            : dialogueBaseBottom;
 
     return Scaffold(
       body: Stack(
         children: [
+          // ═══════════════════════════════════════════════════════════════
+          // LAYER 1: BACKGROUND — scene content (painted first, at the back)
+          // ═══════════════════════════════════════════════════════════════
           Container(
             width: double.infinity,
             height: double.infinity,
@@ -57,7 +68,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
               ),
             ),
           ),
-
           Positioned(bottom: 30, right: 0, child: Character()),
           Positioned(
             bottom: 0,
@@ -67,50 +77,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
               fit: BoxFit.contain,
             ),
           ),
-          Menu(modalHeight: modalHeight),
-
-          // App dialogue that slides with the Bob's Eatery modal
-          Positioned(
-            top: 75,
-            left: 20,
-            child: Container(
-              width: 64, // Total width of the circle
-              height: 64, // Total height of the circle
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                padding: EdgeInsets.zero, // Centers the icon perfectly
-                iconSize: 32, // Size of the actual arrow icon
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ),
-          ),
-
-          Positioned(top: 75, right: 20, child: SettingsButton()),
-
-          Positioned(
-            top: 150,
-            right: 20,
-            child: ElevatedButton(
-              onPressed: () {
-                scenarioSimManager.handleEndOfSession();
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardPage(),
-                  ),
-                );
-              },
-              child: const Text('End Session'),
-            ),
-          ),
-
           if (scenarioSimManager.appetizerUrl != null &&
               scenarioSimManager.showAppetizer.contains(
                 scenarioSimManager.currentStep,
@@ -120,7 +86,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
               right: 200,
               child: Food(foodUrl: scenarioSimManager.appetizerUrl!),
             ),
-
           if (scenarioSimManager.entreeUrl != null &&
               scenarioSimManager.showEntree.contains(
                 scenarioSimManager.currentStep,
@@ -131,17 +96,58 @@ class _ScenarioSimState extends State<ScenarioSim> {
               child: Food(foodUrl: scenarioSimManager.entreeUrl!),
             ),
 
+          // ═══════════════════════════════════════════════════════════════
+          // LAYER 2: IN-BETWEEN — display sheets (menu, receipt, server dialogue)
+          // ═══════════════════════════════════════════════════════════════
+          Menu(modalHeight: modalHeight),
+          Receipt(receiptHeight: receiptHeight),
           AnimatedPositioned(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
             left: 0,
             right: 0,
-            bottom: scenarioSimManager.isBobEateryModalOpen
-                ? modalHeight + 16
-                : dialogueBaseBottom,
+            bottom: dialogueBottom,
             child: SpeechBubble(),
           ),
 
+          // ═══════════════════════════════════════════════════════════════
+          // LAYER 3: HUD — controls (hint, menu, speak, settings)
+          // ═══════════════════════════════════════════════════════════════
+          Positioned(
+            top: 75,
+            left: 20,
+            child: Container(
+              width: 64,
+              height: 64,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                iconSize: 32,
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+          Positioned(top: 75, right: 20, child: SettingsButton()),
+          Positioned(
+            top: 150,
+            right: 20,
+            child: ElevatedButton(
+              onPressed: () {
+                scenarioSimManager.handleEndOfSession();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardPage(),
+                  ),
+                );
+              },
+              child: const Text('End Session'),
+            ),
+          ),
           Positioned(
             bottom: 30,
             right: 20,
