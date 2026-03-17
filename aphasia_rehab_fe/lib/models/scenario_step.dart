@@ -23,6 +23,8 @@ enum ScenarioStep {
   howIsEverything('howIsEverything'),
   areYouDone('areYouDone'),
   readyForBill('readyForBill'),
+  checkReceipt('checkReceipt'),
+  resolveReceipt('resolveReceipt'),
   paymentMethod('paymentMethod'),
   receipt('receipt');
 
@@ -91,6 +93,10 @@ enum ScenarioStep {
         return 'are_you_done';
       case ScenarioStep.readyForBill:
         return 'ready_for_bill';
+      case ScenarioStep.checkReceipt:
+        return "check_receipt";
+      case ScenarioStep.resolveReceipt:
+        return "resolve_receipt";
       case ScenarioStep.paymentMethod:
         return 'payment_method';
       case ScenarioStep.receipt:
