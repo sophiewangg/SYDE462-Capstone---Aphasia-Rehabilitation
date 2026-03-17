@@ -1296,6 +1296,24 @@
     }
   },
   {
+    "id": "scenario_is_that_all_yes_03",
+    "text": "yes that's all thanks",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_04",
+    "text": "thank you that's all",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
     "id": "scenario_is_that_all_no_01",
     "text": "no i want to add more",
     "metadata": {
@@ -1311,6 +1329,213 @@
       "type": "scenario_menu",
       "intent": "is_that_all_no",
       "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_no_03",
+    "text": "i'd like to add more please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_no",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_correction_steak_01",
+    "text": "i ordered the steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_steak_02",
+    "text": "i asked for the ribeye",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_steak_03",
+    "text": "i wanted the steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_01",
+    "text": "i ordered the chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_02",
+    "text": "i asked for the chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_03",
+    "text": "i wanted the chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_01",
+    "text": "i ordered the pasta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_02",
+    "text": "i asked for the pasta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_03",
+    "text": "i wanted the pasta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_soup_01",
+    "text": "i ordered the soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_bruschetta_01",
+    "text": "i ordered the bruschetta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_01",
+    "text": "this is the wrong order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_02",
+    "text": "i didn't order this",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_03",
+    "text": "this isn't what i ordered",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_04",
+    "text": "there is a mistake",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_05",
+    "text": "excuse me this is wrong",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_06",
+    "text": "this isn't mine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_no_01",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_no_02",
+    "text": "no it's not",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_no_03",
+    "text": "that is wrong",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_01",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_02",
+    "text": "yes it is",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
     }
   },
   {
