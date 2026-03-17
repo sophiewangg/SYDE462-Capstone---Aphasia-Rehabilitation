@@ -53,8 +53,7 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioCurveball.wrongOrder,
     ScenarioCurveball.wrongReceipt,
   ];
-  ScenarioCurveball _currentCurveball =
-      ScenarioCurveball.longWait; //TODO: change back
+  ScenarioCurveball _currentCurveball = ScenarioCurveball.none;
   final List<String> _servedItems = [];
 
   // Dynamic Routing Flags
@@ -124,7 +123,7 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   final List<ScenarioStep> _globalSearchSteps = [
-    ScenarioStep.drinksOffer, //TODO: add 'no drink' as an option
+    ScenarioStep.drinksOffer,
     ScenarioStep.readyToOrder,
     ScenarioStep.appetizers,
     ScenarioStep.entrees,
@@ -170,9 +169,9 @@ class ScenarioSimManager extends ChangeNotifier {
 
   // --- Core Scenario Flow Logic ---
   Future<void> init(ImageConfiguration config) async {
-    _currentCurveball = ScenarioCurveball.longWait;
-    //     _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
-    // print("⚾ INITIAL CURVEBALL: ${_currentCurveball.name}"); //TODO: change back
+    _currentCurveball =
+        _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
+    print("⚾ INITIAL CURVEBALL: ${_currentCurveball.name}");
 
     _currentPrompt = await _promptService.fetchPrompt(_currentStep);
     _currentCharacter = _currentPrompt!.imageSpeakingUrl;
@@ -287,7 +286,7 @@ class ScenarioSimManager extends ChangeNotifier {
 
   // --- Cleaned up Reusable Sequence ---
   Future<void> _executeCorrectionSequence(ImageConfiguration config) async {
-    _currentCurveball = ScenarioCurveball.longWait; //TODO: change back
+    _currentCurveball = ScenarioCurveball.none;
     _servedItems.clear();
     _servedItems.addAll(_orderItems);
 
@@ -845,8 +844,8 @@ class ScenarioSimManager extends ChangeNotifier {
     _orderItems.clear();
     _servedItems.clear();
 
-    _currentCurveball = ScenarioCurveball.longWait;
-    // _availableCurveballs[Random().nextInt(_availableCurveballs.length)]; //TODO: change back
+    _currentCurveball =
+        _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
 
     _hasAnsweredSteakDoneness = false;
     _wantsNoAppetizers = false;
