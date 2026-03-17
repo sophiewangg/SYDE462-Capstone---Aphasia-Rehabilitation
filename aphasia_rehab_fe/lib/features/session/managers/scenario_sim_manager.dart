@@ -64,9 +64,11 @@ class ScenarioSimManager extends ChangeNotifier {
   bool _isBobEateryModalOpen = false;
   bool _isScenarioComplete = false;
   bool _showReceiptSheet = false;
+  bool _showRaiseHandButton = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
   bool get showReceiptSheet => _showReceiptSheet;
+  bool get showRaiseHandButton => _showRaiseHandButton;
 
   // --- State Variables: Character and Audio ---
   String _currentCharacter = "";
@@ -424,6 +426,8 @@ class ScenarioSimManager extends ChangeNotifier {
   ) async {
     _promptOverride = null;
     _promptPrefix = null;
+    _showRaiseHandButton = (newStep == ScenarioStep.isThatAll);
+    _showReceiptSheet = (newStep == ScenarioStep.readyForBill);
     Prompt nextPrompt = await _promptService.fetchPrompt(newStep);
     _currentPrompt = nextPrompt;
     _currentCharacter = nextPrompt.imageSpeakingUrl;
@@ -670,7 +674,6 @@ class ScenarioSimManager extends ChangeNotifier {
 
       case ScenarioStep.readyForBill:
         if (intents.contains('ready_for_bill_yes')) {
-          _showReceiptSheet = true;
           _currentStep = ScenarioStep.paymentMethod;
           await _handleScenarioStepChange(_currentStep, config);
           notifyListeners();
@@ -683,7 +686,6 @@ class ScenarioSimManager extends ChangeNotifier {
         break;
 
       case ScenarioStep.paymentMethod:
-        _showReceiptSheet = false;
         _currentStep = ScenarioStep.receipt;
         await _handleScenarioStepChange(_currentStep, config);
         notifyListeners();
@@ -743,6 +745,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
     _showReceiptSheet = false;
+    _showRaiseHandButton = false;
     _orderItems.clear();
     _servedItems.clear();
 

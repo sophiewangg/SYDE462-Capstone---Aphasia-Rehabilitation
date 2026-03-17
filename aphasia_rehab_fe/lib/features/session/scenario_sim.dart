@@ -4,6 +4,7 @@ import 'package:aphasia_rehab_fe/features/session/widgets/food.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/menu.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/receipt.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/raise_hand_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/speech_bubble.dart';
 import 'package:aphasia_rehab_fe/services/session_dashboard_service.dart';
 import 'package:flutter/material.dart';
@@ -109,6 +110,17 @@ class _ScenarioSimState extends State<ScenarioSim> {
             bottom: dialogueBottom,
             child: SpeechBubble(),
           ),
+          if (scenarioSimManager.showRaiseHandButton)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: dialogueBottom + 100,
+              child: Center(
+                child: RaiseHandButton(
+                  onPressed: () {},
+                ),
+              ),
+            ),
 
           // ═══════════════════════════════════════════════════════════════
           // LAYER 3: HUD — controls (hint, menu, speak, settings)

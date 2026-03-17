@@ -156,7 +156,8 @@ class _CueModalState extends State<CueModal> {
 
         return _buildBaseContainer(
           hintManager: hintManager,
-          child: Padding(padding: EdgeInsets.only(bottom: 12),
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 12),
             child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
