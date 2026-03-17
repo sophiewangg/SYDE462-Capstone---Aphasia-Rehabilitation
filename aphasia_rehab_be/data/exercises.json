@@ -351,6 +351,69 @@
     }
   },
   {
+    "id": "scenario_no_drink_01",
+    "text": "no drink",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_02",
+    "text": "nothing for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_03",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_04",
+    "text": "i don't want any drinks",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_05",
+    "text": "no beverage for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_06",
+    "text": "no drink please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_07",
+    "text": "no beverage please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
     "id": "scenario_drink_water_01",
     "text": "just water for me please",
     "metadata": {
@@ -757,7 +820,7 @@
   },
   {
     "id": "ice_question_11",
-    "text": "no ice needed",
+    "text": "no ice please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "no_ice",
@@ -784,7 +847,7 @@
   },
   {
     "id": "ice_question_14",
-    "text": "keep the ice out",
+    "text": "no thanks",
     "metadata": {
       "type": "scenario_menu",
       "intent": "no_ice",
@@ -846,6 +909,15 @@
     }
   },
   {
+    "id": "scenario_ready_yes_04",
+    "text": "yes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
     "id": "scenario_ready_no_01",
     "text": "no i need a bit more time",
     "metadata": {
@@ -866,6 +938,15 @@
   {
     "id": "scenario_ready_no_03",
     "text": "no i am not ready",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_no",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_no_04",
+    "text": "no thank you",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_no",
@@ -1325,6 +1406,42 @@
   {
     "id": "scenario_is_that_all_yes_04",
     "text": "thank you that's all",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_05",
+    "text": "thank you that's it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_06",
+    "text": "yes that's it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_07",
+    "text": "yes that's it for me thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_08",
+    "text": "that's it for me thank you",
     "metadata": {
       "type": "scenario_menu",
       "intent": "is_that_all_yes",

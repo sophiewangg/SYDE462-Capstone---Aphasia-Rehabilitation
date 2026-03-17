@@ -18,7 +18,7 @@ import '../../../services/transcription_service.dart';
 import '../../../models/microphone_state.dart';
 import 'hint_manager.dart';
 
-enum ScenarioCurveball { none, wrongOrder, wrongReceipt }
+enum ScenarioCurveball { none, wrongOrder, wrongReceipt, longWait }
 
 class ScenarioSimManager extends ChangeNotifier {
   bool isInitialized = false;
@@ -41,10 +41,10 @@ class ScenarioSimManager extends ChangeNotifier {
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
 
   // --- State Variables: Scenario Progression ---
-  ScenarioStep _currentStep = ScenarioStep.readyForBill;
+  ScenarioStep _currentStep = ScenarioStep.isThatAll;
   String? _promptPrefix;
   String? _promptOverride;
-  final List<String> _orderItems = [];
+  final List<String> _orderItems = ['order_steak'];
   Prompt? _currentPrompt;
 
   // --- State Variables: Curveballs & Serving ---
@@ -67,11 +67,17 @@ class ScenarioSimManager extends ChangeNotifier {
   bool _showReceiptSheet = false;
   bool _showStaticReceiptSheet = false;
   bool _showRaiseHandButton = false;
+  bool _showWaitTimer = false;
+  int _simulatedWaitMinutes = 0;
+  bool _showSystemMessage = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
   bool get showReceiptSheet => _showReceiptSheet;
   bool get showStaticReceiptSheet => _showStaticReceiptSheet;
   bool get showRaiseHandButton => _showRaiseHandButton;
+  bool get showWaitTimer => _showWaitTimer;
+  int get simulatedWaitMinutes => _simulatedWaitMinutes;
+  bool get showSystemMessage => _showSystemMessage;
 
   // --- State Variables: Character and Audio ---
   String _currentCharacter = "";
@@ -117,7 +123,7 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   final List<ScenarioStep> _globalSearchSteps = [
-    ScenarioStep.drinksOffer, //TODO: add 'no drink' as an option
+    ScenarioStep.drinksOffer,
     ScenarioStep.readyToOrder,
     ScenarioStep.appetizers,
     ScenarioStep.entrees,
@@ -362,6 +368,9 @@ class ScenarioSimManager extends ChangeNotifier {
     _transcription = "";
 
     if (_currentStep != ScenarioStep.reservationName &&
+        _currentStep != ScenarioStep.beBackShortly &&
+        _currentStep != ScenarioStep.howHelp &&
+        _currentStep != ScenarioStep.checkOrder &&
         _currentStep != ScenarioStep.checkReceipt &&
         _currentStep != ScenarioStep.resolveReceipt &&
         !_hereFood.contains(_currentStep) &&
@@ -431,8 +440,6 @@ class ScenarioSimManager extends ChangeNotifier {
   ) async {
     _promptOverride = null;
     _promptPrefix = null;
-    _showRaiseHandButton = (newStep == ScenarioStep.isThatAll);
-    // _showReceiptSheet = (newStep == ScenarioStep.readyForBill);
     Prompt nextPrompt = await _promptService.fetchPrompt(newStep);
     _currentPrompt = nextPrompt;
     _currentCharacter = nextPrompt.imageSpeakingUrl;
@@ -597,7 +604,9 @@ class ScenarioSimManager extends ChangeNotifier {
             }
           }
 
-          if (_servedItems.contains('order_bruschetta')) {
+          if (_currentCurveball == ScenarioCurveball.longWait) {
+            _currentStep = ScenarioStep.beBackShortly;
+          } else if (_servedItems.contains('order_bruschetta')) {
             _currentStep = ScenarioStep.hereBruschetta;
           } else if (_servedItems.contains('order_soup')) {
             _currentStep = ScenarioStep.hereSoup;
@@ -619,10 +628,58 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
 
+      case ScenarioStep.beBackShortly:
+        _showWaitTimer = true;
+        _simulatedWaitMinutes = 0;
+        notifyListeners();
+
+        for (int i = 1; i <= 45; i++) {
+          await Future.delayed(const Duration(milliseconds: 100));
+          _simulatedWaitMinutes = i;
+          notifyListeners();
+        }
+
+        _showWaitTimer = false;
+        _showSystemMessage = true;
+        _showRaiseHandButton = true;
+        notifyListeners();
+
+        break;
+
+      case ScenarioStep.howHelp:
+        _showRaiseHandButton = false;
+        _currentStep = ScenarioStep.checkOrder;
+        await _handleScenarioStepChange(_currentStep, config);
+        notifyListeners();
+        break;
+
+      case ScenarioStep.checkOrder:
+        // Clear the curveball since the user successfully navigated the long wait
+        _currentCurveball = ScenarioCurveball.none;
+
+        // Bring out the correct food based on what they ordered
+        if (_servedItems.contains('order_bruschetta')) {
+          _currentStep = ScenarioStep.hereBruschetta;
+        } else if (_servedItems.contains('order_soup')) {
+          _currentStep = ScenarioStep.hereSoup;
+        } else if (_servedItems.contains('order_pasta')) {
+          _currentStep = ScenarioStep.herePasta;
+        } else if (_servedItems.contains('order_chicken')) {
+          _currentStep = ScenarioStep.hereChicken;
+        } else if (_servedItems.contains('order_steak')) {
+          _currentStep = ScenarioStep.hereSteak;
+        } else {
+          // Fallback just in case nothing matches
+          _currentStep = ScenarioStep.howIsEverything;
+        }
+
+        // Trigger the AI prompt and update the UI
+        await _handleScenarioStepChange(_currentStep, config);
+        notifyListeners();
+        break;
       case ScenarioStep.wrongOrderApology:
       case ScenarioStep.wrongOrderResolved:
         break;
-
       case ScenarioStep.wrongOrderNudge:
         bool saidNo = intents.any((i) => ['nudge_no'].contains(i));
 
@@ -778,7 +835,7 @@ class ScenarioSimManager extends ChangeNotifier {
   void resetScenario() {
     print("--- 🔄 RESETTING SCENARIO ---");
 
-    _currentStep = ScenarioStep.readyForBill;
+    _currentStep = ScenarioStep.isThatAll;
     _isScenarioComplete = false;
     _showReceiptSheet = false;
     _showStaticReceiptSheet = false;
@@ -921,6 +978,28 @@ class ScenarioSimManager extends ChangeNotifier {
 
   void toggleBobEateryModal() {
     _isBobEateryModalOpen = !_isBobEateryModalOpen;
+    notifyListeners();
+  }
+
+  Future<void> raiseHandPressed(ImageConfiguration config) async {
+    print("✋ Raise Hand Button Pressed! Bypassing backend.");
+
+    // 1. Hide the wait UI
+    _showSystemMessage = false;
+    _showRaiseHandButton = false;
+    _showWaitTimer = false;
+
+    // 2. Force the mic to stop and reset to idle, just in case they tried to speak
+    if (_isRecording) {
+      await _transcriptionService.stopStreaming();
+      _isRecording = false;
+    }
+    _currentMicrophoneState = MicrophoneState.idle;
+
+    // 3. Immediately jump to howHelp and update the UI/AI
+    _currentStep = ScenarioStep.howHelp;
+    await _handleScenarioStepChange(_currentStep, config);
+
     notifyListeners();
   }
 

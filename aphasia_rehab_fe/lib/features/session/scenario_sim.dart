@@ -71,7 +71,10 @@ class _ScenarioSimState extends State<ScenarioSim> {
               ),
             ),
           ),
-          Positioned(bottom: 30, right: 0, child: Character()),
+
+          if (!scenarioSimManager.showWaitTimer &&
+              !scenarioSimManager.showSystemMessage)
+            Positioned(bottom: 30, right: 0, child: Character()),
           Positioned(
             bottom: 0,
             child: Image.asset(
@@ -105,24 +108,18 @@ class _ScenarioSimState extends State<ScenarioSim> {
           Menu(modalHeight: modalHeight),
           Receipt(receiptHeight: receiptHeight),
           StaticReceipt(receiptHeight: receiptHeight),
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-            left: 0,
-            right: 0,
-            bottom: dialogueBottom,
-            child: SpeechBubble(),
-          ),
-          if (scenarioSimManager.showRaiseHandButton)
-            Positioned(
+          if (!scenarioSimManager.showWaitTimer &&
+              !scenarioSimManager.showSystemMessage)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut,
               left: 0,
               right: 0,
-              bottom: dialogueBottom + 100,
-              child: Center(child: RaiseHandButton(onPressed: () {})),
+              bottom: dialogueBottom,
+              child: SpeechBubble(),
             ),
-
           // ═══════════════════════════════════════════════════════════════
-          // LAYER 3: HUD — controls (hint, menu, speak, settings)
+          // LAYER 3: HUD — controls (hint, menu, speak, settings, wait UI)
           // ═══════════════════════════════════════════════════════════════
           Positioned(
             top: 75,
@@ -168,6 +165,104 @@ class _ScenarioSimState extends State<ScenarioSim> {
               children: [MicAndHintButton()],
             ),
           ),
+
+          // --- LONG WAIT SCENARIO UI ---
+          if (scenarioSimManager.showWaitTimer ||
+              scenarioSimManager.showSystemMessage)
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 400.0,
+                  left: 24.0,
+                  right: 24.0,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // The Timer Badge
+                    if (scenarioSimManager.showWaitTimer)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.timer_outlined,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${scenarioSimManager.simulatedWaitMinutes} mins',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    // The System Message & Button
+                    if (scenarioSimManager.showSystemMessage) ...[
+                      Container(
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 10,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          "Your food is taking a while... try getting the server's attention.",
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+
+                      // Your custom hand raise button
+                      // Your custom hand raise button
+                      if (scenarioSimManager.showRaiseHandButton)
+                        RaiseHandButton(
+                          onPressed: () {
+                            // Safely grab the configuration from the context
+                            final config = createLocalImageConfiguration(
+                              context,
+                            );
+                            scenarioSimManager.raiseHandPressed(config);
+                          },
+                        ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
