@@ -41,8 +41,36 @@ class UtteranceClassification {
   }
 }
 
+class OrderCorrectionResult {
+  final bool isCorrected;
+  final bool acceptedWrongFood;
+  final bool mentionedCorrectItem;
+  final bool rejectedWrongItem;
+  final String? text;
+
+  OrderCorrectionResult({
+    required this.isCorrected,
+    this.acceptedWrongFood = false,
+    this.mentionedCorrectItem = false,
+    this.rejectedWrongItem = false,
+    this.text,
+  });
+
+  factory OrderCorrectionResult.fromJson(Map<String, dynamic> json) {
+    return OrderCorrectionResult(
+      isCorrected: json['is_corrected'] ?? false,
+      acceptedWrongFood: json['accepted_wrong_food'] ?? false,
+      mentionedCorrectItem: json['mentioned_correct_item'] ?? false,
+      rejectedWrongItem: json['rejected_wrong_item'] ?? false,
+      text: json['text'],
+    );
+  }
+}
+
 class ScenarioApiService {
   final String _classifyUrl = "http://localhost:8000/classify_utterance/";
+  final String _verifyCorrectionUrl =
+      "http://localhost:8000/verify_order_correction/";
 
   Future<UtteranceClassification?> classifyUtterance(
     String transcription,
@@ -69,6 +97,35 @@ class ScenarioApiService {
       }
     } catch (e) {
       print("❌ Error in classifyUtterance: $e");
+      return null;
+    }
+  }
+
+  Future<OrderCorrectionResult?> verifyOrderCorrection(
+    String transcription,
+    List<String> orderedItems,
+    List<String> servedItems,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse(_verifyCorrectionUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "transcription": transcription,
+          "ordered_items": orderedItems,
+          "served_items": servedItems,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        print("🔎 verify_order_correction response: $jsonData");
+        return OrderCorrectionResult.fromJson(jsonData);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("❌ Error in verifyOrderCorrection: $e");
       return null;
     }
   }

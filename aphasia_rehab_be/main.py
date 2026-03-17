@@ -200,6 +200,78 @@ async def classify_utterance(
         "text": transcription
     }
 
+@app.post("/verify_order_correction/")
+async def verify_order_correction(
+    transcription: str = Body(..., embed=True),
+    ordered_items: list[str] = Body(..., embed=True),
+    served_items: list[str] = Body(..., embed=True),
+    threshold: float = Query(0.40),
+):
+    raw_chunks = re.split(r'\b(?:and|with|also|then|but)\b|,|\.|;', transcription.lower())
+    chunks = [chunk.strip() for chunk in raw_chunks if len(chunk.strip()) > 2]
+    if not chunks:
+        chunks = [transcription.lower()]
+
+    negation_words = {"no", "not", "didn't", "did not", "wrong", "instead", "never"}
+    affirmation_words = {"yes", "yeah", "yep", "correct", "right", "good", "fine", "okay"}
+    
+    detected_intents = set()
+    rejected_intents = set()
+    
+    is_generic_no = False
+    is_generic_yes = False
+    
+    for chunk in chunks:
+        words = chunk.split()
+        
+        if any(word in negation_words for word in words):
+            is_generic_no = True
+        if any(word in affirmation_words for word in words) and not is_generic_no:
+            is_generic_yes = True
+
+        results = vector_service.search_exercises(
+            query_text=chunk, 
+            n_results=1,
+            filter_metadata=None 
+        )
+        
+        distances = results.get("distances") or []
+        metadatas = results.get("metadatas") or []
+
+        if distances and distances[0] and metadatas and metadatas[0]:
+            distance = distances[0][0]
+            metadata = metadatas[0][0]
+
+            if distance <= threshold:
+                intent = metadata.get("intent")
+                if intent:
+                    if intent.startswith("order_"):
+                        if is_generic_no:
+                            rejected_intents.add(intent)
+                        else:
+                            detected_intents.add(intent)
+                    elif intent in ["nudge_no", "wrong_order_general"]:
+                        is_generic_no = True
+                    elif intent in ["nudge_yes"]:
+                        is_generic_yes = True
+
+    mentioned_correct_item = any(item in detected_intents for item in ordered_items)
+    rejected_wrong_item = any(item in rejected_intents for item in served_items)
+    claimed_wrong_item = any(item in detected_intents for item in served_items)
+    
+    # They successfully corrected the waiter if they mentioned the right item, rejected the wrong one, OR just said "No"
+    is_corrected = (mentioned_correct_item or rejected_wrong_item or is_generic_no) and not claimed_wrong_item
+    
+    # They mistakenly accepted the wrong food if they explicitly said "Yes" or claimed the wrong item
+    accepted_wrong_food = (is_generic_yes or claimed_wrong_item) and not is_corrected
+
+    return {
+        "is_corrected": is_corrected,
+        "accepted_wrong_food": accepted_wrong_food, # 👈 Send this back to Flutter!
+        "mentioned_correct_item": mentioned_correct_item,
+        "rejected_wrong_item": rejected_wrong_item,
+        "text": transcription
+    }
 @app.get("/list_detections")
 async def list_detections(disfluency_type):
     detection_dir = "detections"
