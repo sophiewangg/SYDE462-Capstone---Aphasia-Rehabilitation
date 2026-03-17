@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ElevenLabsService {
   final String _apiKey = dotenv.get('ELEVEN_LABS_API_KEY');
-  final String _voiceId = "21m00Tcm4TlvDq8ikWAM"; // Rachel voice
+  final String _voiceId = "PoHUWWWMHFrA8z7Q88pu"; // Miranda voice
   Future<Uint8List> fetchAudio(String text) async {
     final url = Uri.parse(
       'https://api.elevenlabs.io/v1/text-to-speech/$_voiceId',

@@ -55,7 +55,7 @@ class _CueModalState extends State<CueModal> {
       // re-ask the current dialogue by replaying the audio.
       if (scenarioSimManager.promptOverride == null &&
           scenarioSimManager.promptPrefix == null) {
-        await scenarioSimManager.playCharacterAudio(config);
+        await scenarioSimManager.playCharacterAudio(config, null);
       } else {
         await scenarioSimManager.playElevenLabsAudio(
           scenarioSimManager.currentDialogue,
