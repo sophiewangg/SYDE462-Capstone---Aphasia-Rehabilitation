@@ -1332,6 +1332,42 @@
     }
   },
   {
+    "id": "scenario_is_that_all_yes_05",
+    "text": "thank you that's it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_06",
+    "text": "yes that's it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_07",
+    "text": "yes that's it for me thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_08",
+    "text": "that's it for me thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
     "id": "scenario_is_that_all_no_01",
     "text": "no i want to add more",
     "metadata": {

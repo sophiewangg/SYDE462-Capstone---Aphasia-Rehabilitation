@@ -27,6 +27,9 @@ VALUES
     ('steak_doneness'),
     ('side_choice'),
     ('is_that_all'),
+    ('be_back_shortly'),
+    ('how_help'),
+    ('check_order'),
     ('here_bruschetta'),
     ('here_soup'),
     ('here_pasta'),
@@ -189,6 +192,15 @@ VALUES
         (SELECT id FROM skills_practiced WHERE skill_name = 'Ordering' LIMIT 1),
         'Is that all for you?'
     ),
+        (
+        (SELECT id FROM scenario_steps WHERE description = 'be_back_shortly' LIMIT 1),
+        'be_back_shortly.mp3',
+        'order_talk.png',
+        'order_listen.png',
+        'order_talk.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Ordering' LIMIT 1),
+        'Great, I''ll be back shortly with your food once it''s ready.'
+    ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'here_bruschetta' LIMIT 1),
         'here_bruschetta.mp3',
@@ -253,6 +265,24 @@ VALUES
         'Here is your actual order, enjoy!'
     ),
     (
+        (SELECT id FROM scenario_steps WHERE description = 'how_help' LIMIT 1),
+        'how_help.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Hi! How can I help you?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'check_order' LIMIT 1),
+        'check_order.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'So sorry about the wait - let me check on your order for you'
+    ),
+    (
         (SELECT id FROM scenario_steps WHERE description = 'wrong_order_nudge' LIMIT 1),
         'how_is_everything.mp3',
         'intro_confused.png',
@@ -299,7 +329,7 @@ VALUES
     ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'resolve_receipt' LIMIT 1),
-        'check_receipt.mp3',
+        'resolve_receipt.mp3',
         'intro_talk.png',
         'intro_listen.png',
         'intro_confused.png',
