@@ -810,6 +810,15 @@
     }
   },
   {
+    "id": "ice_question_17",
+    "text": "yes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "yes_ice",
+      "step": "iceQuestion"
+    }
+  },
+  {
     "id": "scenario_ready_yes_01",
     "text": "yes im ready to order",
     "metadata": {
@@ -965,6 +974,15 @@
   {
     "id": "scenario_ready_no_10",
     "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_no_11",
+    "text": "yes please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_yes",
@@ -1926,6 +1944,15 @@
     }
   },
   {
+    "id": "scenario_done_eating_04",
+    "text": "yes thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "done_eating_yes",
+      "step": "areYouDone"
+    }
+  },
+  {
     "id": "scenario_not_done_eating_01",
     "text": "no",
     "metadata": {
@@ -2025,6 +2052,15 @@
     }
   },
   {
+    "id": "scenario_ready_for_bill_06",
+    "text": "yes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_yes",
+      "step": "readyForBill"
+    }
+  },
+  {
     "id": "scenario_not_ready_for_bill_01",
     "text": "no",
     "metadata": {
@@ -2085,6 +2121,204 @@
       "type": "scenario_menu",
       "intent": "ready_for_bill_no",
       "step": "readyForBill"
+    }
+  },
+  {
+    "id": "scenario_not_ready_for_bill_07",
+    "text": "not quite yet",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_no",
+      "step": "readyForBill"
+    }
+  },
+  {
+    "id": "wrong_receipt_01",
+    "text": "excuse me i think this is the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_02",
+    "text": "this doesn't look like my receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_03",
+    "text": "could you check this please? it's not my receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_04",
+    "text": "i got the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_05",
+    "text": "this receipt isn't mine, thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_06",
+    "text": "i believe this is the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_07",
+    "text": "please give me the correct receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_08",
+    "text": "sorry this receipt is incorrect",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_09",
+    "text": "this isn't my receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_10",
+    "text": "i think you gave me someone else's receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_11",
+    "text": "can you print the right receipt for me please?",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_12",
+    "text": "there's been a mistake this is the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_13",
+    "text": "my receipt has the wrong items on it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_14",
+    "text": "could I get my actual receipt please?",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_15",
+    "text": "you gave me the wrong one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_16",
+    "text": "this receipt belongs to another order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_17",
+    "text": "please take this back it's the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_18",
+    "text": "i have the wrong receipt here",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_19",
+    "text": "this isn't what i bought",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_20",
+    "text": "could you correct this receipt please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_01",
+    "text": "this is the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
     }
   },
   {
@@ -2264,6 +2498,15 @@
     "metadata": {
       "type": "scenario_menu",
       "intent": "receipt_no",
+      "step": "receipt"
+    }
+  },
+  {
+    "id": "scenario_receipt_06",
+    "text": "yes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "receipt_yes",
       "step": "receipt"
     }
   }

@@ -38,6 +38,8 @@ VALUES
     ('how_is_everything'),
     ('are_you_done'),
     ('ready_for_bill'),
+    ('check_receipt'),
+    ('resolve_receipt'),
     ('payment_method'),
     ('receipt');
 
@@ -285,6 +287,24 @@ VALUES
         'intro_confused.png',
         (SELECT id FROM skills_practiced WHERE skill_name = 'Paying' LIMIT 1),
         'Are you ready for the bill?'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'check_receipt' LIMIT 1),
+        'check_receipt.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Paying' LIMIT 1),
+        'Here''s the receipt - please check it over'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'resolve_receipt' LIMIT 1),
+        'check_receipt.mp3',
+        'intro_talk.png',
+        'intro_listen.png',
+        'intro_confused.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Paying' LIMIT 1),
+        'I''m so sorry about that - lets see...here''s your actual receipt.'
     ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'payment_method' LIMIT 1),

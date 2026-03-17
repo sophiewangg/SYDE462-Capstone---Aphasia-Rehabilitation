@@ -18,7 +18,7 @@ import '../../../services/transcription_service.dart';
 import '../../../models/microphone_state.dart';
 import 'hint_manager.dart';
 
-enum ScenarioCurveball { none, wrongOrder }
+enum ScenarioCurveball { none, wrongOrder, wrongReceipt }
 
 class ScenarioSimManager extends ChangeNotifier {
   bool isInitialized = false;
@@ -41,7 +41,7 @@ class ScenarioSimManager extends ChangeNotifier {
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
 
   // --- State Variables: Scenario Progression ---
-  ScenarioStep _currentStep = ScenarioStep.reservation;
+  ScenarioStep _currentStep = ScenarioStep.readyForBill;
   String? _promptPrefix;
   String? _promptOverride;
   final List<String> _orderItems = [];
@@ -51,6 +51,7 @@ class ScenarioSimManager extends ChangeNotifier {
   final List<ScenarioCurveball> _availableCurveballs = [
     ScenarioCurveball.none,
     ScenarioCurveball.wrongOrder,
+    ScenarioCurveball.wrongReceipt,
   ];
   ScenarioCurveball _currentCurveball = ScenarioCurveball.none;
   final List<String> _servedItems = [];
@@ -64,10 +65,12 @@ class ScenarioSimManager extends ChangeNotifier {
   bool _isBobEateryModalOpen = false;
   bool _isScenarioComplete = false;
   bool _showReceiptSheet = false;
+  bool _showStaticReceiptSheet = false;
   bool _showRaiseHandButton = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
   bool get showReceiptSheet => _showReceiptSheet;
+  bool get showStaticReceiptSheet => _showStaticReceiptSheet;
   bool get showRaiseHandButton => _showRaiseHandButton;
 
   // --- State Variables: Character and Audio ---
@@ -114,7 +117,7 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   final List<ScenarioStep> _globalSearchSteps = [
-    ScenarioStep.drinksOffer,
+    ScenarioStep.drinksOffer, //TODO: add 'no drink' as an option
     ScenarioStep.readyToOrder,
     ScenarioStep.appetizers,
     ScenarioStep.entrees,
@@ -359,6 +362,8 @@ class ScenarioSimManager extends ChangeNotifier {
     _transcription = "";
 
     if (_currentStep != ScenarioStep.reservationName &&
+        _currentStep != ScenarioStep.checkReceipt &&
+        _currentStep != ScenarioStep.resolveReceipt &&
         !_hereFood.contains(_currentStep) &&
         (classification == null || !classification.match)) {
       dashboardManager.incrementNumUnclearResponses();
@@ -427,7 +432,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _promptOverride = null;
     _promptPrefix = null;
     _showRaiseHandButton = (newStep == ScenarioStep.isThatAll);
-    _showReceiptSheet = (newStep == ScenarioStep.readyForBill);
+    // _showReceiptSheet = (newStep == ScenarioStep.readyForBill);
     Prompt nextPrompt = await _promptService.fetchPrompt(newStep);
     _currentPrompt = nextPrompt;
     _currentCharacter = nextPrompt.imageSpeakingUrl;
@@ -674,7 +679,14 @@ class ScenarioSimManager extends ChangeNotifier {
 
       case ScenarioStep.readyForBill:
         if (intents.contains('ready_for_bill_yes')) {
-          _currentStep = ScenarioStep.paymentMethod;
+          _currentStep = ScenarioStep.checkReceipt;
+
+          if (_currentCurveball == ScenarioCurveball.wrongReceipt) {
+            _showStaticReceiptSheet = true;
+          } else {
+            _showReceiptSheet = true;
+          }
+
           await _handleScenarioStepChange(_currentStep, config);
           notifyListeners();
         } else if (intents.contains('ready_for_bill_no')) {
@@ -685,6 +697,30 @@ class ScenarioSimManager extends ChangeNotifier {
         }
         break;
 
+      case ScenarioStep.checkReceipt:
+        if (intents.contains('wrong_receipt')) {
+          _currentStep = ScenarioStep.resolveReceipt;
+          _showReceiptSheet = true;
+        } else {
+          //TODO: increment some curveballsMissed stat
+          _showReceiptSheet = false;
+          _currentStep = ScenarioStep.paymentMethod;
+        }
+
+        _showStaticReceiptSheet = false;
+        await _handleScenarioStepChange(_currentStep, config);
+        notifyListeners();
+
+        break;
+
+      case ScenarioStep.resolveReceipt:
+        _showReceiptSheet = false;
+        _showStaticReceiptSheet = false;
+
+        _currentStep = ScenarioStep.paymentMethod;
+        await _handleScenarioStepChange(_currentStep, config);
+        notifyListeners();
+        break;
       case ScenarioStep.paymentMethod:
         _currentStep = ScenarioStep.receipt;
         await _handleScenarioStepChange(_currentStep, config);
@@ -742,10 +778,12 @@ class ScenarioSimManager extends ChangeNotifier {
   void resetScenario() {
     print("--- 🔄 RESETTING SCENARIO ---");
 
-    _currentStep = ScenarioStep.reservation;
+    _currentStep = ScenarioStep.readyForBill;
     _isScenarioComplete = false;
     _showReceiptSheet = false;
+    _showStaticReceiptSheet = false;
     _showRaiseHandButton = false;
+
     _orderItems.clear();
     _servedItems.clear();
 
