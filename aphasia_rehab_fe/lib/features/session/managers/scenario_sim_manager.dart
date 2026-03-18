@@ -42,7 +42,7 @@ class ScenarioSimManager extends ChangeNotifier {
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
 
   // --- State Variables: Scenario Progression ---
-  ScenarioStep _currentStep = ScenarioStep.isThatAll;
+  ScenarioStep _currentStep = ScenarioStep.reservation;
   String? _promptPrefix;
   String? _promptOverride;
   final List<String> _orderItems = ['order_steak'];
@@ -847,7 +847,7 @@ class ScenarioSimManager extends ChangeNotifier {
   void resetScenario() {
     print("--- 🔄 RESETTING SCENARIO ---");
 
-    _currentStep = ScenarioStep.isThatAll;
+    _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
     _showReceiptSheet = false;
     _showStaticReceiptSheet = false;

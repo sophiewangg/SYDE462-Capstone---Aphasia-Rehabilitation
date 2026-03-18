@@ -1,3 +1,4 @@
+import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:aphasia_rehab_fe/common/primary_button.dart';
 import 'package:aphasia_rehab_fe/common/secondary_button.dart';
 import 'package:aphasia_rehab_fe/features/dashboard/widgets/ai_analytic.dart';
@@ -102,7 +103,14 @@ class _DashboardPageState extends State<DashboardPage> {
           future: _combinedFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.yellowSecondary,
+                  ),
+                  strokeWidth: 3,
+                ),
+              );
             }
 
             if (snapshot.hasError) {
