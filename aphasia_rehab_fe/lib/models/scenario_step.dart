@@ -20,7 +20,9 @@ enum ScenarioStep {
   hereChicken('hereChicken'),
   hereSteak('hereSteak'),
   wrongOrderApology('wrongOrderApology'),
-  wrongOrderResolved('wrongOrderResolved'),
+  wrongOrderResolvedPasta('wrongOrderResolvedPasta'),
+  wrongOrderResolvedChicken('wrongOrderResolvedChicken'),
+  wrongOrderResolvedSteak('wrongOrderResolvedSteak'),
   wrongOrderNudge('wrongOrderNudge'),
   notReadyToOrder('notReadyToOrder'),
   howIsEverything('howIsEverything'),
@@ -92,8 +94,12 @@ enum ScenarioStep {
         return "wrong_order_apology";
       case ScenarioStep.wrongOrderNudge:
         return "wrong_order_nudge";
-      case ScenarioStep.wrongOrderResolved:
-        return "wrong_order_resolved";
+      case ScenarioStep.wrongOrderResolvedPasta:
+        return "wrong_order_resolved_pasta";
+      case ScenarioStep.wrongOrderResolvedChicken:
+        return "wrong_order_resolved_chicken";
+      case ScenarioStep.wrongOrderResolvedSteak:
+        return "wrong_order_resolved_steak";
       case ScenarioStep.notReadyToOrder:
         return 'not_ready_to_order';
       case ScenarioStep.howIsEverything:
