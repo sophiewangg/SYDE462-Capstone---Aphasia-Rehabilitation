@@ -36,7 +36,9 @@ VALUES
     ('here_chicken'),
     ('here_steak'),
     ('wrong_order_apology'),
-    ('wrong_order_resolved'),
+    ('wrong_order_resolved_pasta'),
+    ('wrong_order_resolved_chicken'),
+    ('wrong_order_resolved_steak'),
     ('wrong_order_nudge'),
     ('how_is_everything'),
     ('are_you_done'),
@@ -256,11 +258,29 @@ VALUES
         'I''m so sorry about that - let me go back and get your order.'
     ),
     (
-        (SELECT id FROM scenario_steps WHERE description = 'wrong_order_resolved' LIMIT 1),
+        (SELECT id FROM scenario_steps WHERE description = 'wrong_order_resolved_pasta' LIMIT 1),
         'wrong_order_resolved.mp3',
-        'intro_talk.png',
-        'intro_listen.png',
-        'intro_confused.png',
+        'here_pasta.png',
+        'here_pasta.png',
+        'here_pasta.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Here is your actual order, enjoy!'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'wrong_order_resolved_chicken' LIMIT 1),
+        'wrong_order_resolved.mp3',
+        'here_chicken.png',
+        'here_chicken.png',
+        'here_chicken.png',
+        (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
+        'Here is your actual order, enjoy!'
+    ),
+    (
+        (SELECT id FROM scenario_steps WHERE description = 'wrong_order_resolved_steak' LIMIT 1),
+        'wrong_order_resolved.mp3',
+        'here_steak.png',
+        'here_steak.png',
+        'here_steak.png',
         (SELECT id FROM skills_practiced WHERE skill_name = 'Small talk' LIMIT 1),
         'Here is your actual order, enjoy!'
     ),

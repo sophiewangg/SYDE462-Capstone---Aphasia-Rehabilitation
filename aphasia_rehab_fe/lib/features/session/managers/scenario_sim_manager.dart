@@ -116,7 +116,9 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.areYouDone,
     ScenarioStep.wrongOrderNudge,
     ScenarioStep.wrongOrderApology,
-    ScenarioStep.wrongOrderResolved,
+    ScenarioStep.wrongOrderResolvedPasta,
+    ScenarioStep.wrongOrderResolvedChicken,
+    ScenarioStep.wrongOrderResolvedSteak,
   ];
   List<ScenarioStep> get showEntree => [
     ScenarioStep.howIsEverything,
@@ -318,7 +320,22 @@ class ScenarioSimManager extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 5));
 
     // 2. Resolve (Show food and announce)
-    await _handleScenarioStepChange(ScenarioStep.wrongOrderResolved, config);
+    if (_orderedEntree == 'order_pasta') {
+      await _handleScenarioStepChange(
+        ScenarioStep.wrongOrderResolvedPasta,
+        config,
+      );
+    } else if (_orderedEntree == 'order_chicken') {
+      await _handleScenarioStepChange(
+        ScenarioStep.wrongOrderResolvedChicken,
+        config,
+      );
+    } else {
+      await _handleScenarioStepChange(
+        ScenarioStep.wrongOrderResolvedSteak,
+        config,
+      );
+    }
 
     // DELAY: 5 Seconds before asking "how is everything"
     await Future.delayed(const Duration(seconds: 5));
@@ -709,7 +726,9 @@ class ScenarioSimManager extends ChangeNotifier {
         notifyListeners();
         break;
       case ScenarioStep.wrongOrderApology:
-      case ScenarioStep.wrongOrderResolved:
+      case ScenarioStep.wrongOrderResolvedPasta:
+      case ScenarioStep.wrongOrderResolvedChicken:
+      case ScenarioStep.wrongOrderResolvedSteak:
         break;
       case ScenarioStep.wrongOrderNudge:
         bool saidNo = intents.any((i) => ['nudge_no'].contains(i));
