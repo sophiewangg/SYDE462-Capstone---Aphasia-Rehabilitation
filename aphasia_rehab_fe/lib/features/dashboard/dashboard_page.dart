@@ -128,7 +128,8 @@ class _DashboardPageState extends State<DashboardPage> {
                   Progress(
                     dashboardManager.numHintsUsed,
                     (dashboardManager.numWordsUsed /
-                        dashboardManager.numPromptsGiven),
+                        (dashboardManager.numPromptsGiven +
+                            dashboardManager.numRepeats)),
                     1 -
                         (dashboardManager.numUnclearResponses /
                             dashboardManager.numPromptsGiven),

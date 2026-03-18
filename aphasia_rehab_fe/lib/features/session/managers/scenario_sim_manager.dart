@@ -934,6 +934,9 @@ class ScenarioSimManager extends ChangeNotifier {
     ImageConfiguration config,
     bool isDontUnderstand,
   ) async {
+    if (!_isScenarioComplete) {
+      dashboardManager.incrementNumRepeats();
+    }
     _currentCharacter = _currentPrompt!.imageSpeakingUrl;
     await precacheCharacterImage(config);
     await clearAudioCache();

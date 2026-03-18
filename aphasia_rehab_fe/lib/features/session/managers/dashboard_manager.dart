@@ -20,6 +20,7 @@ class DashboardManager extends ChangeNotifier {
 
   // Response Clarity
   int _numPromptsGiven = 1;
+  int _numRepeats = 0;
   int _numUnclearResponses = 0;
 
   // Skills Practiced
@@ -34,6 +35,7 @@ class DashboardManager extends ChangeNotifier {
   int get numHintsSuccess => _numHintsSuccess;
   List<String> get hintsGiven => _hintsGiven;
   int get numPromptsGiven => _numPromptsGiven;
+  int get numRepeats => _numRepeats;
   int get numUnclearResponses => _numUnclearResponses;
   Map<String, int> get skillsPracticed => _skillsPracticed;
   int get numWordsUsed => _numWordsUsed;
@@ -55,6 +57,10 @@ class DashboardManager extends ChangeNotifier {
 
   void incrementNumPromptsGiven() {
     _numPromptsGiven += 1;
+  }
+
+  void incrementNumRepeats() {
+    _numRepeats += 1;
   }
 
   void incrementNumWordsUsed(int numWords) {
