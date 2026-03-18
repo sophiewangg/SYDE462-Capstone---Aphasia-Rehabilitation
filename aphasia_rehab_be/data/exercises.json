@@ -18,6 +18,15 @@
     }
   },
   {
+    "id": "scenario_has_reservation_03",
+    "text": "yes i do",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
     "id": "scenario_no_reservation_01",
     "text": "no i don't have a reservation",
     "metadata": {
