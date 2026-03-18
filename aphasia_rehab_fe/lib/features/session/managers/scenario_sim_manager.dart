@@ -841,7 +841,6 @@ class ScenarioSimManager extends ChangeNotifier {
         notifyListeners();
         await _handlePromptOverride(config, false);
         navigateToDashboardPage();
-        handleEndOfSession();
         break;
 
       case ScenarioStep.notReadyToOrder:
