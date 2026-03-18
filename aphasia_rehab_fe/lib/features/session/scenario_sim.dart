@@ -141,22 +141,6 @@ class _ScenarioSimState extends State<ScenarioSim> {
           ),
           Positioned(top: 75, right: 20, child: SettingsButton()),
           Positioned(
-            top: 150,
-            right: 20,
-            child: ElevatedButton(
-              onPressed: () {
-                scenarioSimManager.handleEndOfSession();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardPage(),
-                  ),
-                );
-              },
-              child: const Text('End Session'),
-            ),
-          ),
-          Positioned(
             bottom: 30,
             right: 20,
             child: Column(

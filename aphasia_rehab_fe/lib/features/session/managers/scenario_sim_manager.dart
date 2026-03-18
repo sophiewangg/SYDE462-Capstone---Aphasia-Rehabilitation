@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:aphasia_rehab_fe/features/dashboard/dashboard_page.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
+import 'package:aphasia_rehab_fe/main.dart';
 import 'package:aphasia_rehab_fe/models/prompt_model.dart';
 import 'package:aphasia_rehab_fe/models/scenario_step.dart';
 import 'package:aphasia_rehab_fe/services/eleven_labs_service.dart';
@@ -441,6 +443,11 @@ class ScenarioSimManager extends ChangeNotifier {
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.idle;
     _transcription = "";
+
+    navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(builder: (_) => const DashboardPage()),
+    );
+
     notifyListeners();
   }
 
@@ -802,6 +809,7 @@ class ScenarioSimManager extends ChangeNotifier {
         _currentCharacter = _currentPrompt!.imageSpeakingUrl;
         notifyListeners();
         await _handlePromptOverride(config, false);
+        handleEndOfSession();
         break;
 
       case ScenarioStep.notReadyToOrder:

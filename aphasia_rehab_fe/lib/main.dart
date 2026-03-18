@@ -7,6 +7,8 @@ import 'common/bottom_nav_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   await dotenv.load(fileName: ".env");
   runApp(
@@ -34,6 +36,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Aphasia Rehab',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
