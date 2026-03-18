@@ -1,10 +1,10 @@
 import 'package:aphasia_rehab_fe/colors.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
+import 'package:aphasia_rehab_fe/features/session/widgets/cue_audio_button.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button_cue_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../models/cue_model.dart';
 
 class CueModal extends StatefulWidget {
   const CueModal({super.key});
@@ -15,23 +15,6 @@ class CueModal extends StatefulWidget {
 
 class _CueModalState extends State<CueModal> {
   bool _autoCloseScheduled = false;
-
-  String _getHintText(int stage, Cue? fetchedCue) {
-    if (fetchedCue == null) {
-      return "Try saying \"I didn't understand that\"";
-    }
-
-    switch (stage) {
-      case 0:
-        return "Meaning: ${fetchedCue.semantic}";
-      case 1:
-        return "Try a word that rhymes with: ${fetchedCue.rhyming}";
-      case 2:
-        return "Try a word that starts with: ${fetchedCue.firstSound.toUpperCase()}";
-      default:
-        return "Try the word: ${fetchedCue.likelyWord.toUpperCase()}";
-    }
-  }
 
   void _scheduleAutoClose(BuildContext context, HintManager hintManager) {
     if (_autoCloseScheduled) return;
@@ -53,14 +36,11 @@ class _CueModalState extends State<CueModal> {
 
       // After the hint flow completes and the modal closes,
       // re-ask the current dialogue by replaying the audio.
-      if (scenarioSimManager.promptOverride == null &&
+      // if prompt override, the audio playing is handled in _handlePromptOverride
+      if (hintManager.modalIsWordFinding &&
+          scenarioSimManager.promptOverride == null &&
           scenarioSimManager.promptPrefix == null) {
-        await scenarioSimManager.playCharacterAudio(config);
-      } else {
-        await scenarioSimManager.playElevenLabsAudio(
-          scenarioSimManager.currentDialogue,
-          'override-prompt',
-        );
+        await scenarioSimManager.playCharacterAudio(config, null);
       }
     });
   }
@@ -72,111 +52,55 @@ class _CueModalState extends State<CueModal> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildCloseButton(context, hintManager),
-          const SizedBox(height: 12),
-          _buildMessageBox(resultText),
-          const SizedBox(height: 12),
-          MicAndHintButtonCueModal(showHintButton: false),
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildCloseButton(context, hintManager),
+            const SizedBox(height: 12),
+            _buildMessageBox(resultText),
+            const SizedBox(height: 12),
+            MicAndHintButtonCueModal(showHintButton: false),
           ],
         ),
-      )      
+      ),
     );
   }
-
-  Widget _buildDescribePhase(BuildContext context, HintManager hintManager) {
-  return _buildBaseContainer(
-    hintManager: hintManager,
-    child: Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildCloseButton(context, hintManager),
-          const SizedBox(height: 12),
-          _buildMessageBox("Try describing the word"),
-          const SizedBox(height: 12),
-          if (hintManager.cueResultStringNotifier.value != null)
-            _buildMessageBox(hintManager.cueResultStringNotifier.value!),
-            const SizedBox(height: 12),
-          MicAndHintButtonCueModal(showHintButton: false),
-        ],
-      ),
-    ),
-  );
-}
 
   @override
   Widget build(BuildContext context) {
     final hintManager = context.watch<HintManager>();
 
-    // Trigger auto-close when the modal turns green
     if (hintManager.cueCompleteNotifier.value) {
       _scheduleAutoClose(context, hintManager);
-      // When complete, always show success UI (never SizedBox.shrink) so the
-      // modal has proper content for the closing animation
       return _buildCompleteState(context, hintManager);
     }
 
-    if (hintManager.isHintDescribePhase) {
-      return ValueListenableBuilder<String?>(
-        valueListenable: hintManager.cueResultStringNotifier,
-        builder: (_, __, ___) => _buildDescribePhase(context, hintManager),
+    if (hintManager.isLoading) {
+      return _buildBaseContainer(
+        hintManager: hintManager,
+        child: const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              AppColors.yellowSecondary,
+            ),
+            strokeWidth: 3,
+          ),
+        ),
       );
     }
 
-    final cueFuture = hintManager.cueFutureNotifier.value;
-    if (cueFuture == null) {
-      return const SizedBox.shrink();
-    }
-
-    return FutureBuilder<Cue?>(
-      future: cueFuture,
-      builder: (context, cueSnapshot) {
-        if (cueSnapshot.connectionState == ConnectionState.waiting) {
-          return _buildBaseContainer(
-            hintManager: hintManager,
-            child: const Center(
-              child: CircularProgressIndicator(strokeWidth: 3),
-            ),
-          );
-        }
-
-        if (cueSnapshot.hasError) {
-          return _buildBaseContainer(
-            hintManager: hintManager,
-            child: const Center(child: Text("Error loading hints.")),
-          );
-        }
-
-        final fetchedCue = cueSnapshot.data;
-
-        return _buildBaseContainer(
-          hintManager: hintManager,
-          child: Padding(
-            padding: EdgeInsets.only(bottom: 12),
-            child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildCloseButton(context, hintManager),
-              if (hintManager.cueResultStringNotifier.value != null)
-                _buildMessageBox(hintManager.cueResultStringNotifier.value!),
-              const SizedBox(height: 12),
-              _buildMessageBox(
-                _getHintText(hintManager.cueNumberNotifier.value, fetchedCue),
-              ),
-              const SizedBox(height: 24),
-              MicAndHintButtonCueModal(showHintButton: false),
-              ],
-            ),
-          )
-          
-        );
-      },
+    return _buildBaseContainer(
+      hintManager: hintManager,
+      child: Column(
+        children: [
+          _buildCloseButton(context, hintManager),
+          _buildMessageBox(
+            hintManager.hintText,
+          ),
+          const SizedBox(height: 24),
+          MicAndHintButtonCueModal(showHintButton: false),
+        ],
+      ),
     );
   }
 
@@ -186,7 +110,7 @@ class _CueModalState extends State<CueModal> {
   }) {
     return Container(
       width: double.infinity,
-      // height: 300,
+      height: 300,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: hintManager.cueCompleteNotifier.value
@@ -206,10 +130,19 @@ class _CueModalState extends State<CueModal> {
         color: AppColors.hintBackground,
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: Text(
-        text,
-        style: const TextStyle(fontSize: 18, color: Colors.black),
-        textAlign: TextAlign.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const CueAudioButton(),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 18, color: Colors.black),
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ],
       ),
     );
   }

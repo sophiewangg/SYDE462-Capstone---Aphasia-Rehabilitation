@@ -2,7 +2,9 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:aphasia_rehab_fe/features/dashboard/dashboard_page.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/dashboard_manager.dart';
+import 'package:aphasia_rehab_fe/main.dart';
 import 'package:aphasia_rehab_fe/models/prompt_model.dart';
 import 'package:aphasia_rehab_fe/models/scenario_step.dart';
 import 'package:aphasia_rehab_fe/services/eleven_labs_service.dart';
@@ -35,13 +37,14 @@ class ScenarioSimManager extends ChangeNotifier {
   late final HintManager hintManager;
   final DashboardManager dashboardManager = DashboardManager();
   StreamSubscription<TranscriptionResult>? _subscription;
+  String _dontUnderstandUrl = "";
   String _transcription = "";
   bool _hasPermission = false;
   bool _isRecording = false;
   MicrophoneState _currentMicrophoneState = MicrophoneState.idle;
 
   // --- State Variables: Scenario Progression ---
-  ScenarioStep _currentStep = ScenarioStep.isThatAll;
+  ScenarioStep _currentStep = ScenarioStep.reservation;
   String? _promptPrefix;
   String? _promptOverride;
   final List<String> _orderItems = ['order_steak'];
@@ -145,7 +148,7 @@ class ScenarioSimManager extends ChangeNotifier {
       onPromptSimplified: (text, config) async {
         _promptOverride = text;
         notifyListeners();
-        await _handlePromptOverride(config);
+        await _handlePromptOverride(config, false);
         notifyListeners();
       },
       requestStopRecording: () async {
@@ -179,8 +182,12 @@ class ScenarioSimManager extends ChangeNotifier {
 
     dashboardManager.addSkillPracticed(_currentPrompt!.skillPracticedId);
 
+    _dontUnderstandUrl = await _promptService.getSignedUrl(
+      'dont_understand.mp3',
+      'speakeasy_voice_audios',
+    );
     await precacheCharacterImage(config);
-    playCharacterAudio(config);
+    playCharacterAudio(config, null);
     isInitialized = true;
   }
 
@@ -237,6 +244,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _processDashboardMetrics(transcript);
 
     if (transcript.isEmpty) {
+      _promptOverride = null;
       await _triggerFallback(
         "I didn't quite hear that. Could you try again? ",
         config,
@@ -281,7 +289,11 @@ class ScenarioSimManager extends ChangeNotifier {
     }
     _transcription = "";
     notifyListeners();
-    await _handlePromptOverride(config);
+    if (isPrefix) {
+      await _handlePromptOverride(config, false);
+    } else {
+      await _handlePromptOverride(config, true);
+    }
   }
 
   // --- Cleaned up Reusable Sequence ---
@@ -431,6 +443,11 @@ class ScenarioSimManager extends ChangeNotifier {
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.idle;
     _transcription = "";
+
+    navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(builder: (_) => const DashboardPage()),
+    );
+
     notifyListeners();
   }
 
@@ -450,7 +467,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _isRecording = false;
 
     await precacheCharacterImage(config);
-    playCharacterAudio(config);
+    playCharacterAudio(config, null);
     _currentMicrophoneState = MicrophoneState.idle;
 
     notifyListeners();
@@ -488,6 +505,8 @@ class ScenarioSimManager extends ChangeNotifier {
       case ScenarioStep.numberPeople:
         _currentStep = ScenarioStep.drinksOffer;
         await _handleScenarioStepChange(_currentStep, config);
+        _isBobEateryModalOpen = true;
+        notifyListeners();
         break;
       case ScenarioStep.drinksOffer:
         if (intents.contains('beverage_water')) {
@@ -516,7 +535,7 @@ class ScenarioSimManager extends ChangeNotifier {
           _promptOverride =
               "No problem, just say 'I'm ready to order' when you've decided.";
           notifyListeners();
-          await _handlePromptOverride(config);
+          await _handlePromptOverride(config, false);
         } else if (intents.contains('ready_yes') ||
             orderedNewItems ||
             _wantsNoAppetizers ||
@@ -529,11 +548,11 @@ class ScenarioSimManager extends ChangeNotifier {
         if (intents.contains('ask_specials') || intents.contains('ask_soup')) {
           _promptOverride = "Today's soup is creamy roasted garlic.";
           notifyListeners();
-          await _handlePromptOverride(config);
+          await _handlePromptOverride(config, false);
         } else if (intents.contains('ask_recommendations')) {
           _promptOverride = "My personal favourite is the ribeye steak.";
           notifyListeners();
-          await _handlePromptOverride(config);
+          await _handlePromptOverride(config, false);
         } else if (orderedNewItems || _wantsNoAppetizers || _wantsNoEntrees) {
           _currentStep = _determineNextLogicalStep();
           await _handleScenarioStepChange(_currentStep, config);
@@ -730,7 +749,7 @@ class ScenarioSimManager extends ChangeNotifier {
           _promptOverride =
               "No problem, call me over when you're ready by saying 'I'm done'";
           notifyListeners();
-          await _handlePromptOverride(config);
+          await _handlePromptOverride(config, false);
         }
         break;
 
@@ -750,7 +769,7 @@ class ScenarioSimManager extends ChangeNotifier {
           _promptOverride =
               "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
           notifyListeners();
-          await _handlePromptOverride(config);
+          await _handlePromptOverride(config, false);
         }
         break;
 
@@ -789,7 +808,8 @@ class ScenarioSimManager extends ChangeNotifier {
         _promptOverride = "Thank you for dining with us! Have a wonderful day.";
         _currentCharacter = _currentPrompt!.imageSpeakingUrl;
         notifyListeners();
-        await _handlePromptOverride(config);
+        await _handlePromptOverride(config, false);
+        handleEndOfSession();
         break;
 
       case ScenarioStep.notReadyToOrder:
@@ -835,7 +855,7 @@ class ScenarioSimManager extends ChangeNotifier {
   void resetScenario() {
     print("--- 🔄 RESETTING SCENARIO ---");
 
-    _currentStep = ScenarioStep.isThatAll;
+    _currentStep = ScenarioStep.reservation;
     _isScenarioComplete = false;
     _showReceiptSheet = false;
     _showStaticReceiptSheet = false;
@@ -860,6 +880,8 @@ class ScenarioSimManager extends ChangeNotifier {
 
     _appetizerUrl = null;
     _entreeUrl = null;
+
+    _isBobEateryModalOpen = false;
 
     hintManager.reset();
     dashboardManager.resetDashboard();
@@ -908,25 +930,45 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _handlePromptOverride(ImageConfiguration config) async {
+  Future<void> _handlePromptOverride(
+    ImageConfiguration config,
+    bool isDontUnderstand,
+  ) async {
+    if (!_isScenarioComplete) {
+      dashboardManager.incrementNumRepeats();
+    }
     _currentCharacter = _currentPrompt!.imageSpeakingUrl;
     await precacheCharacterImage(config);
     await clearAudioCache();
     notifyListeners();
-    await playElevenLabsAudio(currentDialogue, 'override-prompt');
+    if (isDontUnderstand) {
+      playCharacterAudio(config, _dontUnderstandUrl);
+    } else {
+      await playElevenLabsAudio(currentDialogue, 'override-prompt');
+    }
     _currentMicrophoneState = MicrophoneState.idle;
     _currentCharacter = currentPrompt!.imageListeningUrl;
     await precacheCharacterImage(config);
     notifyListeners();
   }
 
-  Future<void> playCharacterAudio(ImageConfiguration config) async {
+  Future<void> playCharacterAudio(
+    ImageConfiguration config,
+    String? overrideUrl,
+  ) async {
     if (_currentAudio.isNotEmpty) {
       try {
-        await _audioPlayer.setAudioSource(
-          AudioSource.uri(Uri.parse(_currentAudio)),
-          preload: true,
-        );
+        if (overrideUrl != null) {
+          await _audioPlayer.setAudioSource(
+            AudioSource.uri(Uri.parse(_dontUnderstandUrl)),
+            preload: true,
+          );
+        } else {
+          await _audioPlayer.setAudioSource(
+            AudioSource.uri(Uri.parse(_currentAudio)),
+            preload: true,
+          );
+        }
       } catch (e) {
         print("Error loading audio: $e");
       }

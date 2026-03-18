@@ -20,7 +20,7 @@ class _PlayAudioButtonState extends State<PlayAudioButton> {
         if (scenarioSimManager.promptOverride == null &&
             scenarioSimManager.promptPrefix == null) {
           final config = createLocalImageConfiguration(context);
-          scenarioSimManager.playCharacterAudio(config);
+          scenarioSimManager.playCharacterAudio(config, null);
         } else {
           scenarioSimManager.playElevenLabsAudio(
             scenarioSimManager.currentDialogue,
