@@ -152,6 +152,7 @@ class ScenarioSimManager extends ChangeNotifier {
     hintManager = HintManager(
       dashboardManager: dashboardManager,
       getCurrentPrompt: () => currentPrompt!.promptText,
+      getCurrentPromptSkill: () => currentPrompt!.skillPracticedId,
       onPromptSimplified: (text, config) async {
         _promptOverride = text;
         notifyListeners();
@@ -227,7 +228,6 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   void processHint(ImageConfiguration config) async {
-    dashboardManager.incrementHintUsed(_currentPrompt!.skillPracticedId);
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;

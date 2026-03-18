@@ -37,7 +37,7 @@ class _ImprovedResponseSuggestionState
                   children: [
                     HintAudioButton(
                       widget.improvedResponse.prompt,
-                      '${widget.improvedResponse.taskId}/prompt',
+                      '${widget.improvedResponse.taskId}-improved-response',
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -85,7 +85,7 @@ class _ImprovedResponseSuggestionState
                     const SizedBox(height: 8),
                     _buildResponseBox(
                       text: widget.improvedResponse.response,
-                      id: '${widget.improvedResponse.taskId}/response',
+                      id: '${widget.improvedResponse.taskId}-response',
                       backgroundColor:
                           AppColors.cueModalInProgress, // Light orange
                       iconColor: Colors.black,
@@ -106,7 +106,7 @@ class _ImprovedResponseSuggestionState
                     const SizedBox(height: 8),
                     _buildResponseBox(
                       text: widget.improvedResponse.improvedResponse1,
-                      id: '${widget.improvedResponse.improvedResponse1}/improvedResponse1',
+                      id: '${widget.improvedResponse.improvedResponse1}-improvedResponse1',
                       backgroundColor:
                           AppColors.cueModalComplete, // Light green
                       iconColor: Colors.black,
@@ -114,7 +114,7 @@ class _ImprovedResponseSuggestionState
                     const SizedBox(height: 8),
                     _buildResponseBox(
                       text: widget.improvedResponse.improvedResponse2,
-                      id: '${widget.improvedResponse.improvedResponse1}/improvedResponse2',
+                      id: '${widget.improvedResponse.improvedResponse1}-improvedResponse2',
                       backgroundColor:
                           AppColors.cueModalComplete, // Light green
                       iconColor: Colors.black,
