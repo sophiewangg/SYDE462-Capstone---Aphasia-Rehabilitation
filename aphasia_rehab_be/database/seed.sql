@@ -248,7 +248,7 @@ VALUES
     ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'wrong_order_apology' LIMIT 1),
-        'here_steak.mp3',
+        'wrong_order_apology.mp3',
         'intro_talk.png',
         'intro_listen.png',
         'intro_confused.png',
@@ -257,7 +257,7 @@ VALUES
     ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'wrong_order_resolved' LIMIT 1),
-        'how_is_everything.mp3',
+        'wrong_order_resolved.mp3',
         'intro_talk.png',
         'intro_listen.png',
         'intro_confused.png',
@@ -284,7 +284,7 @@ VALUES
     ),
     (
         (SELECT id FROM scenario_steps WHERE description = 'wrong_order_nudge' LIMIT 1),
-        'how_is_everything.mp3',
+        'wrong_order_nudge.mp3',
         'intro_confused.png',
         'intro_listen.png',
         'intro_confused.png',
