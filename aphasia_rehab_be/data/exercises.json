@@ -423,6 +423,15 @@
     }
   },
   {
+    "id": "scenario_no_drink_08",
+    "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
     "id": "scenario_drink_water_01",
     "text": "just water for me please",
     "metadata": {
@@ -891,6 +900,15 @@
     }
   },
   {
+    "id": "ice_question_18",
+    "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice",
+      "step": "iceQuestion"
+    }
+  },
+  {
     "id": "scenario_ready_yes_01",
     "text": "yes im ready to order",
     "metadata": {
@@ -1206,6 +1224,24 @@
     }
   },
   {
+    "id": "no_appetizer_03",
+    "text": "no",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_appetizer",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "no_appetizer_04",
+    "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_appetizer",
+      "step": "appetizers"
+    }
+  },
+  {
     "id": "scenario_order_steak_01",
     "text": "i'd like the ribeye",
     "metadata": {
@@ -1287,7 +1323,7 @@
     }
   },
   {
-    "id": "scenario_no_entree",
+    "id": "scenario_no_entree_01",
     "text": "i don't want any entrees",
     "metadata": {
       "type": "scenario_menu",
@@ -1296,8 +1332,26 @@
     }
   },
   {
-    "id": "scenario_no_entree",
+    "id": "scenario_no_entree_02",
     "text": "no entrees for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_entrees",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_no_entree_03",
+    "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_entrees",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_no_entree_04",
+    "text": "no",
     "metadata": {
       "type": "scenario_menu",
       "intent": "no_entrees",
@@ -1458,6 +1512,24 @@
     }
   },
   {
+    "id": "scenario_is_that_all_yes_08",
+    "text": "yes that's it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_08",
+    "text": "that's it for me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
     "id": "scenario_is_that_all_no_01",
     "text": "no i want to add more",
     "metadata": {
@@ -1478,6 +1550,15 @@
   {
     "id": "scenario_is_that_all_no_03",
     "text": "i'd like to add more please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_no",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_no_04",
+    "text": "no thank you",
     "metadata": {
       "type": "scenario_menu",
       "intent": "is_that_all_no",
@@ -2133,6 +2214,15 @@
     }
   },
   {
+    "id": "scenario_not_done_eating_07",
+    "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "done_eating_no",
+      "step": "areYouDone"
+    }
+  },
+  {
     "id": "scenario_ready_for_bill_01",
     "text": "yes",
     "metadata": {
@@ -2252,6 +2342,15 @@
   {
     "id": "scenario_not_ready_for_bill_07",
     "text": "not quite yet",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_no",
+      "step": "readyForBill"
+    }
+  },
+  {
+    "id": "scenario_not_ready_for_bill_08",
+    "text": "no thank you",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_for_bill_no",
@@ -2439,8 +2538,44 @@
     }
   },
   {
-    "id": "wrong_receipt_01",
+    "id": "wrong_receipt_21",
     "text": "this is the wrong receipt",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_22",
+    "text": "i didn't order this",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_23",
+    "text": "this is the wrong order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_24",
+    "text": "this isn't my order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "wrong_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "wrong_receipt_25",
+    "text": "not my order",
     "metadata": {
       "type": "scenario_menu",
       "intent": "wrong_receipt",
@@ -2633,6 +2768,24 @@
     "metadata": {
       "type": "scenario_menu",
       "intent": "receipt_yes",
+      "step": "receipt"
+    }
+  },
+  {
+    "id": "scenario_receipt_05",
+    "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "receipt_no",
+      "step": "receipt"
+    }
+  },
+  {
+    "id": "scenario_receipt_05",
+    "text": "no receipt please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "receipt_no",
       "step": "receipt"
     }
   }
