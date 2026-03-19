@@ -52,7 +52,7 @@ def process_recording_pipeline(raw_filepath: str):
     return "Pipeline started"
 
 @celery_app.task(name="worker.classify_sound_rep_task")
-def classify_sound_rep_task(audio_buffer_bytes, threshold=0.74):
+def classify_sound_rep_task(audio_buffer_bytes, threshold=0.80):
     # This task receives the bytes, and hands them to the service instance
     # Notice: NO 'self' in the arguments here!
     label, confidence = service.classify_sound_rep(audio_buffer_bytes, threshold=threshold)
@@ -60,7 +60,7 @@ def classify_sound_rep_task(audio_buffer_bytes, threshold=0.74):
     return {"label": label, "confidence": confidence}
 
 @celery_app.task(name="worker.classify_interjection_task")
-def classify_interjection_task(audio_buffer_bytes, threshold=0.74):
+def classify_interjection_task(audio_buffer_bytes, threshold=0.80):
     # This task receives the bytes, and hands them to the service instance
     # Notice: NO 'self' in the arguments here!
     label, confidence = service.classify_interjection(audio_buffer_bytes, threshold=threshold)

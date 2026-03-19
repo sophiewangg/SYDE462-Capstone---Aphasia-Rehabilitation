@@ -35,6 +35,7 @@ class HintManager extends ChangeNotifier {
   final cueFutureNotifier = ValueNotifier<Future<Cue?>?>(null);
 
   String Function() getCurrentPrompt;
+  String Function() getCurrentPromptSkill;
   Future<void> Function(String, dynamic) onPromptSimplified;
   Future<void> Function() requestStopRecording;
   void Function() onProcessingComplete;
@@ -44,6 +45,7 @@ class HintManager extends ChangeNotifier {
 
   HintManager({
     required this.getCurrentPrompt,
+    required this.getCurrentPromptSkill,
     required this.onPromptSimplified,
     required this.requestStopRecording,
     required this.onProcessingComplete,
@@ -204,13 +206,14 @@ class HintManager extends ChangeNotifier {
   void closeModal(String promptText) {
     cueFutureNotifier.value = null;
     _isModalOpen = false;
-
+    final skillId = getCurrentPromptSkill();
+    dashboardManager.incrementHintUsed(skillId);
     // Update metrics for dahsboard
     dashboardManager.cueComplete(
       cueNumberNotifier.value,
       _likelyWord ?? promptText,
     );
-
+    reset();
     notifyListeners();
   }
 
@@ -252,7 +255,7 @@ class HintManager extends ChangeNotifier {
 
     if (await file.exists()) {
       print("Playing from local cache: $filePath");
-      await  _hintPlayer.setFilePath(filePath);
+      await _hintPlayer.setFilePath(filePath);
     } else {
       print("Fetching from ElevenLabs API...");
       Uint8List audioBytes = await _elevenLabsService.fetchAudio(text);

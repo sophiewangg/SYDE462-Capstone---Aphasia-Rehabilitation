@@ -22,6 +22,7 @@ class _CueModalState extends State<CueModal> {
 
     // Capture dependencies while the context is still safely mounted.
     final scenarioSimManager = context.read<ScenarioSimManager>();
+    final bool modalWasWordFinding = hintManager.modalIsWordFinding;
     final config = createLocalImageConfiguration(context);
 
     Future.delayed(const Duration(milliseconds: 1000), () async {
@@ -37,7 +38,7 @@ class _CueModalState extends State<CueModal> {
       // After the hint flow completes and the modal closes,
       // re-ask the current dialogue by replaying the audio.
       // if prompt override, the audio playing is handled in _handlePromptOverride
-      if (hintManager.modalIsWordFinding &&
+      if (modalWasWordFinding &&
           scenarioSimManager.promptOverride == null &&
           scenarioSimManager.promptPrefix == null) {
         await scenarioSimManager.playCharacterAudio(config, null);
@@ -94,9 +95,7 @@ class _CueModalState extends State<CueModal> {
       child: Column(
         children: [
           _buildCloseButton(context, hintManager),
-          _buildMessageBox(
-            hintManager.hintText,
-          ),
+          _buildMessageBox(hintManager.hintText),
           const SizedBox(height: 24),
           MicAndHintButtonCueModal(showHintButton: false),
         ],

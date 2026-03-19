@@ -47,7 +47,7 @@ class ScenarioSimManager extends ChangeNotifier {
   ScenarioStep _currentStep = ScenarioStep.reservation;
   String? _promptPrefix;
   String? _promptOverride;
-  final List<String> _orderItems = ['order_steak'];
+  final List<String> _orderItems = [];
   Prompt? _currentPrompt;
 
   // --- State Variables: Curveballs & Serving ---
@@ -58,6 +58,8 @@ class ScenarioSimManager extends ChangeNotifier {
   ];
   ScenarioCurveball _currentCurveball = ScenarioCurveball.none;
   final List<String> _servedItems = [];
+  String? _orderedEntree;
+  String? _wrongEntree;
 
   // Dynamic Routing Flags
   bool _hasAnsweredSteakDoneness = false;
@@ -112,6 +114,11 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.hereSteak,
     ScenarioStep.howIsEverything,
     ScenarioStep.areYouDone,
+    ScenarioStep.wrongOrderNudge,
+    ScenarioStep.wrongOrderApology,
+    ScenarioStep.wrongOrderResolvedPasta,
+    ScenarioStep.wrongOrderResolvedChicken,
+    ScenarioStep.wrongOrderResolvedSteak,
   ];
   List<ScenarioStep> get showEntree => [
     ScenarioStep.howIsEverything,
@@ -145,6 +152,7 @@ class ScenarioSimManager extends ChangeNotifier {
     hintManager = HintManager(
       dashboardManager: dashboardManager,
       getCurrentPrompt: () => currentPrompt!.promptText,
+      getCurrentPromptSkill: () => currentPrompt!.skillPracticedId,
       onPromptSimplified: (text, config) async {
         _promptOverride = text;
         notifyListeners();
@@ -220,7 +228,6 @@ class ScenarioSimManager extends ChangeNotifier {
   }
 
   void processHint(ImageConfiguration config) async {
-    dashboardManager.incrementHintUsed(_currentPrompt!.skillPracticedId);
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.processing;
@@ -299,8 +306,11 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- Cleaned up Reusable Sequence ---
   Future<void> _executeCorrectionSequence(ImageConfiguration config) async {
     _currentCurveball = ScenarioCurveball.none;
-    _servedItems.clear();
-    _servedItems.addAll(_orderItems);
+    _entreeUrl = null;
+    notifyListeners();
+
+    _servedItems.remove(_wrongEntree);
+    _servedItems.add(_orderedEntree!);
 
     // 1. Apologize
     await _handleScenarioStepChange(ScenarioStep.wrongOrderApology, config);
@@ -310,7 +320,22 @@ class ScenarioSimManager extends ChangeNotifier {
     await Future.delayed(const Duration(seconds: 5));
 
     // 2. Resolve (Show food and announce)
-    await _handleScenarioStepChange(ScenarioStep.wrongOrderResolved, config);
+    if (_orderedEntree == 'order_pasta') {
+      await _handleScenarioStepChange(
+        ScenarioStep.wrongOrderResolvedPasta,
+        config,
+      );
+    } else if (_orderedEntree == 'order_chicken') {
+      await _handleScenarioStepChange(
+        ScenarioStep.wrongOrderResolvedChicken,
+        config,
+      );
+    } else {
+      await _handleScenarioStepChange(
+        ScenarioStep.wrongOrderResolvedSteak,
+        config,
+      );
+    }
 
     // DELAY: 5 Seconds before asking "how is everything"
     await Future.delayed(const Duration(seconds: 5));
@@ -401,19 +426,20 @@ class ScenarioSimManager extends ChangeNotifier {
     List<String> items,
     ImageConfiguration config,
   ) async {
-    _appetizerUrl = null;
     _entreeUrl = null;
 
-    if (items.contains('order_bruschetta')) {
-      _appetizerUrl = await _promptService.getSignedUrl(
-        'bruschetta.png',
-        'speakeasy_food_images',
-      );
-    } else if (items.contains('order_soup')) {
-      _appetizerUrl = await _promptService.getSignedUrl(
-        'soup.png',
-        'speakeasy_food_images',
-      );
+    if (_appetizerUrl == null) {
+      if (items.contains('order_bruschetta')) {
+        _appetizerUrl = await _promptService.getSignedUrl(
+          'bruschetta.png',
+          'speakeasy_food_images',
+        );
+      } else if (items.contains('order_soup')) {
+        _appetizerUrl = await _promptService.getSignedUrl(
+          'soup.png',
+          'speakeasy_food_images',
+        );
+      }
     }
 
     if (items.contains('order_pasta')) {
@@ -437,17 +463,19 @@ class ScenarioSimManager extends ChangeNotifier {
     if (_entreeUrl != null) await precacheFood(_entreeUrl!, config);
   }
 
+  void navigateToDashboardPage() {
+    navigatorKey.currentState?.pushReplacement(
+      MaterialPageRoute(builder: (_) => const DashboardPage()),
+    );
+  }
+
   Future<void> handleEndOfSession() async {
     print("--- 🛑 ENDING SESSION ---");
     await _transcriptionService.stopStreaming();
     _isRecording = false;
     _currentMicrophoneState = MicrophoneState.idle;
     _transcription = "";
-
-    navigatorKey.currentState?.pushReplacement(
-      MaterialPageRoute(builder: (_) => const DashboardPage()),
-    );
-
+    resetScenario();
     notifyListeners();
   }
 
@@ -589,6 +617,7 @@ class ScenarioSimManager extends ChangeNotifier {
               (item) => allEntrees.contains(item),
               orElse: () => null,
             );
+            _orderedEntree = orderedEntree;
 
             if (orderedEntree != null) {
               final wrongEntrees = allEntrees
@@ -598,6 +627,7 @@ class ScenarioSimManager extends ChangeNotifier {
                   wrongEntrees[Random().nextInt(wrongEntrees.length)];
               _servedItems.remove(orderedEntree);
               _servedItems.add(wrongEntree);
+              _wrongEntree = wrongEntree;
               print(
                 "⚾ CURVEBALL APPLIED: Swapped $orderedEntree for $wrongEntree",
               );
@@ -638,7 +668,6 @@ class ScenarioSimManager extends ChangeNotifier {
           } else {
             _currentStep = ScenarioStep.howIsEverything;
           }
-
           await updateFoodVisuals(_servedItems, config);
           await _handleScenarioStepChange(_currentStep, config);
         } else if (intents.contains('is_that_all_no')) {
@@ -697,7 +726,9 @@ class ScenarioSimManager extends ChangeNotifier {
         notifyListeners();
         break;
       case ScenarioStep.wrongOrderApology:
-      case ScenarioStep.wrongOrderResolved:
+      case ScenarioStep.wrongOrderResolvedPasta:
+      case ScenarioStep.wrongOrderResolvedChicken:
+      case ScenarioStep.wrongOrderResolvedSteak:
         break;
       case ScenarioStep.wrongOrderNudge:
         bool saidNo = intents.any((i) => ['nudge_no'].contains(i));
@@ -809,7 +840,7 @@ class ScenarioSimManager extends ChangeNotifier {
         _currentCharacter = _currentPrompt!.imageSpeakingUrl;
         notifyListeners();
         await _handlePromptOverride(config, false);
-        handleEndOfSession();
+        navigateToDashboardPage();
         break;
 
       case ScenarioStep.notReadyToOrder:

@@ -1,5 +1,4 @@
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
-import 'package:aphasia_rehab_fe/features/dashboard/dashboard_page.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/food.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/menu.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/mic_and_hint_button.dart';
@@ -135,7 +134,10 @@ class _ScenarioSimState extends State<ScenarioSim> {
                 padding: EdgeInsets.zero,
                 iconSize: 32,
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  scenarioSimManager.handleEndOfSession();
+                  Navigator.pop(context);
+                },
               ),
             ),
           ),
