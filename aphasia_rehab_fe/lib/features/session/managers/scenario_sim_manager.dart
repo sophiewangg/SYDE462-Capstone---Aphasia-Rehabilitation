@@ -153,6 +153,7 @@ class ScenarioSimManager extends ChangeNotifier {
       dashboardManager: dashboardManager,
       getCurrentPrompt: () => currentPrompt!.promptText,
       getCurrentPromptSkill: () => currentPrompt!.skillPracticedId,
+      getCurrentScenarioStep: () => currentStep,
       onPromptSimplified: (text, config) async {
         _promptOverride = text;
         notifyListeners();
@@ -1051,6 +1052,11 @@ class ScenarioSimManager extends ChangeNotifier {
 
   void toggleBobEateryModal() {
     _isBobEateryModalOpen = !_isBobEateryModalOpen;
+    notifyListeners();
+  }
+
+  void resetTranscription() {
+    _transcription = '';
     notifyListeners();
   }
 
