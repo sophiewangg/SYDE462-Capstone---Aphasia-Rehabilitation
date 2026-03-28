@@ -34,6 +34,7 @@ class _CueModalState extends State<CueModal> {
       hintManager.updateCueNumber(reset: true);
       hintManager.resetCueComplete();
       hintManager.resetCueResultString();
+      scenarioSimManager.resetTranscription();
 
       // After the hint flow completes and the modal closes,
       // re-ask the current dialogue by replaying the audio.
@@ -70,6 +71,7 @@ class _CueModalState extends State<CueModal> {
   @override
   Widget build(BuildContext context) {
     final hintManager = context.watch<HintManager>();
+    final scenarioSimManager = context.watch<ScenarioSimManager>();
 
     if (hintManager.cueCompleteNotifier.value) {
       _scheduleAutoClose(context, hintManager);
@@ -96,6 +98,17 @@ class _CueModalState extends State<CueModal> {
         children: [
           _buildCloseButton(context, hintManager),
           _buildMessageBox(hintManager.hintText),
+          const SizedBox(height: 12),
+          Text(
+            scenarioSimManager.transcription,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+            softWrap: true,
+          ),
           const SizedBox(height: 24),
           MicAndHintButtonCueModal(showHintButton: false),
         ],
@@ -109,7 +122,7 @@ class _CueModalState extends State<CueModal> {
   }) {
     return Container(
       width: double.infinity,
-      height: 300,
+      height: 350,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: hintManager.cueCompleteNotifier.value
@@ -159,6 +172,7 @@ class _CueModalState extends State<CueModal> {
           hintManager.resetCueComplete();
           hintManager.resetCueResultString();
           hintManager.closeModal(scenarioSimManager.currentPrompt!.promptText);
+          scenarioSimManager.resetTranscription();
         },
         icon: const Icon(Icons.close),
         label: const Text('Cancel'),

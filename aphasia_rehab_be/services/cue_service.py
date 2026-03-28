@@ -14,11 +14,18 @@ class CueService:
             f"Provide the following cues: semantic, a word that rhymes, the first sound (>1 letters)" \
             f"Return a JSON object with the fields: 'likely_word', 'semantic', 'rhyming', 'first_sound'"
     
+    def build_menu_cue_prompt(self, goal, transcription):
+        return f"You are talking to someone with aphasia who is ordering at a restaurant and has been asked: {goal}.\n" \
+            f"This is what they have just said: {transcription}.\n" \
+            f"'steak', 'chicken', 'katsu', 'pasta', 'seafood', 'bruschetta', 'soup' are the cues that should be given when relevant.'\n" \
+            f"Provide the following cues: semantic, a word that rhymes, the first sound (>1 letters)" \
+            f"Return a JSON object with the fields: 'likely_word', 'semantic', 'rhyming', 'first_sound'"
+    
     def build_simplify_prompt(self, prompt):
         return f"A user with aphasia was given the following prompt: {prompt}. THey said they don't understand. Simplify the prompt. Return only the simplified prompt." \
             f"Return a JSON object with only the field: 'simplified_prompt'"
     
-    def generate_cues(self, transcription, goal):
+    def generate_cues(self, transcription, goal, ordering_step):
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -26,7 +33,7 @@ class CueService:
 
         data = {
             "model": self.MODEL,  # use GPT-4o mini
-            "input": self.build_prompt(goal, transcription)
+            "input": self.build_prompt(goal, transcription) if not ordering_step else self.build_menu_cue_prompt(goal, transcription)
         }
 
         response = requests.post(self.URL, headers=headers, json=data)

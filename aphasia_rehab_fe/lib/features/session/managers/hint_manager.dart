@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:aphasia_rehab_fe/models/scenario_step.dart';
 import 'package:aphasia_rehab_fe/services/eleven_labs_service.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -36,6 +37,7 @@ class HintManager extends ChangeNotifier {
 
   String Function() getCurrentPrompt;
   String Function() getCurrentPromptSkill;
+  ScenarioStep Function() getCurrentScenarioStep;
   Future<void> Function(String, dynamic) onPromptSimplified;
   Future<void> Function() requestStopRecording;
   void Function() onProcessingComplete;
@@ -50,6 +52,7 @@ class HintManager extends ChangeNotifier {
     required this.requestStopRecording,
     required this.onProcessingComplete,
     required this.dashboardManager,
+    required this.getCurrentScenarioStep,
     this.onEnterDescribePhase,
   });
 
@@ -115,6 +118,7 @@ class HintManager extends ChangeNotifier {
       final cueFuture = _cueService.getCues(
         _cueDescriptionTranscript!,
         getCurrentPrompt(),
+        getCurrentScenarioStep(),
       );
       cueFutureNotifier.value = cueFuture;
       cueNumberNotifier.value = 1;

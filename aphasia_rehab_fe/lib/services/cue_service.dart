@@ -1,15 +1,25 @@
 import 'dart:convert';
 import 'package:aphasia_rehab_fe/models/cue_model.dart';
+import 'package:aphasia_rehab_fe/models/scenario_step.dart';
 import 'package:aphasia_rehab_fe/models/simplified_prompt_model.dart';
 import 'package:http/http.dart' as http;
 
 class CueService {
   final String backendUrl = "http://localhost:8000/";
 
-  Future<Cue?> getCues(String transcription, String goal) async {
+  Future<Cue?> getCues(
+    String transcription,
+    String goal,
+    ScenarioStep scenarioStep,
+  ) async {
     try {
+      final isOrderingStep = [
+        ScenarioStep.readyToOrder,
+        ScenarioStep.appetizers,
+        ScenarioStep.entrees,
+      ].contains(scenarioStep);
       final response = await http.post(
-        Uri.parse("${backendUrl}generate_cues/"),
+        Uri.parse("${backendUrl}generate_cues/?ordering_step=$isOrderingStep"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"transcription": transcription, "goal": goal}),
       );

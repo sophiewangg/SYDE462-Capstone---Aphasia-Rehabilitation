@@ -95,8 +95,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 logger.info(f"🚀 Handed off {raw_filename} to Celery pipeline")
 
 @app.post("/generate_cues/")
-async def generate_cues(transcription: str = Body(..., embed=True), goal: str = Body(..., embed=True)):
-    return cue_service.generate_cues(transcription, goal)
+async def generate_cues(transcription: str = Body(..., embed=True), goal: str = Body(..., embed=True), ordering_step: bool = False):
+    return cue_service.generate_cues(transcription, goal, ordering_step)
 
 @app.post("/simplify_prompt/")
 async def simplify_prompt(prompt: str = Body(..., embed=True)):

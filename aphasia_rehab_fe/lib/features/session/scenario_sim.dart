@@ -1,3 +1,4 @@
+import 'package:aphasia_rehab_fe/features/session/managers/hint_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/food.dart';
 import 'package:aphasia_rehab_fe/features/session/widgets/menu.dart';
@@ -43,6 +44,7 @@ class _ScenarioSimState extends State<ScenarioSim> {
     final receiptHeight = screenHeight * 2 / 3;
     final dialogueBaseBottom = screenHeight * 0.34;
     final scenarioSimManager = context.watch<ScenarioSimManager>();
+    final hintManager = context.watch<HintManager>();
 
     // Dialogue sits above menu or receipt when either is open, else at base position.
     final dialogueBottom = scenarioSimManager.isBobEateryModalOpen
@@ -142,6 +144,40 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
           Positioned(top: 75, right: 20, child: SettingsButton()),
+          if (scenarioSimManager.isBobEateryModalOpen)
+            Positioned(
+              top: 150,
+              left: 25,
+              right: 25,
+              child: Text(
+                scenarioSimManager.transcription,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                softWrap: true,
+              ),
+            ),
+          if (!scenarioSimManager.isBobEateryModalOpen &&
+              !hintManager.isModalOpen)
+            Positioned(
+              bottom: 175,
+              left: 25,
+              right: 25,
+              child: Text(
+                scenarioSimManager.transcription,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                softWrap: true,
+              ),
+            ),
+
           Positioned(
             bottom: 30,
             right: 20,
