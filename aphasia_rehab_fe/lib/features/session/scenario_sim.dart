@@ -144,7 +144,8 @@ class _ScenarioSimState extends State<ScenarioSim> {
             ),
           ),
           Positioned(top: 75, right: 20, child: SettingsButton()),
-          if (scenarioSimManager.isBobEateryModalOpen)
+          if (scenarioSimManager.isBobEateryModalOpen ||
+              scenarioSimManager.showReceipt)
             Positioned(
               top: 150,
               left: 25,
@@ -161,7 +162,8 @@ class _ScenarioSimState extends State<ScenarioSim> {
               ),
             ),
           if (!scenarioSimManager.isBobEateryModalOpen &&
-              !hintManager.isModalOpen)
+              !hintManager.isModalOpen &&
+              !scenarioSimManager.showReceipt)
             Positioned(
               bottom: 175,
               left: 25,

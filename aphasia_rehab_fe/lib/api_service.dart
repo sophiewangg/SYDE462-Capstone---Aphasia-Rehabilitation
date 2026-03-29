@@ -71,6 +71,7 @@ class ScenarioApiService {
   final String _classifyUrl = "http://localhost:8000/classify_utterance/";
   final String _verifyCorrectionUrl =
       "http://localhost:8000/verify_order_correction/";
+  final String _llmFallbackUrl = "http://localhost:8000/llm_fallback/";
 
   Future<UtteranceClassification?> classifyUtterance(
     String transcription,
@@ -126,6 +127,41 @@ class ScenarioApiService {
       }
     } catch (e) {
       print("❌ Error in verifyOrderCorrection: $e");
+      return null;
+    }
+  }
+
+  Future<List<String>?> llmFallback(
+    String transcription,
+    String currentStep,
+    String currentPrompt,
+  ) async {
+    try {
+      print(transcription);
+      final response = await http.post(
+        Uri.parse(_llmFallbackUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "transcription": transcription,
+          "current_step": currentStep,
+          "current_prompt": currentPrompt,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+        print("llm fallback response: $jsonData");
+
+        final List<dynamic>? rawIntents = jsonData['intents'];
+
+        if (rawIntents == null) return null;
+
+        return rawIntents.map((item) => item.toString()).toList();
+      } else {
+        return null;
+      }
+    } catch (e) {
+      print("Error in LLM Fallback: $e");
       return null;
     }
   }

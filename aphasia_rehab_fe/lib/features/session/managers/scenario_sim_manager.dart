@@ -107,6 +107,7 @@ class ScenarioSimManager extends ChangeNotifier {
   String? get appetizerUrl => _appetizerUrl;
   String? get entreeUrl => _entreeUrl;
   ScenarioCurveball get currentCurveball => _currentCurveball;
+  bool get showReceipt => _showReceiptSheet || _showStaticReceiptSheet;
 
   List<ScenarioStep> get showAppetizer => [
     ScenarioStep.hereChicken,
@@ -182,7 +183,7 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- Core Scenario Flow Logic ---
   Future<void> init(ImageConfiguration config) async {
     _currentCurveball =
-        _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
+    _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
     print("⚾ INITIAL CURVEBALL: ${_currentCurveball.name}");
 
     _currentPrompt = await _promptService.fetchPrompt(_currentStep);
@@ -360,7 +361,7 @@ class ScenarioSimManager extends ChangeNotifier {
         _orderItems,
         _servedItems,
       );
-
+      _transcription = "";
       if (correctionResult != null) {
         if (correctionResult.isCorrected) {
           print("✅ Curveball successfully navigated (Immediate)!");
@@ -413,14 +414,28 @@ class ScenarioSimManager extends ChangeNotifier {
         _currentStep != ScenarioStep.resolveReceipt &&
         !_hereFood.contains(_currentStep) &&
         (classification == null || !classification.match)) {
-      dashboardManager.incrementNumUnclearResponses();
-      await _triggerFallback(
-        "I'm not sure I understood. Could you try saying that another way?",
-        config,
-      );
-      return null;
+      final List<String>? intents = await _performLLMFallback(transcript);
+
+      if (intents == null) {
+        dashboardManager.incrementNumUnclearResponses();
+        await _triggerFallback(
+          "I'm not sure I understood. Could you try saying that another way?",
+          config,
+        );
+        return null;
+      }
+      return intents;
     }
     return classification?.intents ?? [];
+  }
+
+  Future<List<String>?> _performLLMFallback(String transcript) async {
+    final intents = await _scenarioApiService.llmFallback(
+      transcript,
+      _currentStep.id,
+      _currentPrompt!.promptText,
+    );
+    return intents;
   }
 
   Future<void> updateFoodVisuals(
@@ -579,7 +594,7 @@ class ScenarioSimManager extends ChangeNotifier {
           notifyListeners();
           await _handlePromptOverride(config, false);
         } else if (intents.contains('ask_recommendations')) {
-          _promptOverride = "My personal favourite is the ribeye steak.";
+          _promptOverride = "My personal favourite is the bruschetta.";
           notifyListeners();
           await _handlePromptOverride(config, false);
         } else if (orderedNewItems || _wantsNoAppetizers || _wantsNoEntrees) {

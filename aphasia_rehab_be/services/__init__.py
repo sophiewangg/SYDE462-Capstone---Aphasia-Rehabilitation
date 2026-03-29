@@ -5,6 +5,7 @@ from .vector_service import VectorService
 from .disfluency_detection_service import DisfluencyDetectionService
 from .prompt_service import PromptService
 from .dashboard_service import DashboardService
+from .llm_fallback_service import LLMFallbackService
 # This defines what is exported when someone types "from services import *"
 __all__ = [
     "UserService",
@@ -13,5 +14,6 @@ __all__ = [
     "VectorService",
     "DisfluencyDetectionService",
     "PromptService",
-    "DashboardService"
+    "DashboardService",
+    "LLMFallbackService"
 ]

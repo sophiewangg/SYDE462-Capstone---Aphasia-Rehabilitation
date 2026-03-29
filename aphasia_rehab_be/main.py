@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from celery.result import AsyncResult
 from worker import celery_app
 
-from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService, PromptService, DashboardService)
+from services import (CueService, TranscriptionService, UserService, VectorService, DisfluencyDetectionService, PromptService, DashboardService, LLMFallbackService)
 
 
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +32,8 @@ transcription_service = TranscriptionService(api_key=os.getenv("ASSEMBLYAI_API_K
 cue_service = CueService(api_key=os.getenv("GPT_API_KEY")) # type: ignore
 vector_service = VectorService()
 disfluency_detection_service = DisfluencyDetectionService()
-dashoboard_service = DashboardService(api_key=os.getenv("GPT_API_KEY"))
+dashboard_service = DashboardService(api_key=os.getenv("GPT_API_KEY"))
+llm_fallback_service = LLMFallbackService(api_key=os.getenv("GPT_API_KEY"))
 
 def get_user_service(db: Session = Depends(database.get_db)):
     return UserService(db)
@@ -272,6 +273,15 @@ async def verify_order_correction(
         "rejected_wrong_item": rejected_wrong_item,
         "text": transcription
     }
+
+@app.post("/llm_fallback/")
+async def llm_fallback(
+    transcription: str = Body(..., embed=True),
+    current_step: str = Body(None, embed=True), 
+    current_prompt: str = Body(None, embed=True), 
+):
+    return llm_fallback_service.perform_llm_fallback(transcription, current_step, current_prompt)
+    
 @app.get("/list_detections")
 async def list_detections(disfluency_type):
     detection_dir = "detections"
@@ -317,7 +327,7 @@ def get_skill_name(skill_id: str, db: Session = Depends(database.get_db)):
 
 @app.post("/improve_response")
 def get_skill_name(prompt: str, response: str):
-    result = dashoboard_service.improve_response(prompt, response)
+    result = dashboard_service.improve_response(prompt, response)
     return result
 
 @app.get("/task_status/{task_id}")
