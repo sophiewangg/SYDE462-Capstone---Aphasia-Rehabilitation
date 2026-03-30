@@ -1764,6 +1764,168 @@
     }
   },
   {
+    "id": "scenario_nudge_yes_03",
+    "text": "yes you did",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_04",
+    "text": "yes this looks good",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_05",
+    "text": "yes that's the one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_06",
+    "text": "yes you got it right",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_07",
+    "text": "yes that's exactly what i ordered",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_08",
+    "text": "yeah looks good to me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_09",
+    "text": "yes everything's right",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_10",
+    "text": "yeah this is correct",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_11",
+    "text": "yep this is perfect",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_12",
+    "text": "yup this is what i ordered",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_13",
+    "text": "yes this is what i asked for",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_14",
+    "text": "yes thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_15",
+    "text": "yep thanks",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_16",
+    "text": "yep that's the right dish",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_17",
+    "text": "yep that's it",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_18",
+    "text": "yup looks great",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_19",
+    "text": "yes you brought the right one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_20",
+    "text": "yes looks correct to me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
     "id": "scenario_how_is_everything_01",
     "text": "good",
     "metadata": {
@@ -2355,6 +2517,15 @@
       "type": "scenario_menu",
       "intent": "ready_for_bill_no",
       "step": "readyForBill"
+    }
+  },
+  {
+    "id": "correct_receipt_01",
+    "text": "yep this looks good",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "correct_receipt",
+      "step": "checkReceipt"
     }
   },
   {

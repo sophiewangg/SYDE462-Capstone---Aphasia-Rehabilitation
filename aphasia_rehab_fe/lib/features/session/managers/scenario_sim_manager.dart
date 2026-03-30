@@ -1,3 +1,5 @@
+library scenario_sim_manager;
+
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
@@ -20,22 +22,26 @@ import '../../../services/transcription_service.dart';
 import '../../../models/microphone_state.dart';
 import 'hint_manager.dart';
 
+part 'scenario_sim_advance_states.dart';
+
 enum ScenarioCurveball { none, wrongOrder, wrongReceipt, longWait }
 
 class ScenarioSimManager extends ChangeNotifier {
   bool isInitialized = false;
 
   // --- Services ---
-  final TranscriptionService _transcriptionService = TranscriptionService();
-  final ScenarioApiService _scenarioApiService = ScenarioApiService();
-  final PromptService _promptService = PromptService();
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  final AudioPlayer _overridePlayer = AudioPlayer();
-  final ElevenLabsService _elevenLabsService = ElevenLabsService();
+  final TranscriptionService _transcriptionService;
+  final ScenarioApiService _scenarioApiService;
+  final PromptService _promptService;
+  final AudioPlayer _audioPlayer;
+  final AudioPlayer _overridePlayer;
+  final ElevenLabsService _elevenLabsService;
+  final DashboardManager dashboardManager;
+  final Random _random;
+  final Future<void> Function(Duration) _delay;
 
   // --- State Variables: Transcription & Mic ---
   late final HintManager hintManager;
-  final DashboardManager dashboardManager = DashboardManager();
   StreamSubscription<TranscriptionResult>? _subscription;
   String _dontUnderstandUrl = "";
   String _transcription = "";
@@ -75,6 +81,7 @@ class ScenarioSimManager extends ChangeNotifier {
   bool _showWaitTimer = false;
   int _simulatedWaitMinutes = 0;
   bool _showSystemMessage = false;
+  bool _isDisposed = false;
 
   bool get isScenarioComplete => _isScenarioComplete;
   bool get showReceiptSheet => _showReceiptSheet;
@@ -149,9 +156,27 @@ class ScenarioSimManager extends ChangeNotifier {
     ScenarioStep.hereSteak,
   ];
 
-  ScenarioSimManager() {
+  ScenarioSimManager({
+    TranscriptionService? transcriptionService,
+    ScenarioApiService? scenarioApiService,
+    PromptService? promptService,
+    AudioPlayer? audioPlayer,
+    AudioPlayer? overridePlayer,
+    ElevenLabsService? elevenLabsService,
+    DashboardManager? dashboardManager,
+    Random? random,
+    Future<void> Function(Duration)? delay,
+  }) : _transcriptionService = transcriptionService ?? TranscriptionService(),
+       _scenarioApiService = scenarioApiService ?? ScenarioApiService(),
+       _promptService = promptService ?? PromptService(),
+       _audioPlayer = audioPlayer ?? AudioPlayer(),
+       _overridePlayer = overridePlayer ?? AudioPlayer(),
+       _elevenLabsService = elevenLabsService ?? ElevenLabsService(),
+       dashboardManager = dashboardManager ?? DashboardManager(),
+       _random = random ?? Random(),
+       _delay = delay ?? Future.delayed {
     hintManager = HintManager(
-      dashboardManager: dashboardManager,
+      dashboardManager: this.dashboardManager,
       getCurrentPrompt: () => currentPrompt!.promptText,
       getCurrentPromptSkill: () => currentPrompt!.skillPracticedId,
       getCurrentScenarioStep: () => currentStep,
@@ -183,7 +208,7 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- Core Scenario Flow Logic ---
   Future<void> init(ImageConfiguration config) async {
     _currentCurveball =
-    _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
+        _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
     print("⚾ INITIAL CURVEBALL: ${_currentCurveball.name}");
 
     _currentPrompt = await _promptService.fetchPrompt(_currentStep);
@@ -267,7 +292,7 @@ class ScenarioSimManager extends ChangeNotifier {
     final intents = await _classifyAndValidateTranscript(transcript, config);
     if (intents == null) return;
 
-    _advanceScenario(intents, config);
+    await _advanceScenario(intents, config);
   }
 
   Future<void> _stopRecordingState() async {
@@ -319,7 +344,7 @@ class ScenarioSimManager extends ChangeNotifier {
     await updateFoodVisuals(_servedItems, config);
 
     // DELAY: 5 Seconds before serving the actual food
-    await Future.delayed(const Duration(seconds: 5));
+    await _delay(const Duration(seconds: 5));
 
     // 2. Resolve (Show food and announce)
     if (_orderedEntree == 'order_pasta') {
@@ -340,7 +365,7 @@ class ScenarioSimManager extends ChangeNotifier {
     }
 
     // DELAY: 5 Seconds before asking "how is everything"
-    await Future.delayed(const Duration(seconds: 5));
+    await _delay(const Duration(seconds: 5));
 
     // 3. Move Forward
     _currentStep = ScenarioStep.howIsEverything;
@@ -495,12 +520,29 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Called when user leaves session screen via back navigation.
+  /// Keeps scenario progress intact so they can resume later.
+  Future<void> handlePauseSession() async {
+    if (_isRecording) {
+      await _transcriptionService.stopStreaming();
+      _isRecording = false;
+    }
+    _currentMicrophoneState = MicrophoneState.idle;
+    _transcription = "";
+    notifyListeners();
+  }
+
   Future<void> _handleScenarioStepChange(
     ScenarioStep newStep,
     ImageConfiguration config,
   ) async {
     _promptOverride = null;
     _promptPrefix = null;
+
+    if (newStep == ScenarioStep.receipt) {
+      _isScenarioComplete = true;
+    }
+
     Prompt nextPrompt = await _promptService.fetchPrompt(newStep);
     _currentPrompt = nextPrompt;
     _currentCharacter = nextPrompt.imageSpeakingUrl;
@@ -517,7 +559,10 @@ class ScenarioSimManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _advanceScenario(List<String> intents, ImageConfiguration config) async {
+  Future<void> _advanceScenario(
+    List<String> intents,
+    ImageConfiguration config,
+  ) async {
     if (intents.contains('no_appetizer')) _wantsNoAppetizers = true;
     if (intents.contains('no_entrees')) _wantsNoEntrees = true;
     if (intents.contains('steak_doneness')) _hasAnsweredSteakDoneness = true;
@@ -532,336 +577,9 @@ class ScenarioSimManager extends ChangeNotifier {
       }
     }
 
-    switch (_currentStep) {
-      case ScenarioStep.reservation:
-        if (intents.contains("reservation_yes")) {
-          _currentStep = ScenarioStep.reservationName;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains("reservation_no")) {
-          _currentStep = ScenarioStep.numberPeople;
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.reservationName:
-        _currentStep = ScenarioStep.numberPeople;
-        await _handleScenarioStepChange(_currentStep, config);
-        break;
-      case ScenarioStep.numberPeople:
-        _currentStep = ScenarioStep.drinksOffer;
-        await _handleScenarioStepChange(_currentStep, config);
-        _isBobEateryModalOpen = true;
-        notifyListeners();
-        break;
-      case ScenarioStep.drinksOffer:
-        if (intents.contains('beverage_water')) {
-          _currentStep = ScenarioStep.waterType;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('water_still') ||
-            intents.contains('water_sparkling') ||
-            intents.contains('beverage_other')) {
-          _currentStep = ScenarioStep.iceQuestion;
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.waterType:
-        if (intents.contains('water_still') ||
-            intents.contains('water_sparkling')) {
-          _currentStep = ScenarioStep.iceQuestion;
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.iceQuestion:
-        _currentStep = ScenarioStep.readyToOrder;
-        await _handleScenarioStepChange(_currentStep, config);
-        break;
-      case ScenarioStep.readyToOrder:
-        if (intents.contains('ready_no')) {
-          _promptOverride =
-              "No problem, just say 'I'm ready to order' when you've decided.";
-          notifyListeners();
-          await _handlePromptOverride(config, false);
-        } else if (intents.contains('ready_yes') ||
-            orderedNewItems ||
-            _wantsNoAppetizers ||
-            _wantsNoEntrees) {
-          _currentStep = _determineNextLogicalStep();
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.appetizers:
-        if (intents.contains('ask_specials') || intents.contains('ask_soup')) {
-          _promptOverride = "Today's soup is creamy roasted garlic.";
-          notifyListeners();
-          await _handlePromptOverride(config, false);
-        } else if (intents.contains('ask_recommendations')) {
-          _promptOverride = "My personal favourite is the bruschetta.";
-          notifyListeners();
-          await _handlePromptOverride(config, false);
-        } else if (orderedNewItems || _wantsNoAppetizers || _wantsNoEntrees) {
-          _currentStep = _determineNextLogicalStep();
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.entrees:
-        if (orderedNewItems || _wantsNoEntrees) {
-          _currentStep = _determineNextLogicalStep();
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.steakDoneness:
-        if (intents.contains('steak_doneness')) {
-          _currentStep = _determineNextLogicalStep();
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.sideChoice:
-        if (orderedNewItems) {
-          _currentStep = _determineNextLogicalStep();
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-      case ScenarioStep.isThatAll:
-        if (intents.contains('is_that_all_yes')) {
-          _servedItems.clear();
-          _servedItems.addAll(_orderItems);
-
-          if (_currentCurveball == ScenarioCurveball.wrongOrder) {
-            final allEntrees = ['order_pasta', 'order_chicken', 'order_steak'];
-            final allApps = ['order_bruschetta', 'order_soup'];
-
-            final orderedEntree = _servedItems.cast<String?>().firstWhere(
-              (item) => allEntrees.contains(item),
-              orElse: () => null,
-            );
-            _orderedEntree = orderedEntree;
-
-            if (orderedEntree != null) {
-              final wrongEntrees = allEntrees
-                  .where((item) => item != orderedEntree)
-                  .toList();
-              final wrongEntree =
-                  wrongEntrees[Random().nextInt(wrongEntrees.length)];
-              _servedItems.remove(orderedEntree);
-              _servedItems.add(wrongEntree);
-              _wrongEntree = wrongEntree;
-              print(
-                "⚾ CURVEBALL APPLIED: Swapped $orderedEntree for $wrongEntree",
-              );
-            } else {
-              final orderedApp = _servedItems.cast<String?>().firstWhere(
-                (item) => allApps.contains(item),
-                orElse: () => null,
-              );
-
-              if (orderedApp != null) {
-                final wrongApps = allApps
-                    .where((item) => item != orderedApp)
-                    .toList();
-                final wrongApp = wrongApps[Random().nextInt(wrongApps.length)];
-                _servedItems.remove(orderedApp);
-                _servedItems.add(wrongApp);
-                print("⚾ CURVEBALL APPLIED: Swapped $orderedApp for $wrongApp");
-              } else {
-                _servedItems.add(
-                  allEntrees[Random().nextInt(allEntrees.length)],
-                );
-              }
-            }
-          }
-
-          if (_currentCurveball == ScenarioCurveball.longWait) {
-            _currentStep = ScenarioStep.beBackShortly;
-          } else if (_servedItems.contains('order_bruschetta')) {
-            _currentStep = ScenarioStep.hereBruschetta;
-          } else if (_servedItems.contains('order_soup')) {
-            _currentStep = ScenarioStep.hereSoup;
-          } else if (_servedItems.contains('order_pasta')) {
-            _currentStep = ScenarioStep.herePasta;
-          } else if (_servedItems.contains('order_chicken')) {
-            _currentStep = ScenarioStep.hereChicken;
-          } else if (_servedItems.contains('order_steak')) {
-            _currentStep = ScenarioStep.hereSteak;
-          } else {
-            _currentStep = ScenarioStep.howIsEverything;
-          }
-          await updateFoodVisuals(_servedItems, config);
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('is_that_all_no')) {
-          _currentStep = ScenarioStep.appetizers;
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-
-      case ScenarioStep.beBackShortly:
-        _showWaitTimer = true;
-        _simulatedWaitMinutes = 0;
-        notifyListeners();
-
-        for (int i = 1; i <= 45; i++) {
-          await Future.delayed(const Duration(milliseconds: 100));
-          _simulatedWaitMinutes = i;
-          notifyListeners();
-        }
-
-        _showWaitTimer = false;
-        _showSystemMessage = true;
-        _showRaiseHandButton = true;
-        notifyListeners();
-
-        break;
-
-      case ScenarioStep.howHelp:
-        _showRaiseHandButton = false;
-        _currentStep = ScenarioStep.checkOrder;
-        await _handleScenarioStepChange(_currentStep, config);
-        notifyListeners();
-        break;
-
-      case ScenarioStep.checkOrder:
-        // Clear the curveball since the user successfully navigated the long wait
-        _currentCurveball = ScenarioCurveball.none;
-
-        // Bring out the correct food based on what they ordered
-        if (_servedItems.contains('order_bruschetta')) {
-          _currentStep = ScenarioStep.hereBruschetta;
-        } else if (_servedItems.contains('order_soup')) {
-          _currentStep = ScenarioStep.hereSoup;
-        } else if (_servedItems.contains('order_pasta')) {
-          _currentStep = ScenarioStep.herePasta;
-        } else if (_servedItems.contains('order_chicken')) {
-          _currentStep = ScenarioStep.hereChicken;
-        } else if (_servedItems.contains('order_steak')) {
-          _currentStep = ScenarioStep.hereSteak;
-        } else {
-          // Fallback just in case nothing matches
-          _currentStep = ScenarioStep.howIsEverything;
-        }
-
-        // Trigger the AI prompt and update the UI
-        await _handleScenarioStepChange(_currentStep, config);
-        notifyListeners();
-        break;
-      case ScenarioStep.wrongOrderApology:
-      case ScenarioStep.wrongOrderResolvedPasta:
-      case ScenarioStep.wrongOrderResolvedChicken:
-      case ScenarioStep.wrongOrderResolvedSteak:
-        break;
-      case ScenarioStep.wrongOrderNudge:
-        bool saidNo = intents.any((i) => ['nudge_no'].contains(i));
-
-        if (saidNo) {
-          print("✅ Curveball successfully navigated (Via Nudge)!");
-          await _executeCorrectionSequence(config);
-        } else {
-          print("❌ Curveball Failed: User accepted wrong food after nudge.");
-          _currentCurveball = ScenarioCurveball.none;
-          _currentStep = ScenarioStep.howIsEverything;
-          await _handleScenarioStepChange(_currentStep, config);
-        }
-        break;
-
-      case ScenarioStep.hereBruschetta:
-      case ScenarioStep.hereSoup:
-        if (_servedItems.contains('order_pasta')) {
-          _currentStep = ScenarioStep.herePasta;
-        } else if (_servedItems.contains('order_chicken')) {
-          _currentStep = ScenarioStep.hereChicken;
-        } else if (_servedItems.contains('order_steak')) {
-          _currentStep = ScenarioStep.hereSteak;
-        } else {
-          _currentStep = ScenarioStep.howIsEverything;
-        }
-        await precacheFood(_appetizerUrl!, config);
-        await _handleScenarioStepChange(_currentStep, config);
-        break;
-
-      case ScenarioStep.herePasta:
-      case ScenarioStep.hereChicken:
-      case ScenarioStep.hereSteak:
-        await precacheFood(entreeUrl!, config);
-        _currentStep = ScenarioStep.howIsEverything;
-        await _handleScenarioStepChange(_currentStep, config);
-        break;
-
-      case ScenarioStep.howIsEverything:
-        _currentStep = ScenarioStep.areYouDone;
-        await _handleScenarioStepChange(_currentStep, config);
-        break;
-
-      case ScenarioStep.areYouDone:
-        if (intents.contains('done_eating_yes')) {
-          _currentStep = ScenarioStep.readyForBill;
-          await _handleScenarioStepChange(_currentStep, config);
-        } else if (intents.contains('done_eating_no')) {
-          _promptOverride =
-              "No problem, call me over when you're ready by saying 'I'm done'";
-          notifyListeners();
-          await _handlePromptOverride(config, false);
-        }
-        break;
-
-      case ScenarioStep.readyForBill:
-        if (intents.contains('ready_for_bill_yes')) {
-          _currentStep = ScenarioStep.checkReceipt;
-
-          if (_currentCurveball == ScenarioCurveball.wrongReceipt) {
-            _showStaticReceiptSheet = true;
-          } else {
-            _showReceiptSheet = true;
-          }
-
-          await _handleScenarioStepChange(_currentStep, config);
-          notifyListeners();
-        } else if (intents.contains('ready_for_bill_no')) {
-          _promptOverride =
-              "No problem, call me over when you're ready by saying 'I'm ready for the bill'";
-          notifyListeners();
-          await _handlePromptOverride(config, false);
-        }
-        break;
-
-      case ScenarioStep.checkReceipt:
-        if (intents.contains('wrong_receipt')) {
-          _currentStep = ScenarioStep.resolveReceipt;
-          _showReceiptSheet = true;
-        } else {
-          //TODO: increment some curveballsMissed stat
-          _showReceiptSheet = false;
-          _currentStep = ScenarioStep.paymentMethod;
-        }
-
-        _showStaticReceiptSheet = false;
-        await _handleScenarioStepChange(_currentStep, config);
-        notifyListeners();
-
-        break;
-
-      case ScenarioStep.resolveReceipt:
-        _showReceiptSheet = false;
-        _showStaticReceiptSheet = false;
-
-        _currentStep = ScenarioStep.paymentMethod;
-        await _handleScenarioStepChange(_currentStep, config);
-        notifyListeners();
-        break;
-      case ScenarioStep.paymentMethod:
-        _currentStep = ScenarioStep.receipt;
-        await _handleScenarioStepChange(_currentStep, config);
-        notifyListeners();
-        break;
-
-      case ScenarioStep.receipt:
-        _isScenarioComplete = true;
-        _promptOverride = "Thank you for dining with us! Have a wonderful day.";
-        _currentCharacter = _currentPrompt!.imageSpeakingUrl;
-        notifyListeners();
-        await _handlePromptOverride(config, false);
-        navigateToDashboardPage();
-        break;
-
-      case ScenarioStep.notReadyToOrder:
-        break;
-    }
+    await _scenarioSimAdvanceStateFor(
+      _currentStep,
+    ).advance(this, intents, orderedNewItems, config);
   }
 
   ScenarioStep _determineNextLogicalStep() {
@@ -912,7 +630,7 @@ class ScenarioSimManager extends ChangeNotifier {
     _servedItems.clear();
 
     _currentCurveball =
-        _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
+        _availableCurveballs[_random.nextInt(_availableCurveballs.length)];
 
     _hasAnsweredSteakDoneness = false;
     _wantsNoAppetizers = false;
@@ -959,6 +677,8 @@ class ScenarioSimManager extends ChangeNotifier {
       await completer.future;
       stream.removeListener(listener);
     }
+
+    if (_isDisposed) return;
     notifyListeners();
   }
 
@@ -974,6 +694,7 @@ class ScenarioSimManager extends ChangeNotifier {
     stream.addListener(listener);
     await completer.future;
     stream.removeListener(listener);
+    if (_isDisposed) return;
     notifyListeners();
   }
 
@@ -1027,6 +748,7 @@ class ScenarioSimManager extends ChangeNotifier {
 
     _currentCharacter = currentPrompt!.imageListeningUrl;
     await precacheCharacterImage(config);
+    if (_isDisposed) return;
     notifyListeners();
   }
 
@@ -1099,6 +821,7 @@ class ScenarioSimManager extends ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
     _subscription?.cancel();
     hintManager.dispose();
     _audioPlayer.dispose();

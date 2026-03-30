@@ -136,8 +136,9 @@ class _ScenarioSimState extends State<ScenarioSim> {
                 padding: EdgeInsets.zero,
                 iconSize: 32,
                 icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  scenarioSimManager.handleEndOfSession();
+                onPressed: () async {
+                  await scenarioSimManager.handlePauseSession();
+                  if (!context.mounted) return;
                   Navigator.pop(context);
                 },
               ),
