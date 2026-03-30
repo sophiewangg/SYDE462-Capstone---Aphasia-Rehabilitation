@@ -82,7 +82,7 @@
   },
   {
     "id": "scenario_number_people_05",
-    "text": "just the two of us",
+    "text": "two people",
     "metadata": {
       "type": "scenario_menu",
       "intent": "two_people",
@@ -425,6 +425,15 @@
   {
     "id": "scenario_no_drink_08",
     "text": "no thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_drink",
+      "step": "drinksOffer"
+    }
+  },
+  {
+    "id": "scenario_no_drink_09",
+    "text": "no thanks",
     "metadata": {
       "type": "scenario_menu",
       "intent": "no_drink",
@@ -945,6 +954,69 @@
     }
   },
   {
+    "id": "scenario_ready_yes_05",
+    "text": "i think we are all set to order",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_06",
+    "text": "we are good to go",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_07",
+    "text": "yeah i know what i want",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_08",
+    "text": "we are all ready over here",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_09",
+    "text": "im ready whenever you are",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_10",
+    "text": "yes",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_11",
+    "text": "yes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
     "id": "scenario_ready_no_01",
     "text": "no i need a bit more time",
     "metadata": {
@@ -981,52 +1053,7 @@
     }
   },
   {
-    "id": "scenario_ready_yes_04",
-    "text": "i think we are all set to order",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_yes_05",
-    "text": "we are good to go",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_yes_06",
-    "text": "yeah i know what i want",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_yes_07",
-    "text": "we are all ready over here",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_yes_08",
-    "text": "im ready whenever you are",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_no_04",
+    "id": "scenario_ready_no_05",
     "text": "just a couple more minutes please",
     "metadata": {
       "type": "scenario_menu",
@@ -1035,7 +1062,7 @@
     }
   },
   {
-    "id": "scenario_ready_no_05",
+    "id": "scenario_ready_no_06",
     "text": "not quite yet",
     "metadata": {
       "type": "scenario_menu",
@@ -1044,7 +1071,7 @@
     }
   },
   {
-    "id": "scenario_ready_no_06",
+    "id": "scenario_ready_no_07",
     "text": "could you come back in a few",
     "metadata": {
       "type": "scenario_menu",
@@ -1053,7 +1080,7 @@
     }
   },
   {
-    "id": "scenario_ready_no_07",
+    "id": "scenario_ready_no_08",
     "text": "we still need to look at the menu",
     "metadata": {
       "type": "scenario_menu",
@@ -1062,7 +1089,7 @@
     }
   },
   {
-    "id": "scenario_ready_no_08",
+    "id": "scenario_ready_no_09",
     "text": "still deciding",
     "metadata": {
       "type": "scenario_menu",
@@ -1071,29 +1098,11 @@
     }
   },
   {
-    "id": "scenario_ready_no_09",
+    "id": "scenario_ready_no_10",
     "text": "no",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_no",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_no_10",
-    "text": "yes",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
-      "step": "readyToOrder"
-    }
-  },
-  {
-    "id": "scenario_ready_no_11",
-    "text": "yes please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ready_yes",
       "step": "readyToOrder"
     }
   },
@@ -1216,7 +1225,7 @@
   },
   {
     "id": "no_appetizer_02",
-    "text": "I don't want any appetizers",
+    "text": "i don't want any appetizers",
     "metadata": {
       "type": "scenario_menu",
       "intent": "no_appetizer",
@@ -2071,7 +2080,7 @@
   },
   {
     "id": "scenario_how_is_everything_35",
-    "text": "I'm not really enjoying this",
+    "text": "i'm not really enjoying this",
     "metadata": {
       "type": "scenario_menu",
       "intent": "unsatisfied",
@@ -2107,7 +2116,7 @@
   },
   {
     "id": "scenario_how_is_everything_39",
-    "text": "I think the chef might have burnt this",
+    "text": "i think the chef might have burnt this",
     "metadata": {
       "type": "scenario_menu",
       "intent": "unsatisfied",
@@ -2754,7 +2763,7 @@
     }
   },
   {
-    "id": "scenario_receipt_05",
+    "id": "scenario_receipt_06",
     "text": "no receipt",
     "metadata": {
       "type": "scenario_menu",
@@ -2763,7 +2772,7 @@
     }
   },
   {
-    "id": "scenario_receipt_06",
+    "id": "scenario_receipt_07",
     "text": "yes please",
     "metadata": {
       "type": "scenario_menu",
@@ -2772,7 +2781,7 @@
     }
   },
   {
-    "id": "scenario_receipt_05",
+    "id": "scenario_receipt_08",
     "text": "no thank you",
     "metadata": {
       "type": "scenario_menu",
@@ -2781,8 +2790,17 @@
     }
   },
   {
-    "id": "scenario_receipt_05",
+    "id": "scenario_receipt_09",
     "text": "no receipt please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "receipt_no",
+      "step": "receipt"
+    }
+  },
+  {
+    "id": "scenario_receipt_10",
+    "text": "no thanks",
     "metadata": {
       "type": "scenario_menu",
       "intent": "receipt_no",
