@@ -208,7 +208,7 @@ class ScenarioSimManager extends ChangeNotifier {
   // --- Core Scenario Flow Logic ---
   Future<void> init(ImageConfiguration config) async {
     _currentCurveball =
-        _availableCurveballs[Random().nextInt(_availableCurveballs.length)];
+        _availableCurveballs[_random.nextInt(_availableCurveballs.length)];
     print("⚾ INITIAL CURVEBALL: ${_currentCurveball.name}");
 
     _currentPrompt = await _promptService.fetchPrompt(_currentStep);
