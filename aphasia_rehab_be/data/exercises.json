@@ -27,6 +27,24 @@
     }
   },
   {
+    "id": "scenario_has_reservation_04",
+    "text": "sure",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
+    "id": "scenario_has_reservation_04",
+    "text": "sure do",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "reservation_yes",
+      "step": "reservation"
+    }
+  },
+  {
     "id": "scenario_no_reservation_01",
     "text": "no i don't have a reservation",
     "metadata": {
@@ -55,285 +73,6 @@
   },
   {
     "id": "scenario_number_people_02",
-    "text": "one",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_03",
-    "text": "table for one",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_04",
-    "text": "table for two",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "two_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_05",
-    "text": "two people",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "two_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_06",
-    "text": "three of us",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "three_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_07",
-    "text": "we need a table for three",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "three_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_08",
-    "text": "party of four",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "four_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_09",
-    "text": "four please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "four_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_10",
-    "text": "we have five",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "five_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_11",
-    "text": "five people",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "five_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_12",
-    "text": "six",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "six_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_13",
-    "text": "a table for six",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "six_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_14",
-    "text": "we are seven",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "seven_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_15",
-    "text": "seven altogether",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "seven_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_16",
-    "text": "eight of us",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "eight_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_17",
-    "text": "a big table for eight",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "eight_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_18",
-    "text": "party of nine",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "nine_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_19",
-    "text": "there are nine in our group",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "nine_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_20",
-    "text": "ten people",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ten_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_21",
-    "text": "we have a reservation for ten",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "ten_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_22",
-    "text": "eleven",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "eleven_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_23",
-    "text": "it's going to be eleven of us",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "eleven_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_24",
-    "text": "twelve",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "twelve_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_25",
-    "text": "a large table for twelve, please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "twelve_people",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_26",
-    "text": "it's just me today",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_27",
-    "text": "just a table for one, please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_28",
-    "text": "I'm by myself",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_29",
-    "text": "party of one",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_30",
-    "text": "it's only me",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_31",
-    "text": "single seat, please",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_32",
-    "text": "can I get a spot for one?",
-    "metadata": {
-      "type": "scenario_menu",
-      "intent": "one_person",
-      "step": "numberPeople"
-    }
-  },
-  {
-    "id": "scenario_number_people_33",
     "text": "just myself",
     "metadata": {
       "type": "scenario_menu",
@@ -342,8 +81,8 @@
     }
   },
   {
-    "id": "scenario_number_people_34",
-    "text": "I'm dining alone",
+    "id": "scenario_number_people_03",
+    "text": "it's just me today",
     "metadata": {
       "type": "scenario_menu",
       "intent": "one_person",
@@ -351,11 +90,317 @@
     }
   },
   {
-    "id": "scenario_number_people_35",
-    "text": "I'm on my own",
+    "id": "scenario_number_people_04",
+    "text": "one",
     "metadata": {
       "type": "scenario_menu",
       "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_05",
+    "text": "one person",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_06",
+    "text": "party of one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_07",
+    "text": "table for one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_08",
+    "text": "table for one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_09",
+    "text": "can I get a spot for one?",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_10",
+    "text": "reservation for one",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "one_person",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_11",
+    "text": "two please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "two_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_12",
+    "text": "two people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "two_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_13",
+    "text": "table for two",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "two_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_14",
+    "text": "spot for two please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "two_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_15",
+    "text": "reservation for two",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "two_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_16",
+    "text": "three",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "three_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_17",
+    "text": "three people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "three_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_18",
+    "text": "spot for three please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "three_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_19",
+    "text": "reservation for three",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "three_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_20",
+    "text": "four",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "four_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_21",
+    "text": "four please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "four_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_22",
+    "text": "four people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "four_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_23",
+    "text": "spot for four please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "four_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_24",
+    "text": "reservation for four",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "four_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_25",
+    "text": "five",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "five_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_26",
+    "text": "five people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "five_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_27",
+    "text": "reservation for five",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "five_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_28",
+    "text": "six",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "six_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_29",
+    "text": "six people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "six_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_30",
+    "text": "reservation for six",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "six_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_31",
+    "text": "seven",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "seven_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_32",
+    "text": "seven people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "seven_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_33",
+    "text": "eight",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "eight_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_34",
+    "text": "eight people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "eight_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_35",
+    "text": "nine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nine_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_36",
+    "text": "nine people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nine_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_37",
+    "text": "ten",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ten_people",
+      "step": "numberPeople"
+    }
+  },
+  {
+    "id": "scenario_number_people_38",
+    "text": "ten people",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ten_people",
       "step": "numberPeople"
     }
   },
@@ -918,6 +963,15 @@
     }
   },
   {
+    "id": "ice_question_19",
+    "text": "sure",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "no_ice",
+      "step": "iceQuestion"
+    }
+  },
+  {
     "id": "scenario_ready_yes_01",
     "text": "yes im ready to order",
     "metadata": {
@@ -1010,6 +1064,15 @@
   {
     "id": "scenario_ready_yes_11",
     "text": "yes please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_yes",
+      "step": "readyToOrder"
+    }
+  },
+  {
+    "id": "scenario_ready_yes_12",
+    "text": "sure",
     "metadata": {
       "type": "scenario_menu",
       "intent": "ready_yes",
@@ -1206,8 +1269,62 @@
     }
   },
   {
+    "id": "scenario_order_soup_04",
+    "text": "soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_soup",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "scenario_order_soup_05",
+    "text": "today's soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_soup",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "scenario_order_soup_06",
+    "text": "daily soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_soup",
+      "step": "appetizers"
+    }
+  },
+  {
     "id": "scenario_order_bruschetta_01",
     "text": "i'll get the bruschetta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_bruschetta",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "scenario_order_bruschetta_02",
+    "text": "bruschetta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_bruschetta",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "scenario_order_bruschetta_03",
+    "text": "i want the bruschetta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_bruschetta",
+      "step": "appetizers"
+    }
+  },
+  {
+    "id": "scenario_order_bruschetta_04",
+    "text": "bruschetta please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "order_bruschetta",
@@ -1278,6 +1395,33 @@
     }
   },
   {
+    "id": "scenario_order_steak_04",
+    "text": "steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_steak",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_steak_05",
+    "text": "ribeye",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_steak",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_steak_06",
+    "text": "ribeye steak please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_steak",
+      "step": "entrees"
+    }
+  },
+  {
     "id": "scenario_order_chicken_01",
     "text": "i'll have the chicken",
     "metadata": {
@@ -1305,6 +1449,24 @@
     }
   },
   {
+    "id": "scenario_order_chicken_04",
+    "text": "katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_chicken",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_chicken_05",
+    "text": "chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_chicken",
+      "step": "entrees"
+    }
+  },
+  {
     "id": "scenario_order_pasta_01",
     "text": "i'll get the pasta",
     "metadata": {
@@ -1325,6 +1487,69 @@
   {
     "id": "scenario_order_pasta_03",
     "text": "i'll get the alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_04",
+    "text": "alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_05",
+    "text": "pasta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_06",
+    "text": "seafood",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_07",
+    "text": "noodles",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_08",
+    "text": "seafood alfredo please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_09",
+    "text": "alfredo please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "order_pasta",
+      "step": "entrees"
+    }
+  },
+  {
+    "id": "scenario_order_pasta_10",
+    "text": "pasta please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "order_pasta",
@@ -1377,6 +1602,69 @@
     }
   },
   {
+    "id": "scenario_steak_rare_02",
+    "text": "rare",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_rare_03",
+    "text": "i'd like my steak rare",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_rare_04",
+    "text": "i'd like my steak rare please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium_rare_01",
+    "text": "medium rare please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium_rare_02",
+    "text": "medium rare",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium_rare_03",
+    "text": "i'd like my steak medium rare",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium_rare_04",
+    "text": "i'd like my steak medium rare please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
     "id": "scenario_steak_medium_01",
     "text": "medium please",
     "metadata": {
@@ -1386,8 +1674,62 @@
     }
   },
   {
+    "id": "scenario_steak_medium_02",
+    "text": "medium",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium_03",
+    "text": "i'd like my steak medium",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_medium_04",
+    "text": "i'd like my steak medium please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
     "id": "scenario_steak_welldone_01",
     "text": "well done please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_welldone_02",
+    "text": "well done",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_welldone_03",
+    "text": "well",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "steak_doneness",
+      "step": "steakDoneness"
+    }
+  },
+  {
+    "id": "scenario_steak_welldone_04",
+    "text": "well please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "steak_doneness",
@@ -1422,6 +1764,51 @@
     }
   },
   {
+    "id": "scenario_side_salad_04",
+    "text": "salad",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_salad_05",
+    "text": "solid",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_salad_06",
+    "text": "side salad",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_salad_07",
+    "text": "side solid",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_salad_08",
+    "text": "salad on the side please",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_salad",
+      "step": "sideChoice"
+    }
+  },
+  {
     "id": "scenario_side_fries_01",
     "text": "fries please",
     "metadata": {
@@ -1442,6 +1829,24 @@
   {
     "id": "scenario_side_fries_03",
     "text": "i want fries",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_fries",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_fries_04",
+    "text": "fries",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "side_fries",
+      "step": "sideChoice"
+    }
+  },
+  {
+    "id": "scenario_side_fries_05",
+    "text": "side of fries please",
     "metadata": {
       "type": "scenario_menu",
       "intent": "side_fries",
@@ -1539,6 +1944,24 @@
     }
   },
   {
+    "id": "scenario_is_that_all_yes_09",
+    "text": "sure",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
+    "id": "scenario_is_that_all_yes_10",
+    "text": "sure is all from me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "is_that_all_yes",
+      "step": "isThatAll"
+    }
+  },
+  {
     "id": "scenario_is_that_all_no_01",
     "text": "no i want to add more",
     "metadata": {
@@ -1602,6 +2025,33 @@
     }
   },
   {
+    "id": "scenario_correction_steak_04",
+    "text": "steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_steak_05",
+    "text": "ribeye",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_steak_06",
+    "text": "ribeye steak",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
     "id": "scenario_correction_chicken_01",
     "text": "i ordered the chicken",
     "metadata": {
@@ -1622,6 +2072,78 @@
   {
     "id": "scenario_correction_chicken_03",
     "text": "i wanted the chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_04",
+    "text": "chicken",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_05",
+    "text": "katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_06",
+    "text": "i ordered the chicken katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_07",
+    "text": "i asked for the chicken katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_08",
+    "text": "i wanted the chicken katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_09",
+    "text": "i ordered the katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_10",
+    "text": "i asked for the katsu",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_chicken_11",
+    "text": "i wanted the katsu",
     "metadata": {
       "type": "scenario_menu",
       "intent": "nudge_no",
@@ -1656,6 +2178,60 @@
     }
   },
   {
+    "id": "scenario_correction_pasta_04",
+    "text": "i ordered the alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_05",
+    "text": "i asked for the alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_06",
+    "text": "i wanted the alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_07",
+    "text": "i ordered the seafood alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_08",
+    "text": "i asked for the seafood alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_pasta_09",
+    "text": "i wanted the seafood alfredo",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
     "id": "scenario_correction_soup_01",
     "text": "i ordered the soup",
     "metadata": {
@@ -1665,8 +2241,26 @@
     }
   },
   {
+    "id": "scenario_correction_soup_02",
+    "text": "soup",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
     "id": "scenario_correction_bruschetta_01",
     "text": "i ordered the bruschetta",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_correction_bruschetta_02",
+    "text": "bruschetta",
     "metadata": {
       "type": "scenario_menu",
       "intent": "nudge_no",
@@ -1721,6 +2315,15 @@
   {
     "id": "scenario_wrong_order_general_06",
     "text": "this isn't mine",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_no",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_wrong_order_general_07",
+    "text": "i actually didn't order this",
     "metadata": {
       "type": "scenario_menu",
       "intent": "nudge_no",
@@ -1928,6 +2531,15 @@
   {
     "id": "scenario_nudge_yes_20",
     "text": "yes looks correct to me",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "nudge_yes",
+      "step": "wrong_order_nudge"
+    }
+  },
+  {
+    "id": "scenario_nudge_yes_21",
+    "text": "sure",
     "metadata": {
       "type": "scenario_menu",
       "intent": "nudge_yes",
@@ -2170,55 +2782,55 @@
   },
   {
     "id": "scenario_how_is_everything_27",
-    "text": "my food is actually burnt",
+    "text": "delicious",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_28",
-    "text": "this is a bit charred",
+    "text": "great",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_29",
-    "text": "it's been burnt",
+    "text": "wonderful",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_30",
-    "text": "its completely black",
+    "text": "perfect",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_31",
-    "text": "it's way too overcooked",
+    "text": "well",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_32",
-    "text": "it's bad",
+    "text": "tasty",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
@@ -2227,22 +2839,22 @@
     "text": "this is bad",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_34",
-    "text": "it's burnt",
+    "text": "lovely",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_35",
-    "text": "i'm not really enjoying this",
+    "text": "bad",
     "metadata": {
       "type": "scenario_menu",
       "intent": "unsatisfied",
@@ -2251,34 +2863,97 @@
   },
   {
     "id": "scenario_how_is_everything_36",
-    "text": "burnt",
+    "text": "fine",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_37",
-    "text": "this is pretty burnt on the edges",
+    "text": "excellent",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_38",
-    "text": "it has a bit of a burnt aftertaste",
+    "text": "nice",
     "metadata": {
       "type": "scenario_menu",
-      "intent": "unsatisfied",
+      "intent": "satisfied",
       "step": "howIsEverything"
     }
   },
   {
     "id": "scenario_how_is_everything_39",
-    "text": "i think the chef might have burnt this",
+    "text": "satisfactory",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_40",
+    "text": "appetizing",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_41",
+    "text": "swell",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_42",
+    "text": "flavorful",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_43",
+    "text": "delightful",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_44",
+    "text": "exquisite",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_44",
+    "text": "delectable",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "satisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_45",
+    "text": "yuck",
     "metadata": {
       "type": "scenario_menu",
       "intent": "unsatisfied",
@@ -2286,8 +2961,44 @@
     }
   },
   {
-    "id": "scenario_how_is_everything_40",
-    "text": "could I send this back? it's burnt",
+    "id": "scenario_how_is_everything_46",
+    "text": "unappetizing",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "unsatisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_47",
+    "text": "bland",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "unsatisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_48",
+    "text": "unsavory",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "unsatisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_49",
+    "text": "distasteful",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "unsatisfied",
+      "step": "howIsEverything"
+    }
+  },
+  {
+    "id": "scenario_how_is_everything_50",
+    "text": "unpalatable",
     "metadata": {
       "type": "scenario_menu",
       "intent": "unsatisfied",
@@ -2324,6 +3035,24 @@
   {
     "id": "scenario_done_eating_04",
     "text": "yes thank you",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "done_eating_yes",
+      "step": "areYouDone"
+    }
+  },
+  {
+    "id": "scenario_done_eating_05",
+    "text": "yes thanks",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "done_eating_yes",
+      "step": "areYouDone"
+    }
+  },
+  {
+    "id": "scenario_done_eating_05",
+    "text": "sure",
     "metadata": {
       "type": "scenario_menu",
       "intent": "done_eating_yes",
@@ -2448,6 +3177,15 @@
     }
   },
   {
+    "id": "scenario_ready_for_bill_07",
+    "text": "sure",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "ready_for_bill_yes",
+      "step": "readyForBill"
+    }
+  },
+  {
     "id": "scenario_not_ready_for_bill_01",
     "text": "no",
     "metadata": {
@@ -2531,6 +3269,15 @@
   {
     "id": "correct_receipt_01",
     "text": "yep this looks good",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "correct_receipt",
+      "step": "checkReceipt"
+    }
+  },
+  {
+    "id": "correct_receipt_02",
+    "text": "sure",
     "metadata": {
       "type": "scenario_menu",
       "intent": "correct_receipt",
@@ -2972,6 +3719,15 @@
   {
     "id": "scenario_receipt_10",
     "text": "no thanks",
+    "metadata": {
+      "type": "scenario_menu",
+      "intent": "receipt_no",
+      "step": "receipt"
+    }
+  },
+  {
+    "id": "scenario_receipt_10",
+    "text": "sure",
     "metadata": {
       "type": "scenario_menu",
       "intent": "receipt_no",

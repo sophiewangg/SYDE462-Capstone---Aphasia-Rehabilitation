@@ -141,65 +141,15 @@ async def find_exercise(transcription: str = Body(..., embed=True)):
 async def classify_utterance(
     transcription: str = Body(..., embed=True),
     current_step: str = Body(None, embed=True), 
-    global_search: bool = Body(False, embed=True), # 👈 Added this parameter
+    global_search: bool = Body(False, embed=True),
     threshold: float = Query(0.40),
 ):
-    """
-    Splits the transcription into chunks and runs vector similarity.
-    The frontend dictates whether to search globally via the global_search flag.
-    """
-    
-    # 1. Frontend controls the filter scope
-    if current_step and not global_search:
-        step_filter = {"step": current_step}
-        logger.info(f"🔒 Strict filter applied for step: {current_step}")
-    else:
-        step_filter = None
-        logger.info(f"🌐 Global search executed (Step recorded as: {current_step})")
-
-    # 2. Chunking the transcription
-    raw_chunks = re.split(r'\b(?:and|with|also|then)\b|,|\.|;', transcription.lower())
-    chunks = [chunk.strip() for chunk in raw_chunks if len(chunk.strip()) > 2]
-    if not chunks:
-        chunks = [transcription]
-
-    detected_intents = set()
-    best_distance = None
-    best_metadata = None
-
-    # 3. Querying the Vector Database
-    for chunk in chunks:
-        results = vector_service.search_exercises(
-            query_text=chunk, 
-            n_results=1,
-            filter_metadata=step_filter  # Applies None or the strict dictionary
-        )
-        
-        distances = results.get("distances") or []
-        metadatas = results.get("metadatas") or []
-
-        if distances and distances[0] and metadatas and metadatas[0]:
-            distance = distances[0][0]
-            metadata = metadatas[0][0]
-
-            if distance <= threshold:
-                intent = metadata.get("intent")
-                if intent:
-                    detected_intents.add(intent)
-                    
-                    if best_distance is None or distance < best_distance:
-                        best_distance = distance
-                        best_metadata = metadata
-
-    is_match = len(detected_intents) > 0
-
-    return {
-        "match": is_match,
-        "intents": list(detected_intents), 
-        "distance": best_distance,
-        "metadata": best_metadata,
-        "text": transcription
-    }
+    return vector_service.classify_intent(
+        text=transcription,
+        current_step=current_step,
+        global_search=global_search,
+        threshold=threshold
+    )
 
 @app.post("/verify_order_correction/")
 async def verify_order_correction(
