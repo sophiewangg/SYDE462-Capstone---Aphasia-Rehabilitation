@@ -1,37 +1,21 @@
 import 'package:aphasia_rehab_fe/colors.dart';
-import 'package:aphasia_rehab_fe/features/session/managers/scenario_sim_manager.dart';
-import 'package:aphasia_rehab_fe/features/session/scenario_sim.dart';
+import 'package:aphasia_rehab_fe/common/scenario_overview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:provider/provider.dart';
 
-class StartButton extends StatefulWidget {
+class StartButton extends StatelessWidget {
   const StartButton({super.key});
 
   @override
-  State<StartButton> createState() => _StartButtonState();
-}
-
-class _StartButtonState extends State<StartButton> {
-  @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width:
-          double.infinity, // This forces the button to fill all available width
+      width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () async {
-          final manager = Provider.of<ScenarioSimManager>(
+        onPressed: () {
+          Navigator.push(
             context,
-            listen: false,
+            MaterialPageRoute(builder: (_) => const ScenarioOverview()),
           );
-          final config = createLocalImageConfiguration(context);
-          await manager.init(config);
-          if (context.mounted) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ScenarioSim()),
-            );
-          }
         },
         icon: SvgPicture.asset(
           'assets/icons/start_icon.svg',
@@ -41,9 +25,7 @@ class _StartButtonState extends State<StartButton> {
           ),
           width: 16,
         ),
-
         label: Text('Start', style: Theme.of(context).textTheme.titleSmall),
-
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.yellowPrimary,
           foregroundColor: AppColors.textPrimary,
@@ -53,6 +35,4 @@ class _StartButtonState extends State<StartButton> {
       ),
     );
   }
-
-  void showLoadingDialog(BuildContext context) {}
 }

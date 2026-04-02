@@ -45,6 +45,8 @@ dependencies:
   provider: ^6.1.5+1
   path_provider: ^2.1.5
 
+  video_player: ^2.8.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -92,6 +94,7 @@ flutter:
     - assets/images/okay.png
     - assets/images/frustrated.png
     - .env
+    - assets/videos/tutorial.mp4
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
