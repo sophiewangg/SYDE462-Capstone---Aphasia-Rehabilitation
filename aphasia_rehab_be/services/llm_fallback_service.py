@@ -256,7 +256,7 @@ class LLMFallbackService:
             "readyToOder": self.ready_to_order,
             "appetizers": self.appetizers,
             "entrees": self.entrees,
-            "steakDoness": self.steak_doneness,
+            "steakDoneness": self.steak_doneness,
             "sideChoice": self.side_choice,
             "isThatAll": self.is_that_all,
             "howIsEverything": self.how_is_everything,
