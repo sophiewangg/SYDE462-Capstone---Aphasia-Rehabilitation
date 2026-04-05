@@ -15,7 +15,8 @@ class VectorService:
         
         self.collection = self.client.get_or_create_collection(
             name="therapy_exercises",
-            embedding_function=self.emb_fn
+            embedding_function=self.emb_fn,
+            #metadata={"hnsw:space": "cosine"} #to use cosine distance instead of euclidean distance
         )
 
     def add_exercise(self, exercise_id: str, text: str, metadata: dict):
@@ -37,8 +38,8 @@ class VectorService:
         """
         Handles chunking, filtering logic, and searching for the best intent match.
         """
-        if len(text.strip().split()) == 3 and current_step:
-            logger.info(f"🔒 Single-word utterance detected ('{text.strip()}'). Forcing local search.")
+        if len(text.strip().split()) <= 3 and current_step:
+            logger.info(f"🔒 Short utterance detected ('{text.strip()}'). Forcing local search.")
             global_search = False
 
         step_filter = {"step": current_step} if (current_step and not global_search) else None
