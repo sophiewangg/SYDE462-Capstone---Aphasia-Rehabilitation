@@ -4,7 +4,8 @@ import 'package:aphasia_rehab_fe/models/scenario_step.dart';
 import 'package:http/http.dart' as http;
 
 class PromptService {
-  final String baseUrl = "http://127.0.0.1:8000";
+  // final String baseUrl = "http://127.0.0.1:8000";
+  final String baseUrl = "https://clotilde-squaretoed-fredrick.ngrok-free.dev";
 
   Future<Prompt> fetchPrompt(ScenarioStep scenarioStep) async {
     try {

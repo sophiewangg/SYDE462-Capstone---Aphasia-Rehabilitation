@@ -767,7 +767,17 @@ class ScenarioSimManager extends ChangeNotifier {
       await _overridePlayer.setFilePath(filePath);
     }
 
+    // Start playing
     await _overridePlayer.play();
+
+    // 1. Wait for the audio to actually finish
+    // We listen to the processingState stream and wait for the 'completed' event
+    await _overridePlayer.processingStateStream.firstWhere(
+      (state) => state == ProcessingState.completed,
+    );
+
+    // 2. Optional: Reset the player position so it's ready for next time
+    await _overridePlayer.stop();
   }
 
   Future<void> clearAudioCache() async {

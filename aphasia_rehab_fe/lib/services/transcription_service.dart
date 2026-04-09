@@ -6,9 +6,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class TranscriptionResult {
   final String text;
 
-  TranscriptionResult({
-    required this.text,
-  });
+  TranscriptionResult({required this.text});
 }
 
 class TranscriptionService {
@@ -20,7 +18,10 @@ class TranscriptionService {
   final _textController = StreamController<TranscriptionResult>.broadcast();
   Stream<TranscriptionResult> get transcriptionStream => _textController.stream;
 
-  final String backendUrl = "ws://localhost:8000/ws/transcribe";
+  // final String backendUrl = "ws://localhost:8000/ws/transcribe";
+
+  final String backendUrl =
+      "wss://clotilde-squaretoed-fredrick.ngrok-free.dev/ws/transcribe";
 
   Future<void> startStreaming() async {
     try {
@@ -39,11 +40,7 @@ class TranscriptionService {
           try {
             final data = jsonDecode(message);
             if (!_textController.isClosed) {
-              _textController.add(
-                TranscriptionResult(
-                  text: data['text'],
-                ),
-              );
+              _textController.add(TranscriptionResult(text: data['text']));
             }
           } catch (e) {
             print("Error parsing transcript: $e");
